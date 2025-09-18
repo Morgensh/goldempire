@@ -6,8 +6,8 @@
   <title>Business Empire Richman</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"/>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
-    /* Existing styles unchanged */
     :root {
       /* Светлая тема по умолчанию */
       --bg-primary: #f0f4f8;
@@ -404,13 +404,25 @@
       font-size: 32px;
       font-weight: bold;
       color: #000;
-      object-fit: cover; /* For img */
+      object-fit: cover;
+    }
+
+    .profile-avatar img {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
     }
 
     .profile-name {
       font-size: 22px;
       font-weight: 700;
       color: var(--text-primary);
+    }
+
+    .profile-username {
+      font-size: 14px;
+      color: var(--text-secondary);
+      margin-top: 4px;
     }
 
     .profile-level {
@@ -437,6 +449,23 @@
     .stat-value {
       font-weight: 600;
       color: var(--text-primary);
+    }
+
+    /* Прогресс бар */
+    .progress-container {
+      width: 100%;
+      height: 8px;
+      background: var(--progress-bg);
+      border-radius: 4px;
+      overflow: hidden;
+      margin: 16px 0;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), #10b981);
+      width: 0%;
+      transition: width 0.3s ease;
     }
 
     /* Тема переключатель */
@@ -612,7 +641,7 @@
         <div class="bank-card-bottom">
           <div class="bank-card-info">
             <div class="bank-card-label">Баланс</div>
-            <div class="bank-card-balance" id="card-balance">$ 0,00</div>
+            <div class="bank-card-balance" id="card-balance">$ 65,00</div>
           </div>
           <div class="bank-card-info">
             <div class="bank-card-label">Уровень</div>
@@ -657,7 +686,7 @@
       <div class="card">
         <div class="stat-row" style="border-bottom: 1px solid var(--card-border);">
           <span class="stat-label">Баланс</span>
-          <span class="stat-value" id="wallet-balance">$ 0,00</span>
+          <span class="stat-value" id="wallet-balance">$ 65,00</span>
         </div>
         <div class="stat-row" style="border-bottom: 1px solid var(--card-border);">
           <span class="stat-label">Акции</span>
@@ -665,7 +694,7 @@
         </div>
         <div class="stat-row" style="border-bottom: none;">
           <span class="stat-label">Общая стоимость</span>
-          <span class="stat-value" id="wallet-total">$ 0,00</span>
+          <span class="stat-value" id="wallet-total">$ 65,00</span>
         </div>
       </div>
     </div>
@@ -675,15 +704,18 @@
       <h2 class="section-title">Профиль</h2>
       
       <div class="profile-header">
-        <img class="profile-avatar" id="profile-avatar" src="" alt="Avatar">
-        <div class="profile-name" id="profile-name">Richman Player (from Telegram)</div>
+        <div class="profile-avatar" id="profile-avatar">
+          <img id="avatar-img" src="" alt="Avatar" style="display: none;">
+        </div>
+        <div class="profile-name" id="profile-name">Richman Player</div>
+        <div class="profile-username" id="profile-username">@username</div>
         <div class="profile-level">Уровень <span id="profile-level">1</span></div>
       </div>
 
       <div class="card">
         <div class="stat-row">
           <span class="stat-label">ID игрока</span>
-          <span class="stat-value" id="profile-id">Loading...</span>
+          <span class="stat-value" id="player-id">#74291</span>
         </div>
         <div class="stat-row">
           <span class="stat-label">Всего кликов</span>
@@ -691,7 +723,7 @@
         </div>
         <div class="stat-row">
           <span class="stat-label">Прогресс до следующего уровня</span>
-          <span class="stat-value" id="progress-percent">0%</span>
+          <span class="stat-value" id="progress-percent">60%</span>
         </div>
       </div>
       
@@ -699,7 +731,7 @@
         <div class="progress-container">
           <div class="progress-fill" id="progress-fill"></div>
         </div>
-        <div class="stat-label" style="text-align: center; margin-top: 8px;" id="progress-text">$0 / $1 000</div>
+        <div class="stat-label" style="text-align: center; margin-top: 8px;" id="progress-text">$1 000,00 / $2 000,00</div>
       </div>
       
       <div class="card">
@@ -740,14 +772,20 @@
   <div id="toast"></div>
 
   <script>
+    // Telegram WebApp init
+    const tg = window.Telegram.WebApp;
+    tg.ready();
+    tg.expand();
+
     // Глобальные переменные
-    let balance = 0;
+    let userData = tg.initDataUnsafe.user || {};
+    let telegramId = userData.id || 0;
+    let balance = 65.00;
     let clickValue = 2.50;
     let level = 1;
-    let progress = 0;
+    let progress = 600; // из 1000
     let totalClicks = 0;
-    let user = null;
-    let syncInterval = null;
+    let apiBase = 'https://dinod.ru/api'; // Use your domain
 
     // DOM элементы
     const themeToggle = document.getElementById('theme-toggle');
@@ -766,83 +804,52 @@
     const totalClicksEl = document.getElementById('total-clicks');
     const profileAvatarEl = document.getElementById('profile-avatar');
     const profileNameEl = document.getElementById('profile-name');
-    const profileIdEl = document.getElementById('profile-id');
+    const profileUsernameEl = document.getElementById('profile-username');
+    const playerIdEl = document.getElementById('player-id');
+    const avatarImgEl = document.getElementById('avatar-img');
 
-    // Инициализация Telegram Web App
-    function initTelegram() {
-      if (window.Telegram && window.Telegram.WebApp) {
-        const webApp = window.Telegram.WebApp;
-        webApp.ready();
-        webApp.expand(); // Расширить на весь экран
-        user = webApp.initDataUnsafe.user;
-        if (user) {
-          profileIdEl.textContent = `#${user.id}`;
-          profileNameEl.textContent = `${user.username || user.first_name || 'User'} (from Telegram)`;
-          if (user.photo_url) {
-            profileAvatarEl.src = user.photo_url;
-          } else {
-            profileAvatarEl.src = ''; // Fallback to default if no photo
-            profileAvatarEl.textContent = (user.first_name || 'U')[0].toUpperCase(); // Initial
-          }
-          fetchUserData(); // Загрузить данные с сервера
-          startSync(); // Запустить синхронизацию каждые 30 сек
-        } else {
-          showToast('Не удалось получить данные Telegram. Используем локальный режим.');
-        }
-      } else {
-        showToast('Это приложение предназначено для Telegram Web App.');
-      }
-    }
-
-    // Загрузка данных пользователя с сервера
-    async function fetchUserData() {
-      if (!user) return;
+    // Load user data from server
+    async function loadUserData() {
+      if (!telegramId) return;
       try {
-        const response = await fetch(`/api/get-user?userId=${user.id}`);
-        if (response.ok) {
-          const data = await response.json();
-          balance = data.balance || 0;
-          level = data.level || 1;
-          progress = data.progress || 0;
-          totalClicks = data.total_clicks || 0;
-          clickValue = data.click_value || 2.50; // Рассчитывать на основе уровня, если нужно
-          updateUI();
-        } else {
-          showToast('Ошибка загрузки данных. Используем defaults.');
+        const response = await fetch(`${apiBase}/user/${telegramId}`);
+        const user = await response.json();
+        if (user) {
+          balance = parseFloat(user.balance) || 65.00;
+          level = user.level || 1;
+          progress = parseFloat(user.progress) || 0;
+          totalClicks = user.total_clicks || 0;
+          clickValue = 2.50 * level;
+
+          // Update profile
+          profileNameEl.textContent = user.first_name || 'Player';
+          if (user.username) {
+            profileUsernameEl.textContent = `@${user.username}`;
+          } else {
+            profileUsernameEl.textContent = '';
+          }
+          playerIdEl.textContent = `#${user.telegram_id}`;
+
+          // Avatar
+          if (user.avatar_url) {
+            avatarImgEl.src = user.avatar_url;
+            avatarImgEl.style.display = 'block';
+            profileAvatarEl.style.background = 'none';
+          } else {
+            // Fallback initials
+            const initials = (user.first_name || 'P').charAt(0).toUpperCase();
+            profileAvatarEl.innerHTML = initials;
+          }
         }
       } catch (err) {
-        showToast('Ошибка соединения с сервером.');
+        console.error('Load user error:', err);
       }
-    }
-
-    // Синхронизация баланса каждые 30 сек
-    function startSync() {
-      if (syncInterval) clearInterval(syncInterval);
-      syncInterval = setInterval(async () => {
-        if (!user) return;
-        try {
-          const response = await fetch('/api/update-balance', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ userId: user.id, balance, level, progress, totalClicks })
-          });
-          if (response.ok) {
-            // Опционально: обновить локальные данные из ответа, если сервер корректирует
-          } else {
-            showToast('Ошибка синхронизации баланса.');
-          }
-        } catch (err) {
-          showToast('Ошибка соединения при синхронизации.');
-        }
-      }, 30000); // 30 секунд
+      updateUI();
     }
 
     // Инициализация темы
     const savedTheme = localStorage.getItem('theme') || 'light';
     htmlRoot.setAttribute('data-theme', savedTheme);
-    if (savedTheme === 'dark') {
-      themeToggle.classList.add('dark');
-    }
 
     // Переключение темы
     themeToggle.addEventListener('click', () => {
@@ -870,19 +877,30 @@
       });
     });
 
-    // Кликер
-    tapCircle.addEventListener('click', () => {
-      balance += clickValue;
-      totalClicks++;
-      progress += clickValue * 10;
+    // Handle click with server sync
+    async function handleClick() {
+      if (!telegramId) return;
 
-      // Проверка на новый уровень
-      const nextLevelThreshold = level * 1000;
-      if (progress >= nextLevelThreshold) {
-        level++;
-        progress = 0;
-        clickValue = clickValue * 1.5;
-        showToast(`🎉 Новый уровень! Теперь вы зарабатываете $${clickValue.toFixed(2)} за клик`);
+      try {
+        const response = await fetch(`${apiBase}/click/${telegramId}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ balance, total_clicks: totalClicks })
+        });
+        const updatedUser = await response.json();
+        if (updatedUser) {
+          balance = parseFloat(updatedUser.balance);
+          level = updatedUser.level;
+          progress = parseFloat(updatedUser.progress);
+          totalClicks = updatedUser.total_clicks;
+          clickValue = 2.50 * level;
+
+          if (updatedUser.level > level) { // Level up check
+            showToast(`🎉 Новый уровень! Теперь вы зарабатываете $${clickValue.toFixed(2)} за клик`);
+          }
+        }
+      } catch (err) {
+        console.error('Click error:', err);
       }
 
       updateUI();
@@ -896,7 +914,23 @@
         duration: 200,
         easing: 'ease-out'
       });
-    });
+    }
+
+    tapCircle.addEventListener('click', handleClick);
+
+    // Sync balance every 30 seconds
+    setInterval(async () => {
+      if (!telegramId) return;
+      try {
+        await fetch(`${apiBase}/update-balance/${telegramId}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ balance })
+        });
+      } catch (err) {
+        console.error('Sync error:', err);
+      }
+    }, 30000);
 
     // Обновление UI
     function updateUI() {
@@ -912,7 +946,7 @@
       progressTextEl.textContent = `$${progress.toFixed(0)} / $${nextThreshold.toFixed(0)}`;
       progressPercentEl.textContent = `${progressPercent}%`;
 
-      walletTotalEl.textContent = formattedBalance;
+      walletTotalEl.textContent = '$ ' + balance.toFixed(2).replace('.', ',');
       totalClicksEl.textContent = totalClicks;
     }
 
@@ -928,8 +962,7 @@
     }
 
     // Инициализация
-    initTelegram();
-    updateUI();
+    loadUserData();
   </script>
 
 </body>
