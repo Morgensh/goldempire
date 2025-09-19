@@ -9,6 +9,7 @@
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     :root {
+      /* Светлая тема по умолчанию */
       --bg-primary: #f0f4f8;
       --bg-secondary: #ffffff;
       --text-primary: #1a1a1a;
@@ -26,13 +27,15 @@
       --border-radius: 18px;
       --transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
       
+      /* Цвета для банковской карты и биржи */
       --card-gradient-1: #1a2980;
       --card-gradient-2: #26d0ce;
       --card-chip: #c9a66b;
       --card-text: #ffffff;
-      --exchange-blue: #0f172a;
-      --success-green: #10b981;
-      --warning-red: #ef4444;
+      --stock-green: #22c55e;
+      --stock-red: #ef4444;
+      --stock-bg: #f9fafb;
+      --table-header: #f3f4f6;
     }
 
     [data-theme="dark"] {
@@ -50,13 +53,15 @@
       --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.2);
       --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.3);
       --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.4);
+      --stock-green: #22c55e;
+      --stock-red: #ef4444;
+      --stock-bg: #0f172a;
+      --table-header: #1e293b;
       
+      /* Цвета для банковской карты в темной теме */
       --card-gradient-1: #0f2027;
       --card-gradient-2: #203a43;
       --card-chip: #d4af37;
-      --exchange-blue: #f8fafc;
-      --success-green: #4FFFB0;
-      --warning-red: #f87171;
     }
 
     * {
@@ -78,22 +83,25 @@
       padding-bottom: 80px;
     }
 
+    /* Верхняя панель */
     .header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 20px;
-      background: linear-gradient(180deg, var(--bg-secondary), transparent);
+      padding: 20px 20px 12px;
+      position: relative;
+      z-index: 10;
     }
 
     .logo {
       font-size: 24px;
       font-weight: 700;
-      background: linear-gradient(90deg, var(--accent), var(--success-green));
+      background: linear-gradient(90deg, var(--accent), #10b981);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
 
+    /* Основной контент */
     .main-content {
       flex: 1;
       padding: 0 20px;
@@ -105,6 +113,7 @@
       display: none;
     }
 
+    /* Секции */
     .section {
       display: none;
       animation: fadeIn 0.5s ease;
@@ -126,6 +135,7 @@
       color: var(--text-primary);
     }
 
+    /* Карточки */
     .card {
       background: var(--card-bg);
       border-radius: var(--border-radius);
@@ -141,6 +151,7 @@
       box-shadow: var(--shadow-lg);
     }
 
+    /* Банковская карта */
     .bank-card {
       background: linear-gradient(135deg, var(--card-gradient-1), var(--card-gradient-2));
       border-radius: 18px;
@@ -156,28 +167,29 @@
       justify-content: space-between;
     }
 
-    .bank-card::before, .bank-card::after {
+    .bank-card::before {
       content: "";
       position: absolute;
-      border-radius: 50%;
-      background: rgba(255, 255, 255, 0.1);
-    }
-
-    .bank-card::before {
       top: -50px;
       right: -50px;
       width: 150px;
       height: 150px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.1);
     }
 
     .bank-card::after {
+      content: "";
+      position: absolute;
       bottom: -80px;
       right: -30px;
       width: 200px;
       height: 200px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.05);
     }
 
-    .bank-card-top, .bank-card-bottom {
+    .bank-card-top {
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -186,6 +198,7 @@
     .bank-card-logo {
       font-weight: 700;
       font-size: 20px;
+      letter-spacing: 1px;
     }
 
     .bank-card-chip {
@@ -193,17 +206,54 @@
       height: 40px;
       background: var(--card-chip);
       border-radius: 8px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .bank-card-chip::before {
+      content: "";
+      position: absolute;
+      top: 5px;
+      left: 5px;
+      right: 5px;
+      height: 10px;
+      background: rgba(0, 0, 0, 0.1);
+    }
+
+    .bank-card-chip::after {
+      content: "";
+      position: absolute;
+      top: 20px;
+      left: 5px;
+      right: 5px;
+      height: 10px;
+      background: rgba(0, 0, 0, 0.1);
     }
 
     .bank-card-number {
       font-size: 22px;
+      font-weight: 600;
       letter-spacing: 2px;
+      margin: 15px 0;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    }
+
+    .bank-card-bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+    }
+
+    .bank-card-info {
+      display: flex;
+      flex-direction: column;
     }
 
     .bank-card-label {
       font-size: 10px;
       text-transform: uppercase;
       opacity: 0.8;
+      margin-bottom: 4px;
     }
 
     .bank-card-value {
@@ -214,8 +264,10 @@
     .bank-card-balance {
       font-size: 28px;
       font-weight: 700;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     }
 
+    /* Кликер на главной */
     .clicker-area {
       display: flex;
       flex-direction: column;
@@ -236,6 +288,7 @@
       box-shadow: var(--shadow-md);
       border: 3px solid var(--accent);
       margin: 20px 0;
+      z-index: 2;
     }
 
     .tap-circle:active {
@@ -247,6 +300,16 @@
       color: var(--accent);
     }
 
+    .tap-text {
+      margin-top: 10px;
+      font-size: 16px;
+      color: var(--text-secondary);
+      text-align: center;
+      max-width: 80%;
+      line-height: 1.5;
+    }
+
+    /* Форма создания компании */
     .form-group {
       margin-bottom: 18px;
     }
@@ -271,10 +334,12 @@
     }
 
     .form-input:focus {
+      outline: none;
       border-color: var(--accent);
-      box-shadow: 0 0 0 3px var(--accent-light);
+      box-shadow: 0 0 0 3px rgba(79, 255, 176, 0.2);
     }
 
+    /* Кнопки */
     .btn {
       padding: 14px 24px;
       border-radius: 50px;
@@ -284,6 +349,7 @@
       transition: var(--transition);
       text-align: center;
       border: none;
+      outline: none;
       width: 100%;
       display: flex;
       align-items: center;
@@ -292,8 +358,8 @@
     }
 
     .btn-primary {
-      background: linear-gradient(90deg, var(--accent), var(--success-green));
-      color: #000;
+      background: linear-gradient(90deg, var(--accent), #10b981);
+      color: #000000;
       box-shadow: 0 4px 15px rgba(79, 255, 176, 0.3);
     }
 
@@ -302,15 +368,17 @@
       box-shadow: 0 6px 20px rgba(79, 255, 176, 0.5);
     }
 
-    .btn-sell {
-      background: linear-gradient(90deg, var(--warning-red), #dc2626);
-      color: #fff;
+    .btn-outline {
+      background: transparent;
+      color: var(--accent);
+      border: 2px solid var(--accent);
     }
 
-    .btn-sell:hover {
-      transform: translateY(-2px);
+    .btn-outline:hover {
+      background: var(--accent-light);
     }
 
+    /* Пустое состояние */
     .empty-state {
       text-align: center;
       padding: 40px 20px;
@@ -323,22 +391,27 @@
       opacity: 0.5;
     }
 
+    /* Профиль */
     .profile-header {
       display: flex;
       flex-direction: column;
       align-items: center;
       margin-bottom: 30px;
+      padding: 20px 0;
     }
 
     .profile-avatar {
       width: 80px;
       height: 80px;
       border-radius: 50%;
-      background: linear-gradient(45deg, var(--accent), var(--success-green));
+      background: linear-gradient(45deg, var(--accent), #10b981);
       display: flex;
       align-items: center;
       justify-content: center;
       margin-bottom: 16px;
+      font-size: 32px;
+      font-weight: bold;
+      color: #000;
       object-fit: cover;
     }
 
@@ -351,11 +424,23 @@
     .profile-name {
       font-size: 22px;
       font-weight: 700;
+      color: var(--text-primary);
     }
 
     .profile-username {
       font-size: 14px;
       color: var(--text-secondary);
+      margin-top: 4px;
+    }
+
+    .profile-level {
+      background: var(--accent-light);
+      color: var(--accent);
+      padding: 4px 12px;
+      border-radius: 50px;
+      font-size: 13px;
+      font-weight: 600;
+      margin-top: 8px;
     }
 
     .stat-row {
@@ -371,27 +456,38 @@
 
     .stat-value {
       font-weight: 600;
+      color: var(--text-primary);
     }
 
+    /* Прогресс бар */
     .progress-container {
+      width: 100%;
       height: 8px;
       background: var(--progress-bg);
       border-radius: 4px;
+      overflow: hidden;
       margin: 16px 0;
     }
 
     .progress-fill {
       height: 100%;
-      background: linear-gradient(90deg, var(--accent), var(--success-green));
+      background: linear-gradient(90deg, var(--accent), #10b981);
+      width: 0%;
       transition: width 0.3s ease;
     }
 
+    /* Тема переключатель */
     .theme-toggle-container {
       display: flex;
       align-items: center;
       justify-content: space-between;
       padding: 16px 0;
       border-bottom: 1px solid var(--card-border);
+    }
+
+    .theme-toggle-label {
+      font-size: 16px;
+      color: var(--text-primary);
     }
 
     .theme-toggle {
@@ -401,6 +497,7 @@
       background: var(--card-border);
       position: relative;
       cursor: pointer;
+      transition: var(--transition);
       display: flex;
       align-items: center;
       padding: 2px;
@@ -412,6 +509,7 @@
       height: 22px;
       border-radius: 50%;
       background: var(--bg-primary);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
       transition: var(--transition);
     }
 
@@ -419,13 +517,17 @@
       transform: translateX(24px);
     }
 
+    /* Нижняя навигация */
     .bottom-nav {
       display: flex;
       justify-content: space-around;
+      align-items: center;
       height: 72px;
       background: var(--nav-bg);
+      backdrop-filter: blur(20px);
       border-top: 1px solid var(--card-border);
       box-shadow: var(--nav-shadow);
+      padding: 0 10px;
       position: fixed;
       bottom: 0;
       left: 0;
@@ -437,9 +539,11 @@
       display: flex;
       flex-direction: column;
       align-items: center;
+      justify-content: center;
       font-size: 11px;
       color: var(--text-secondary);
       padding: 8px 0;
+      border-radius: 14px;
       transition: var(--transition);
       width: 20%;
     }
@@ -447,23 +551,47 @@
     .nav-item i {
       font-size: 22px;
       margin-bottom: 4px;
+      transition: var(--transition);
     }
 
     .nav-item.active {
       color: var(--accent);
     }
 
+    .nav-item.active i {
+      transform: translateY(-2px);
+    }
+
+    .nav-item:hover:not(.active) {
+      color: var(--text-primary);
+    }
+
+    /* Анимация пульсации */
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(79, 255, 176, 0.7); }
+      70% { box-shadow: 0 0 0 10px rgba(79, 255, 176, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(79, 255, 176, 0); }
+    }
+
+    .btn-pulse {
+      animation: pulse 2s infinite;
+    }
+
+    /* Toast уведомления */
     #toast {
       position: fixed;
       bottom: 100px;
       left: 50%;
       transform: translateX(-50%) translateY(20px);
       background: var(--card-bg);
+      color: var(--text-primary);
       padding: 12px 24px;
       border-radius: 50px;
       font-size: 14px;
+      font-weight: 500;
       z-index: 1000;
       box-shadow: var(--shadow-lg);
+      border: 1px solid var(--card-border);
       opacity: 0;
       transition: opacity 0.3s, transform 0.3s;
     }
@@ -473,59 +601,159 @@
       transform: translateX(-50%) translateY(0);
     }
 
-    /* Exchange-specific styles */
-    .company-list, .stock-list {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      gap: 16px;
-    }
-
-    .company-card, .stock-card {
-      background: linear-gradient(145deg, var(--card-bg), var(--bg-secondary));
-      cursor: pointer;
-    }
-
-    .owner-info {
+    /* Стили для бизнеса и рынка как биржи */
+    .company-list {
       display: flex;
-      align-items: center;
+      flex-direction: column;
       gap: 12px;
     }
 
-    .owner-avatar {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-    }
-
-    .price-fluctuate {
-      color: var(--success-green);
-      font-weight: 600;
-    }
-
-    .back-btn {
-      background: none;
-      color: var(--accent);
-      font-size: 16px;
+    .company-btn {
+      background: var(--stock-bg);
+      border: 1px solid var(--card-border);
+      border-radius: var(--border-radius);
+      padding: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
       cursor: pointer;
-      margin-bottom: 16px;
+      transition: var(--transition);
+      box-shadow: var(--shadow-sm);
     }
 
+    .company-btn:hover {
+      box-shadow: var(--shadow-md);
+      transform: translateY(-2px);
+    }
+
+    .company-name {
+      font-weight: 600;
+      font-size: 16px;
+    }
+
+    .company-detail {
+      display: none;
+      background: var(--card-bg);
+      border-radius: var(--border-radius);
+      padding: 20px;
+      margin-top: 16px;
+      box-shadow: var(--shadow-lg);
+      border: 1px solid var(--card-border);
+      animation: fadeIn 0.5s ease;
+    }
+
+    .company-detail.active {
+      display: block;
+    }
+
+    .stock-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 16px;
+    }
+
+    .stock-table th, .stock-table td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid var(--card-border);
+    }
+
+    .stock-table th {
+      background: var(--table-header);
+      font-weight: 600;
+      font-size: 14px;
+      text-transform: uppercase;
+    }
+
+    .stock-buy-btn {
+      background: var(--stock-green);
+      color: #ffffff;
+      padding: 8px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .stock-buy-btn:hover {
+      background: #16a34a;
+    }
+
+    .create-company-form, .release-stock-form {
+      display: none;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .create-company-form.active, .release-stock-form.active {
+      display: flex;
+    }
+
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 999;
+    }
+
+    .modal.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background: var(--card-bg);
+      padding: 24px;
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow-lg);
+      width: 90%;
+      max-width: 400px;
+    }
+
+    /* Адаптивность */
     @media (max-width: 480px) {
-      .company-list, .stock-list {
-        grid-template-columns: 1fr;
+      .bank-card {
+        height: 180px;
+        padding: 20px;
+      }
+      
+      .bank-card-number {
+        font-size: 18px;
+      }
+      
+      .bank-card-balance {
+        font-size: 24px;
+      }
+      
+      .tap-circle {
+        width: 110px;
+        height: 110px;
+      }
+      
+      .tap-icon {
+        font-size: 42px;
       }
     }
   </style>
 </head>
 <body>
 
+  <!-- Верхняя панель -->
   <div class="header">
-    <div class="logo">Richman Exchange</div>
+    <div class="logo">Richman</div>
   </div>
 
+  <!-- Основной контент -->
   <div class="main-content">
-    <!-- Home -->
+    
+    <!-- Главная (кликер) -->
     <div class="section active" id="home-section">
+      <!-- Банковская карта -->
       <div class="bank-card">
         <div class="bank-card-top">
           <div class="bank-card-logo">RICHMAN</div>
@@ -534,540 +762,577 @@
         <div class="bank-card-number">•••• •••• •••• 1234</div>
         <div class="bank-card-bottom">
           <div class="bank-card-info">
-            <div class="bank-card-label">Balance</div>
-            <div class="bank-card-balance" id="card-balance">$0.00</div>
+            <div class="bank-card-label">Баланс</div>
+            <div class="bank-card-balance" id="card-balance">$ 65,00</div>
           </div>
           <div class="bank-card-info">
-            <div class="bank-card-label">Level</div>
+            <div class="bank-card-label">Уровень</div>
             <div class="bank-card-value" id="card-level">1</div>
           </div>
         </div>
       </div>
+      
       <div class="clicker-area">
         <div class="tap-circle" id="tap-circle">
           <i class="fas fa-hand-point-up tap-icon"></i>
         </div>
-        <p class="tap-text">Tap to earn money</p>
+        <div class="tap-text">Кликайте, чтобы зарабатывать деньги</div>
       </div>
     </div>
 
-    <!-- Business -->
+    <!-- Бизнес -->
     <div class="section" id="business-section">
-      <h2 class="section-title">Business</h2>
-      <div class="btn btn-primary" id="create-company-btn">Create Company</div>
-      <div id="my-companies-list" class="company-list"></div>
-    </div>
-
-    <!-- Company Create -->
-    <div class="section" id="company-create-section">
-      <button class="back-btn" onclick="switchToSection('business')"><i class="fas fa-arrow-left"></i> Back</button>
-      <h2 class="section-title">Create Company</h2>
+      <h2 class="section-title">Бизнес</h2>
       <div class="card">
-        <div class="form-group">
-          <label class="form-label">Company Name (English letters only)</label>
-          <input class="form-input" id="company-name-input" placeholder="e.g. TechCorp">
+        <button class="btn btn-primary" id="create-company-btn">Создать компанию</button>
+        <div class="create-company-form" id="create-company-form">
+          <div class="form-group">
+            <label class="form-label" for="company-name">Название компании (только английские буквы)</label>
+            <input class="form-input" id="company-name" type="text" pattern="[A-Za-z]+" required>
+          </div>
+          <button class="btn btn-primary" id="submit-company">Создать</button>
+          <button class="btn btn-outline" id="cancel-company">Отмена</button>
         </div>
-        <div class="btn btn-primary" id="submit-create-company">Create</div>
+        <div class="company-list" id="company-list"></div>
       </div>
     </div>
 
-    <!-- Market -->
+    <!-- Рынок -->
     <div class="section" id="market-section">
-      <h2 class="section-title">Stock Market</h2>
-      <div id="market-list" class="stock-list"></div>
+      <h2 class="section-title">Рынок акций</h2>
+      <div class="card">
+        <table class="stock-table" id="stock-table">
+          <thead>
+            <tr>
+              <th>Компания</th>
+              <th>Цена</th>
+              <th>Доступно</th>
+              <th>Действие</th>
+            </tr>
+          </thead>
+          <tbody id="stock-list"></tbody>
+        </table>
+      </div>
     </div>
 
-    <!-- Wallet -->
+    <!-- Кошелек -->
     <div class="section" id="wallet-section">
-      <h2 class="section-title">Wallet</h2>
+      <h2 class="section-title">Кошелек</h2>
       <div class="card">
-        <div class="stat-row">
-          <span class="stat-label">Balance</span>
-          <span class="stat-value" id="wallet-balance">$0.00</span>
+        <div class="stat-row" style="border-bottom: 1px solid var(--card-border);">
+          <span class="stat-label">Баланс</span>
+          <span class="stat-value" id="wallet-balance">$ 65,00</span>
+        </div>
+        <div class="stat-row" style="border-bottom: 1px solid var(--card-border);">
+          <span class="stat-label">Акции</span>
+          <span class="stat-value" id="wallet-stocks">0</span>
+        </div>
+        <div class="stat-row" style="border-bottom: none;">
+          <span class="stat-label">Общая стоимость</span>
+          <span class="stat-value" id="wallet-total">$ 65,00</span>
         </div>
       </div>
-      <div id="owned-stocks-list" class="company-list"></div>
     </div>
 
-    <!-- Profile -->
+    <!-- Профиль -->
     <div class="section" id="profile-section">
-      <h2 class="section-title">Profile</h2>
+      <h2 class="section-title">Профиль</h2>
+      
       <div class="profile-header">
-        <div class="profile-avatar" id="profile-avatar"></div>
-        <div class="profile-name" id="profile-name">Player</div>
+        <div class="profile-avatar" id="profile-avatar">
+          <img id="avatar-img" src="" alt="Avatar" style="display: none;">
+        </div>
+        <div class="profile-name" id="profile-name">Richman Player</div>
         <div class="profile-username" id="profile-username">@username</div>
+        <div class="profile-level">Уровень <span id="profile-level">1</span></div>
       </div>
+
       <div class="card">
         <div class="stat-row">
-          <span class="stat-label">Level</span>
-          <span class="stat-value" id="profile-level">1</span>
+          <span class="stat-label">ID игрока</span>
+          <span class="stat-value" id="player-id">#74291</span>
         </div>
         <div class="stat-row">
-          <span class="stat-label">Total Clicks</span>
+          <span class="stat-label">Всего кликов</span>
           <span class="stat-value" id="total-clicks">0</span>
         </div>
+        <div class="stat-row">
+          <span class="stat-label">Прогресс до следующего уровня</span>
+          <span class="stat-value" id="progress-percent">60%</span>
+        </div>
       </div>
+      
+      <div class="card">
+        <div class="progress-container">
+          <div class="progress-fill" id="progress-fill"></div>
+        </div>
+        <div class="stat-label" style="text-align: center; margin-top: 8px;" id="progress-text">$1 000,00 / $2 000,00</div>
+      </div>
+      
       <div class="card">
         <div class="theme-toggle-container">
-          <div>Dark Theme</div>
+          <div class="theme-toggle-label">Темная тема</div>
           <div class="theme-toggle" id="theme-toggle"></div>
         </div>
       </div>
     </div>
 
-    <!-- Dynamic sections for company cabinets and stock pages will be added via JS -->
   </div>
 
+  <!-- Нижняя навигация -->
   <div class="bottom-nav">
     <div class="nav-item active" data-section="home">
       <i class="fas fa-home"></i>
-      <span>Home</span>
+      <span>Главная</span>
     </div>
     <div class="nav-item" data-section="business">
       <i class="fas fa-building"></i>
-      <span>Business</span>
+      <span>Бизнес</span>
     </div>
     <div class="nav-item" data-section="market">
       <i class="fas fa-chart-line"></i>
-      <span>Market</span>
+      <span>Рынок</span>
     </div>
     <div class="nav-item" data-section="wallet">
       <i class="fas fa-wallet"></i>
-      <span>Wallet</span>
+      <span>Кошелек</span>
     </div>
     <div class="nav-item" data-section="profile">
       <i class="fas fa-user"></i>
-      <span>Profile</span>
+      <span>Профиль</span>
     </div>
   </div>
 
+  <!-- Toast уведомление -->
   <div id="toast"></div>
 
+  <!-- Модал для покупки акций -->
+  <div class="modal" id="buy-modal">
+    <div class="modal-content">
+      <h3>Купить акции</h3>
+      <div class="form-group">
+        <label class="form-label" for="buy-quantity">Количество</label>
+        <input class="form-input" id="buy-quantity" type="number" min="1" required>
+      </div>
+      <button class="btn btn-primary" id="submit-buy">Купить</button>
+      <button class="btn btn-outline" id="cancel-buy">Отмена</button>
+    </div>
+  </div>
+
   <script>
+    // Telegram WebApp init
     const tg = window.Telegram.WebApp;
     tg.ready();
     tg.expand();
 
+    // Глобальные переменные
     let userData = tg.initDataUnsafe.user || {};
     let telegramId = userData.id || 0;
-    let balance = 0;
+    let balance = 65.00;
+    let clickValue = 2.50;
     let level = 1;
-    let progress = 0;
+    let progress = 600; // из 1000
     let totalClicks = 0;
-    let apiBase = 'https://dinod.ru/api'; // Update to your API
+    let apiBase = 'https://dinod.ru/api'; // Use your domain
+    let companies = [];
+    let stocks = [];
+    let userStocks = 0;
+    let currentCompanyId = null;
+    let currentStockId = null;
 
-    const elements = {
-      themeToggle: document.getElementById('theme-toggle'),
-      htmlRoot: document.getElementById('html-root'),
-      navItems: document.querySelectorAll('.nav-item'),
-      sections: document.querySelectorAll('.section'),
-      tapCircle: document.getElementById('tap-circle'),
-      cardBalance: document.getElementById('card-balance'),
-      cardLevel: document.getElementById('card-level'),
-      walletBalance: document.getElementById('wallet-balance'),
-      profileLevel: document.getElementById('profile-level'),
-      totalClicksEl: document.getElementById('total-clicks'),
-      profileAvatar: document.getElementById('profile-avatar'),
-      profileName: document.getElementById('profile-name'),
-      profileUsername: document.getElementById('profile-username'),
-      createCompanyBtn: document.getElementById('create-company-btn'),
-      myCompaniesList: document.getElementById('my-companies-list'),
-      marketList: document.getElementById('market-list'),
-      ownedStocksList: document.getElementById('owned-stocks-list'),
-      companyNameInput: document.getElementById('company-name-input'),
-      submitCreateCompany: document.getElementById('submit-create-company')
-    };
+    // DOM элементы
+    const themeToggle = document.getElementById('theme-toggle');
+    const htmlRoot = document.getElementById('html-root');
+    const navItems = document.querySelectorAll('.nav-item');
+    const sections = document.querySelectorAll('.section');
+    const tapCircle = document.getElementById('tap-circle');
+    const cardBalanceEl = document.getElementById('card-balance');
+    const cardLevelEl = document.getElementById('card-level');
+    const progressFillEl = document.getElementById('progress-fill');
+    const progressTextEl = document.getElementById('progress-text');
+    const progressPercentEl = document.getElementById('progress-percent');
+    const walletBalanceEl = document.getElementById('wallet-balance');
+    const walletStocksEl = document.getElementById('wallet-stocks');
+    const walletTotalEl = document.getElementById('wallet-total');
+    const profileLevelEl = document.getElementById('profile-level');
+    const totalClicksEl = document.getElementById('total-clicks');
+    const profileAvatarEl = document.getElementById('profile-avatar');
+    const profileNameEl = document.getElementById('profile-name');
+    const profileUsernameEl = document.getElementById('profile-username');
+    const playerIdEl = document.getElementById('player-id');
+    const avatarImgEl = document.getElementById('avatar-img');
+    const createCompanyBtn = document.getElementById('create-company-btn');
+    const createCompanyForm = document.getElementById('create-company-form');
+    const companyNameInput = document.getElementById('company-name');
+    const submitCompanyBtn = document.getElementById('submit-company');
+    const cancelCompanyBtn = document.getElementById('cancel-company');
+    const companyListEl = document.getElementById('company-list');
+    const stockListEl = document.getElementById('stock-list');
+    const buyModal = document.getElementById('buy-modal');
+    const buyQuantityInput = document.getElementById('buy-quantity');
+    const submitBuyBtn = document.getElementById('submit-buy');
+    const cancelBuyBtn = document.getElementById('cancel-buy');
 
-    // Theme init
-    const savedTheme = localStorage.getItem('theme') || 'light';
-    elements.htmlRoot.setAttribute('data-theme', savedTheme);
-
-    elements.themeToggle.addEventListener('click', () => {
-      const newTheme = elements.htmlRoot.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
-      elements.htmlRoot.setAttribute('data-theme', newTheme);
-      localStorage.setItem('theme', newTheme);
-    });
-
-    // Switch sections
-    function switchToSection(sectionId) {
-      document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));
-      elements.navItems.forEach(item => item.classList.remove('active'));
-
-      const section = document.getElementById(`${sectionId}-section`);
-      if (section) section.classList.add('active');
-      const navItem = document.querySelector(`.nav-item[data-section="${sectionId}"]`);
-      if (navItem) navItem.classList.add('active');
-
-      loadSectionData(sectionId);
-    }
-
-    elements.navItems.forEach(item => {
-      item.addEventListener('click', () => switchToSection(item.getAttribute('data-section')));
-    });
-
-    // Load user data
+    // Load user data from server
     async function loadUserData() {
       if (!telegramId) return;
       try {
-        const res = await fetch(`${apiBase}/user/${telegramId}`);
-        const user = await res.json();
-        balance = parseFloat(user.balance);
-        level = user.level;
-        progress = parseFloat(user.progress);
-        totalClicks = user.total_clicks;
+        const response = await fetch(`${apiBase}/user/${telegramId}`);
+        const user = await response.json();
+        if (user) {
+          balance = parseFloat(user.balance) || 65.00;
+          level = user.level || 1;
+          progress = parseFloat(user.progress) || 0;
+          totalClicks = user.total_clicks || 0;
+          clickValue = 2.50 * level;
 
-        elements.profileName.textContent = user.first_name || 'Player';
-        elements.profileUsername.textContent = user.username ? `@${user.username}` : '';
-        if (user.avatar_url) {
-          const img = document.createElement('img');
-          img.src = user.avatar_url;
-          elements.profileAvatar.appendChild(img);
-        } else {
-          elements.profileAvatar.textContent = (user.first_name || 'P').charAt(0).toUpperCase();
+          // Update profile
+          profileNameEl.textContent = user.first_name || 'Player';
+          if (user.username) {
+            profileUsernameEl.textContent = `@${user.username}`;
+          } else {
+            profileUsernameEl.textContent = '';
+          }
+          playerIdEl.textContent = `#${user.telegram_id}`;
+
+          // Avatar
+          if (user.avatar_url) {
+            avatarImgEl.src = user.avatar_url;
+            avatarImgEl.style.display = 'block';
+            profileAvatarEl.style.background = 'none';
+          } else {
+            // Fallback initials
+            const initials = (user.first_name || 'P').charAt(0).toUpperCase();
+            profileAvatarEl.innerHTML = initials;
+          }
         }
-
-        updateUI();
       } catch (err) {
         console.error('Load user error:', err);
       }
+      updateUI();
     }
 
-    // Update UI
-    function updateUI() {
-      const fmtBalance = `$${balance.toFixed(2)}`;
-      elements.cardBalance.textContent = fmtBalance;
-      elements.walletBalance.textContent = fmtBalance;
-      elements.cardLevel.textContent = level;
-      elements.profileLevel.textContent = level;
-      elements.totalClicksEl.textContent = totalClicks;
+    // Инициализация темы
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    htmlRoot.setAttribute('data-theme', savedTheme);
+
+    // Переключение темы
+    themeToggle.addEventListener('click', () => {
+      const currentTheme = htmlRoot.getAttribute('data-theme');
+      const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+      htmlRoot.setAttribute('data-theme', newTheme);
+      localStorage.setItem('theme', newTheme);
+    });
+
+    // Переключение разделов
+    function switchToSection(sectionId) {
+      sections.forEach(section => section.classList.remove('active'));
+      navItems.forEach(item => item.classList.remove('active'));
+      
+      document.getElementById(`${sectionId}-section`).classList.add('active');
+      document.querySelector(`.nav-item[data-section="${sectionId}"]`).classList.add('active');
+      
+      if (sectionId === 'business') loadCompanies();
+      if (sectionId === 'market') loadStocks();
+      if (sectionId === 'wallet') loadWallet();
+      updateUI();
     }
 
-    // Handle click
+    navItems.forEach(item => {
+      item.addEventListener('click', () => {
+        const sectionId = item.getAttribute('data-section');
+        switchToSection(sectionId);
+      });
+    });
+
+    // Handle click with server sync
     async function handleClick() {
+      if (!telegramId) return;
+
       try {
-        const res = await fetch(`${apiBase}/click/${telegramId}`, { method: 'POST' });
-        const user = await res.json();
-        balance = user.balance;
-        level = user.level;
-        progress = user.progress;
-        totalClicks = user.total_clicks;
-        updateUI();
+        const response = await fetch(`${apiBase}/click/${telegramId}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ balance, total_clicks: totalClicks })
+        });
+        const updatedUser = await response.json();
+        if (updatedUser) {
+          balance = parseFloat(updatedUser.balance);
+          level = updatedUser.level;
+          progress = parseFloat(updatedUser.progress);
+          totalClicks = updatedUser.total_clicks;
+          clickValue = 2.50 * level;
+
+          if (updatedUser.level > level) { // Level up check
+            showToast(`🎉 Новый уровень! Теперь вы зарабатываете $${clickValue.toFixed(2)} за клик`);
+          }
+        }
       } catch (err) {
         console.error('Click error:', err);
       }
+
+      updateUI();
+
+      // Анимация клика
+      tapCircle.animate([
+        { transform: 'scale(1)' },
+        { transform: 'scale(0.95)' },
+        { transform: 'scale(1)' }
+      ], {
+        duration: 200,
+        easing: 'ease-out'
+      });
     }
 
-    elements.tapCircle.addEventListener('click', handleClick);
+    tapCircle.addEventListener('click', handleClick);
 
-    // Load section data
-    async function loadSectionData(sectionId) {
-      if (sectionId === 'business') {
-        loadMyCompanies();
-      } else if (sectionId === 'market') {
-        loadMarket();
-      } else if (sectionId === 'wallet') {
-        loadOwnedStocks();
-      }
-    }
-
-    // Load my companies
-    async function loadMyCompanies() {
+    // Sync balance every 30 seconds
+    setInterval(async () => {
+      if (!telegramId) return;
       try {
-        const res = await fetch(`${apiBase}/my-companies/${telegramId}`);
-        const companies = await res.json();
-        elements.myCompaniesList.innerHTML = '';
-        companies.forEach(comp => {
-          const card = document.createElement('div');
-          card.classList.add('card', 'company-card');
-          card.innerHTML = `
-            <div class="owner-info">
-              <img class="owner-avatar" src="${comp.owner_avatar || ''}" alt="">
-              <div>
-                <h3>${comp.name}</h3>
-                <p>Clients: ${comp.clients_count}</p>
-              </div>
-            </div>
-          `;
-          card.addEventListener('click', () => loadCompanyCabinet(comp.id));
-          elements.myCompaniesList.appendChild(card);
-        });
-      } catch (err) {
-        console.error('Load companies error:', err);
-      }
-    }
-
-    // Create company
-    elements.createCompanyBtn.addEventListener('click', () => switchToSection('company-create'));
-
-    elements.submitCreateCompany.addEventListener('click', async () => {
-      const name = elements.companyNameInput.value.trim();
-      if (!/^[a-zA-Z]+$/.test(name)) return showToast('Invalid name: English letters only');
-      try {
-        const res = await fetch(`${apiBase}/create-company`, {
+        await fetch(`${apiBase}/update-balance/${telegramId}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ telegram_id, name })
+          body: JSON.stringify({ balance })
         });
-        if (!res.ok) throw new Error(await res.json().error);
-        showToast('Company created!');
-        elements.companyNameInput.value = '';
-        switchToSection('business');
       } catch (err) {
-        showToast(err.message);
+        console.error('Sync error:', err);
       }
-    });
+    }, 30000);
 
-    // Load company cabinet (dynamic section)
-    async function loadCompanyCabinet(companyId) {
-      try {
-        let section = document.getElementById(`company-${companyId}-section`);
-        if (!section) {
-          section = document.createElement('div');
-          section.classList.add('section');
-          section.id = `company-${companyId}-section`;
-          document.querySelector('.main-content').appendChild(section);
-        }
+    // Обновление UI
+    function updateUI() {
+      const formattedBalance = '$ ' + balance.toFixed(2).replace('.', ',');
+      cardBalanceEl.textContent = formattedBalance;
+      walletBalanceEl.textContent = formattedBalance;
+      cardLevelEl.textContent = level;
+      profileLevelEl.textContent = level;
+      
+      const nextThreshold = level * 1000;
+      const progressPercent = Math.min(100, Math.round((progress / nextThreshold) * 100));
+      progressFillEl.style.width = `${progressPercent}%`;
+      progressTextEl.textContent = `$${progress.toFixed(0)} / $${nextThreshold.toFixed(0)}`;
+      progressPercentEl.textContent = `${progressPercent}%`;
 
-        const res = await fetch(`${apiBase}/company/${companyId}`);
-        const comp = await res.json();
-
-        const maxAdditional = 1000 * comp.clients_count - (comp.issued_shares - 100000);
-        section.innerHTML = `
-          <button class="back-btn" onclick="switchToSection('business')"><i class="fas fa-arrow-left"></i> Back</button>
-          <h2 class="section-title">${comp.name} Cabinet</h2>
-          <div class="card">
-            <p>Issued Shares: ${comp.issued_shares}</p>
-            <p>Available Shares: ${comp.available_shares}</p>
-            <p>Clients: ${comp.clients_count}</p>
-            <p>Price: $${comp.current_price.toFixed(2)}</p>
-            <p>Company Balance: $${comp.balance.toFixed(2)}</p>
-          </div>
-          <div class="card">
-            <div class="form-group">
-              <label class="form-label">Issue Additional Shares (Max: ${maxAdditional})</label>
-              <input class="form-input" id="issue-amount-${companyId}" type="number" placeholder="Amount">
-            </div>
-            <div class="btn btn-primary" onclick="issueShares(${companyId})">Issue</div>
-          </div>
-          <div class="card">
-            <div class="form-group">
-              <label class="form-label">Withdraw from Company</label>
-              <input class="form-input" id="withdraw-amount-${companyId}" type="number" placeholder="Amount">
-            </div>
-            <div class="btn btn-primary" onclick="withdraw(${companyId})">Withdraw</div>
-          </div>
-        `;
-        switchToSection(`company-${companyId}`);
-      } catch (err) {
-        console.error('Load cabinet error:', err);
-      }
+      walletTotalEl.textContent = '$ ' + balance.toFixed(2).replace('.', ',');
+      totalClicksEl.textContent = totalClicks;
+      walletStocksEl.textContent = userStocks;
     }
 
-    // Issue shares
-    window.issueShares = async (companyId) => {
-      const amount = parseInt(document.getElementById(`issue-amount-${companyId}`).value);
-      if (amount <= 0) return showToast('Invalid amount');
-      try {
-        const res = await fetch(`${apiBase}/issue-shares`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ telegram_id, company_id: companyId, amount })
-        });
-        if (!res.ok) throw new Error(await res.json().error);
-        showToast('Shares issued!');
-        loadCompanyCabinet(companyId);
-      } catch (err) {
-        showToast(err.message);
-      }
-    };
-
-    // Withdraw
-    window.withdraw = async (companyId) => {
-      const amount = parseFloat(document.getElementById(`withdraw-amount-${companyId}`).value);
-      if (amount <= 0) return showToast('Invalid amount');
-      try {
-        const res = await fetch(`${apiBase}/withdraw`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ telegram_id, company_id: companyId, amount })
-        });
-        if (!res.ok) throw new Error(await res.json().error);
-        showToast('Withdrawn!');
-        loadUserData();
-        loadCompanyCabinet(companyId);
-      } catch (err) {
-        showToast(err.message);
-      }
-    };
-
-    // Load market
-    async function loadMarket() {
-      try {
-        const res = await fetch(`${apiBase}/companies`);
-        const companies = await res.json();
-        elements.marketList.innerHTML = '';
-        companies.forEach(comp => {
-          const card = document.createElement('div');
-          card.classList.add('card', 'stock-card');
-          card.innerHTML = `
-            <div class="owner-info">
-              <img class="owner-avatar" src="${comp.owner_avatar || ''}" alt="">
-              <div>
-                <h3>${comp.name}</h3>
-                <p>Owner: @${comp.owner_username || 'unknown'}</p>
-              </div>
-            </div>
-            <p>Clients: ${comp.clients_count}</p>
-            <p class="price-fluctuate">Price: $${comp.current_price.toFixed(2)}</p>
-          `;
-          card.addEventListener('click', () => loadStockPage(comp.id));
-          elements.marketList.appendChild(card);
-        });
-      } catch (err) {
-        console.error('Load market error:', err);
-      }
-    }
-
-    // Load stock page (dynamic)
-    async function loadStockPage(companyId) {
-      try {
-        let section = document.getElementById(`stock-${companyId}-section`);
-        if (!section) {
-          section = document.createElement('div');
-          section.classList.add('section');
-          section.id = `stock-${companyId}-section`;
-          document.querySelector('.main-content').appendChild(section);
-        }
-
-        const compRes = await fetch(`${apiBase}/company/${companyId}`);
-        const comp = await compRes.json();
-
-        const ownRes = await fetch(`${apiBase}/ownerships/${telegramId}`);
-        const ownerships = await ownRes.json();
-        const owned = ownerships.find(o => o.company_id == companyId)?.shares || 0;
-
-        section.innerHTML = `
-          <button class="back-btn" onclick="switchToSection('market')"><i class="fas fa-arrow-left"></i> Back</button>
-          <h2 class="section-title">${comp.name} Stock</h2>
-          <div class="card">
-            <p>Available: ${comp.available_shares}</p>
-            <p>Clients: ${comp.clients_count}</p>
-            <p>Price: $${comp.current_price.toFixed(2)}</p>
-            <p>Your Shares: ${owned}</p>
-          </div>
-          <div class="card">
-            <div class="form-group">
-              <label class="form-label">Buy Amount</label>
-              <input class="form-input" id="buy-amount-${companyId}" type="number" placeholder="Amount">
-            </div>
-            <div class="btn btn-primary" onclick="buyShares(${companyId})">Buy</div>
-          </div>
-          ${owned > 0 ? `
-            <div class="card">
-              <div class="form-group">
-                <label class="form-label">Sell Amount</label>
-                <input class="form-input" id="sell-amount-${companyId}" type="number" placeholder="Amount">
-              </div>
-              <div class="btn btn-sell" onclick="sellShares(${companyId})">Sell</div>
-            </div>
-          ` : ''}
-        `;
-        switchToSection(`stock-${companyId}`);
-      } catch (err) {
-        console.error('Load stock page error:', err);
-      }
-    }
-
-    // Buy shares
-    window.buyShares = async (companyId) => {
-      const amount = parseInt(document.getElementById(`buy-amount-${companyId}`).value);
-      if (amount <= 0) return showToast('Invalid amount');
-      try {
-        const res = await fetch(`${apiBase}/buy`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ telegram_id, company_id: companyId, amount })
-        });
-        if (!res.ok) throw new Error(await res.json().error);
-        showToast('Shares bought!');
-        loadUserData();
-        loadStockPage(companyId);
-      } catch (err) {
-        showToast(err.message);
-      }
-    };
-
-    // Sell shares
-    window.sellShares = async (companyId) => {
-      const amount = parseInt(document.getElementById(`sell-amount-${companyId}`).value);
-      if (amount <= 0) return showToast('Invalid amount');
-      try {
-        const res = await fetch(`${apiBase}/sell`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ telegram_id, company_id: companyId, amount })
-        });
-        if (!res.ok) throw new Error(await res.json().error);
-        showToast('Shares sold!');
-        loadUserData();
-        loadStockPage(companyId);
-      } catch (err) {
-        showToast(err.message);
-      }
-    };
-
-    // Load owned stocks
-    async function loadOwnedStocks() {
-      try {
-        const res = await fetch(`${apiBase}/ownerships/${telegramId}`);
-        const ownerships = await res.json();
-        elements.ownedStocksList.innerHTML = '';
-        ownerships.forEach(own => {
-          const incomeRate = (own.shares * 0.01 * own.clients_count).toFixed(2);
-          const card = document.createElement('div');
-          card.classList.add('card', 'company-card');
-          card.innerHTML = `
-            <h3>${own.name}</h3>
-            <p>Shares: ${own.shares}</p>
-            <p>Value: $${(own.shares * own.current_price).toFixed(2)}</p>
-            <p>Hourly Income: $${incomeRate}</p>
-            <div class="btn btn-sell" onclick="sellAll(${own.company_id}, ${own.shares})">Sell All</div>
-          `;
-          elements.ownedStocksList.appendChild(card);
-        });
-      } catch (err) {
-        console.error('Load owned error:', err);
-      }
-    }
-
-    // Sell all
-    window.sellAll = async (companyId, amount) => {
-      try {
-        const res = await fetch(`${apiBase}/sell`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ telegram_id, company_id: companyId, amount })
-        });
-        if (!res.ok) throw new Error(await res.json().error);
-        showToast('All shares sold!');
-        loadUserData();
-        loadOwnedStocks();
-      } catch (err) {
-        showToast(err.message);
-      }
-    };
-
-    // Toast
+    // Toast уведомления
     function showToast(message) {
       const toast = document.getElementById('toast');
       toast.textContent = message;
       toast.classList.add('show');
-      setTimeout(() => toast.classList.remove('show'), 3000);
+      
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3000);
     }
 
-    // Init
+    // Бизнес логика
+    createCompanyBtn.addEventListener('click', () => {
+      createCompanyForm.classList.add('active');
+    });
+
+    cancelCompanyBtn.addEventListener('click', () => {
+      createCompanyForm.classList.remove('active');
+      companyNameInput.value = '';
+    });
+
+    submitCompanyBtn.addEventListener('click', async () => {
+      const name = companyNameInput.value.trim();
+      if (!/^[A-Za-z]+$/.test(name)) {
+        showToast('Название должно содержать только английские буквы');
+        return;
+      }
+      try {
+        const response = await fetch(`${apiBase}/company/${telegramId}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name })
+        });
+        if (response.ok) {
+          const data = await response.json();
+          balance = data.balance;
+          showToast('Компания создана!');
+          createCompanyForm.classList.remove('active');
+          companyNameInput.value = '';
+          loadCompanies();
+          updateUI();
+        } else {
+          const err = await response.json();
+          showToast(err.error);
+        }
+      } catch (err) {
+        showToast('Ошибка создания компании');
+      }
+    });
+
+    async function loadCompanies() {
+      try {
+        const response = await fetch(`${apiBase}/companies/${telegramId}`);
+        companies = await response.json();
+        companyListEl.innerHTML = '';
+        companies.forEach(company => {
+          const btn = document.createElement('div');
+          btn.classList.add('company-btn');
+          btn.innerHTML = `<span class="company-name">${company.name}</span><i class="fas fa-chevron-right"></i>`;
+          btn.addEventListener('click', () => showCompanyDetail(company));
+          companyListEl.appendChild(btn);
+        });
+      } catch (err) {
+        showToast('Ошибка загрузки компаний');
+      }
+    }
+
+    function showCompanyDetail(company) {
+      let detailEl = document.getElementById(`detail-${company.id}`);
+      if (!detailEl) {
+        detailEl = document.createElement('div');
+        detailEl.id = `detail-${company.id}`;
+        detailEl.classList.add('company-detail');
+        detailEl.innerHTML = `
+          <h3>${company.name}</h3>
+          <p>Владелец: Вы</p>
+          <p>Акции выпущено: ${company.stocks_released || 0}</p>
+          <button class="btn btn-primary" id="release-stock-btn-${company.id}">Выпустить акции</button>
+          <div class="release-stock-form" id="release-stock-form-${company.id}">
+            <div class="form-group">
+              <label class="form-label" for="stock-quantity-${company.id}">Количество</label>
+              <input class="form-input" id="stock-quantity-${company.id}" type="number" min="1" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="stock-price-${company.id}">Цена за акцию ($)</label>
+              <input class="form-input" id="stock-price-${company.id}" type="number" min="0.01" step="0.01" required>
+            </div>
+            <button class="btn btn-primary" id="submit-release-${company.id}">Выпустить</button>
+            <button class="btn btn-outline" id="cancel-release-${company.id}">Отмена</button>
+          </div>
+        `;
+        companyListEl.appendChild(detailEl);
+
+        const releaseBtn = document.getElementById(`release-stock-btn-${company.id}`);
+        const releaseForm = document.getElementById(`release-stock-form-${company.id}`);
+        const submitRelease = document.getElementById(`submit-release-${company.id}`);
+        const cancelRelease = document.getElementById(`cancel-release-${company.id}`);
+        const quantityInput = document.getElementById(`stock-quantity-${company.id}`);
+        const priceInput = document.getElementById(`stock-price-${company.id}`);
+
+        releaseBtn.addEventListener('click', () => releaseForm.classList.add('active'));
+        cancelRelease.addEventListener('click', () => {
+          releaseForm.classList.remove('active');
+          quantityInput.value = '';
+          priceInput.value = '';
+        });
+        submitRelease.addEventListener('click', async () => {
+          const quantity = parseInt(quantityInput.value);
+          const price = parseFloat(priceInput.value);
+          if (isNaN(quantity) || quantity < 1 || isNaN(price) || price < 0.01) {
+            showToast('Неверные данные');
+            return;
+          }
+          try {
+            const response = await fetch(`${apiBase}/stock/${telegramId}`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ company_id: company.id, quantity, price })
+            });
+            if (response.ok) {
+              showToast('Акции выпущены!');
+              releaseForm.classList.remove('active');
+              quantityInput.value = '';
+              priceInput.value = '';
+              loadCompanies();
+            } else {
+              const err = await response.json();
+              showToast(err.error);
+            }
+          } catch (err) {
+            showToast('Ошибка выпуска акций');
+          }
+        });
+      }
+      detailEl.classList.toggle('active');
+    }
+
+    async function loadStocks() {
+      try {
+        const response = await fetch(`${apiBase}/stocks`);
+        stocks = await response.json();
+        stockListEl.innerHTML = '';
+        stocks.forEach(stock => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td>${stock.company_name}</td>
+            <td>$${stock.price.toFixed(2)}</td>
+            <td>${stock.available_quantity}</td>
+            <td><button class="stock-buy-btn" data-stock-id="${stock.id}">Купить</button></td>
+          `;
+          stockListEl.appendChild(row);
+        });
+        document.querySelectorAll('.stock-buy-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            currentStockId = btn.getAttribute('data-stock-id');
+            buyModal.classList.add('active');
+          });
+        });
+      } catch (err) {
+        showToast('Ошибка загрузки акций');
+      }
+    }
+
+    cancelBuyBtn.addEventListener('click', () => {
+      buyModal.classList.remove('active');
+      buyQuantityInput.value = '';
+      currentStockId = null;
+    });
+
+    submitBuyBtn.addEventListener('click', async () => {
+      const quantity = parseInt(buyQuantityInput.value);
+      if (isNaN(quantity) || quantity < 1) {
+        showToast('Неверное количество');
+        return;
+      }
+      try {
+        const response = await fetch(`${apiBase}/buy-stock/${telegramId}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ stock_id: currentStockId, quantity })
+        });
+        if (response.ok) {
+          const data = await response.json();
+          balance = data.balance;
+          userStocks += quantity;
+          showToast('Акции куплены!');
+          buyModal.classList.remove('active');
+          buyQuantityInput.value = '';
+          currentStockId = null;
+          loadStocks();
+          updateUI();
+        } else {
+          const err = await response.json();
+          showToast(err.error);
+        }
+      } catch (err) {
+        showToast('Ошибка покупки');
+      }
+    });
+
+    async function loadWallet() {
+      try {
+        const response = await fetch(`${apiBase}/wallet/${telegramId}`);
+        const data = await response.json();
+        userStocks = data.stocks || 0;
+        updateUI();
+      } catch (err) {
+        showToast('Ошибка загрузки кошелька');
+      }
+    }
+
+    // Инициализация
     loadUserData();
-    setInterval(loadUserData, 60000); // Refresh every minute for income
   </script>
+
 </body>
 </html>
