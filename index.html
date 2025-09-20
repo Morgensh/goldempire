@@ -7,210 +7,55 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
-    /* Только базовые сбросы и белый фон */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: Arial, sans-serif;
-    }
-
-    body {
-      background: white;
-      color: black;
-      min-height: 100vh;
-      padding-bottom: 72px; /* место под навигацию */
-    }
-
-    /* Простой заголовок */
-    .header {
-      padding: 20px;
-      font-size: 24px;
-      font-weight: bold;
-    }
-
-    /* Основной контент */
-    .main-content {
-      padding: 0 20px;
-    }
-
-    /* Секции — только блок/скрыто */
-    .section {
-      display: none;
-    }
-
-    .section.active {
-      display: block;
-    }
-
-    /* Карточки — просто белый фон, граница и отступы */
-    .card {
-      background: white;
-      border: 1px solid #ccc;
-      padding: 20px;
-      margin-bottom: 16px;
-    }
-
-    /* Банковская карта — просто прямоугольник */
-    .bank-card {
-      background: white;
-      border: 1px solid #ccc;
-      padding: 20px;
-      margin-bottom: 24px;
-    }
-
-    /* Кликер — просто круглая кнопка */
-    .tap-circle {
-      width: 120px;
-      height: 120px;
-      border-radius: 50%;
-      background: white;
-      border: 2px solid #ccc;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 20px auto;
-      cursor: pointer;
-    }
-
-    .tap-text {
-      text-align: center;
-      margin: 10px 0;
-    }
-
-    /* Кнопки — просто прямоугольники */
-    .btn {
-      padding: 12px;
-      background: white;
-      border: 1px solid #ccc;
-      cursor: pointer;
-      margin: 8px 0;
-      text-align: center;
-    }
-
-    /* Нижняя навигация — просто ряд иконок */
-    .bottom-nav {
-      display: flex;
-      justify-content: space-around;
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      height: 72px;
-      background: white;
-      border-top: 1px solid #ccc;
-    }
-
-    .nav-item {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      font-size: 12px;
-      padding: 8px 0;
-    }
-
-    .nav-item.active {
-      color: black;
-      font-weight: bold;
-    }
-
-    /* Toast — просто белый блок с текстом */
-    #toast {
-      position: fixed;
-      bottom: 100px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: white;
-      border: 1px solid #ccc;
-      padding: 12px 24px;
-      border-radius: 4px;
-      z-index: 1000;
-      opacity: 0;
-      transition: opacity 0.3s;
-    }
-
-    #toast.show {
-      opacity: 1;
-    }
-
-    /* Заголовки секций */
-    .section-title {
-      font-size: 22px;
-      font-weight: bold;
-      margin: 20px 0 10px;
-    }
-
-    /* Профиль — просто структура */
-    .profile-header {
-      text-align: center;
-      margin-bottom: 20px;
-    }
-
-    .profile-avatar {
-      width: 80px;
-      height: 80px;
-      border-radius: 50%;
-      background: #eee;
-      margin: 0 auto 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .profile-level, .stat-row {
-      margin: 8px 0;
-    }
-
-    .stat-row {
-      display: flex;
-      justify-content: space-between;
-      padding: 10px 0;
-      border-bottom: 1px solid #eee;
-    }
-
-    .progress-container {
-      width: 100%;
-      height: 8px;
-      background: #eee;
-      margin: 10px 0;
-    }
-
-    .progress-fill {
-      height: 100%;
-      background: #ccc;
-      width: 0%;
-    }
-
-    /* Дополнительно для форм */
-    input[type="text"], input[type="number"] {
-      width: 100%;
-      padding: 12px;
-      border: 1px solid #ccc;
-      margin: 8px 0;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
+    body { background: white; color: black; min-height: 100vh; padding-bottom: 72px; }
+    .header { padding: 20px; font-size: 24px; font-weight: bold; }
+    .main-content { padding: 0 20px; }
+    .section { display: none; }
+    .section.active { display: block; }
+    .card { background: white; border: 1px solid #ccc; padding: 20px; margin-bottom: 16px; }
+    .bank-card { background: white; border: 1px solid #ccc; padding: 20px; margin-bottom: 24px; }
+    .tap-circle { width: 120px; height: 120px; border-radius: 50%; background: white; border: 2px solid #ccc; display: flex; align-items: center; justify-content: center; margin: 20px auto; cursor: pointer; }
+    .tap-text { text-align: center; margin: 10px 0; }
+    .btn { padding: 12px; background: white; border: 1px solid #ccc; cursor: pointer; margin: 8px 0; text-align: center; }
+    .bottom-nav { display: flex; justify-content: space-around; position: fixed; bottom: 0; left: 0; right: 0; height: 72px; background: white; border-top: 1px solid #ccc; }
+    .nav-item { display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 12px; padding: 8px 0; }
+    .nav-item.active { color: black; font-weight: bold; }
+    #toast { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%); background: white; border: 1px solid #ccc; padding: 12px 24px; border-radius: 4px; z-index: 1000; opacity: 0; transition: opacity 0.3s; }
+    #toast.show { opacity: 1; }
+    .section-title { font-size: 22px; font-weight: bold; margin: 20px 0 10px; }
+    .profile-header { text-align: center; margin-bottom: 20px; }
+    .profile-avatar { width: 80px; height: 80px; border-radius: 50%; background: #eee; margin: 0 auto 10px; display: flex; align-items: center; justify-content: center; }
+    .profile-level, .stat-row { margin: 8px 0; }
+    .stat-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #eee; }
+    .progress-container { width: 100%; height: 8px; background: #eee; margin: 10px 0; }
+    .progress-fill { height: 100%; background: #ccc; width: 0%; }
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 2000; justify-content: center; align-items: center; }
+    .modal-content { background: white; padding: 20px; width: 90%; max-width: 500px; border-radius: 8px; }
+    .modal-title { font-size: 20px; font-weight: bold; margin-bottom: 16px; }
+    .input { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ccc; }
+    .company-list { margin-top: 16px; }
+    .stock-item { padding: 12px; border: 1px solid #ddd; margin: 8px 0; cursor: pointer; }
+    .wallet-stock { padding: 12px; border: 1px solid #ddd; margin: 8px 0; }
+    .profit { color: green; }
+    .loss { color: red; }
   </style>
 </head>
 <body>
 
-  <!-- Верхняя панель -->
   <div class="header">Richman</div>
 
-  <!-- Основной контент -->
   <div class="main-content">
-    
-    <!-- Главная (кликер) -->
+    <!-- Главная -->
     <div class="section active" id="home-section">
-      <!-- Банковская карта -->
       <div class="bank-card">
         <div>RICHMAN</div>
         <div>•••• •••• •••• 1234</div>
         <div>
-          <div>Баланс: <span id="card-balance">$ 0,00</span></div>
+          <div>Баланс: <span id="card-balance">$ 65,00</span></div>
           <div>Уровень: <span id="card-level">1</span></div>
         </div>
       </div>
-      
       <div class="clicker-area">
         <div class="tap-circle" id="tap-circle">
           <i class="fas fa-hand-point-up" style="font-size: 40px;"></i>
@@ -222,13 +67,14 @@
     <!-- Бизнес -->
     <div class="section" id="business-section">
       <h2 class="section-title">Бизнес</h2>
-      <div id="business-content"></div>
+      <div class="btn" id="create-company-btn">➕ Создать компанию</div>
+      <div id="company-list" class="company-list"></div>
     </div>
 
     <!-- Рынок -->
     <div class="section" id="market-section">
       <h2 class="section-title">Рынок акций</h2>
-      <div id="market-content"></div>
+      <div id="market-list"></div>
     </div>
 
     <!-- Кошелек -->
@@ -237,24 +83,23 @@
       <div class="card">
         <div class="stat-row">
           <span>Баланс</span>
-          <span id="wallet-balance">$ 0,00</span>
+          <span id="wallet-balance">$ 65,00</span>
         </div>
         <div class="stat-row">
           <span>Акции</span>
-          <span id="wallet-shares">0</span>
+          <span id="wallet-stocks-count">0</span>
         </div>
         <div class="stat-row">
           <span>Общая стоимость</span>
-          <span id="wallet-total">$ 0,00</span>
+          <span id="wallet-total">$ 65,00</span>
         </div>
       </div>
-      <div id="holdings-content"></div>
+      <div id="wallet-stocks-list"></div>
     </div>
 
     <!-- Профиль -->
     <div class="section" id="profile-section">
       <h2 class="section-title">Профиль</h2>
-      
       <div class="profile-header">
         <div class="profile-avatar" id="profile-avatar">
           <img id="avatar-img" src="" alt="Avatar" style="display: none; width: 100%; height: 100%; border-radius: 50%;">
@@ -263,11 +108,10 @@
         <div class="profile-username" id="profile-username">@username</div>
         <div class="profile-level">Уровень <span id="profile-level">1</span></div>
       </div>
-
       <div class="card">
         <div class="stat-row">
           <span>ID игрока</span>
-          <span id="player-id">#0</span>
+          <span id="player-id">#74291</span>
         </div>
         <div class="stat-row">
           <span>Всего кликов</span>
@@ -275,79 +119,89 @@
         </div>
         <div class="stat-row">
           <span>Прогресс до следующего уровня</span>
-          <span id="progress-percent">0%</span>
+          <span id="progress-percent">60%</span>
         </div>
       </div>
-      
       <div class="card">
         <div class="progress-container">
           <div class="progress-fill" id="progress-fill"></div>
         </div>
-        <div style="text-align: center; margin-top: 8px;" id="progress-text">$0 / $1 000</div>
+        <div style="text-align: center; margin-top: 8px;" id="progress-text">$1 000,00 / $2 000,00</div>
       </div>
     </div>
-
-    <!-- Личный кабинет компании (динамический) -->
-    <div class="section" id="cabinet-section">
-      <h2 class="section-title">Личный кабинет компании</h2>
-      <div id="cabinet-content"></div>
-    </div>
-
-    <!-- Детали акций (динамический) -->
-    <div class="section" id="stock-detail-section">
-      <h2 class="section-title">Детали акций</h2>
-      <div id="stock-detail-content"></div>
-    </div>
-
   </div>
 
-  <!-- Нижняя навигация -->
+  <!-- Модальные окна -->
+  <div class="modal" id="create-company-modal">
+    <div class="modal-content">
+      <div class="modal-title">Создать компанию</div>
+      <input type="text" class="input" id="company-name-input" placeholder="Название (только английские буквы)">
+      <div class="btn" id="confirm-create-company">Создать</div>
+      <div class="btn" id="cancel-create-company">Отмена</div>
+    </div>
+  </div>
+
+  <div class="modal" id="company-modal">
+    <div class="modal-content">
+      <div class="modal-title" id="company-modal-title">Личный кабинет компании</div>
+      <div>Клиентов: <span id="company-clients">0</span></div>
+      <div>Доступно к выпуску: <span id="company-available-shares">0</span></div>
+      <div class="btn" id="issue-shares-btn">Выпустить акции</div>
+      <div class="btn" id="close-company-modal">Закрыть</div>
+    </div>
+  </div>
+
+  <div class="modal" id="stock-modal">
+    <div class="modal-content">
+      <div class="modal-title" id="stock-modal-title">Купить акции</div>
+      <div>Владелец: <span id="stock-owner"></span></div>
+      <div>Клиентов: <span id="stock-clients"></span></div>
+      <div>Цена за акцию: <span id="stock-price"></span></div>
+      <input type="number" class="input" id="stock-quantity" placeholder="Количество" min="1" value="1">
+      <div class="btn" id="buy-stock-btn">Купить</div>
+      <div class="btn" id="close-stock-modal">Отмена</div>
+    </div>
+  </div>
+
   <div class="bottom-nav">
     <div class="nav-item active" data-section="home">
-      <i class="fas fa-home"></i>
-      <span>Главная</span>
+      <i class="fas fa-home"></i><span>Главная</span>
     </div>
     <div class="nav-item" data-section="business">
-      <i class="fas fa-building"></i>
-      <span>Бизнес</span>
+      <i class="fas fa-building"></i><span>Бизнес</span>
     </div>
     <div class="nav-item" data-section="market">
-      <i class="fas fa-chart-line"></i>
-      <span>Рынок</span>
+      <i class="fas fa-chart-line"></i><span>Рынок</span>
     </div>
     <div class="nav-item" data-section="wallet">
-      <i class="fas fa-wallet"></i>
-      <span>Кошелек</span>
+      <i class="fas fa-wallet"></i><span>Кошелек</span>
     </div>
     <div class="nav-item" data-section="profile">
-      <i class="fas fa-user"></i>
-      <span>Профиль</span>
+      <i class="fas fa-user"></i><span>Профиль</span>
     </div>
   </div>
 
-  <!-- Toast уведомление -->
   <div id="toast"></div>
 
   <script>
-    // Telegram WebApp init
     const tg = window.Telegram.WebApp;
     tg.ready();
     tg.expand();
 
-    // Глобальные переменные
     let userData = tg.initDataUnsafe.user || {};
     let telegramId = userData.id || 0;
-    let balance = 0.00;
+    let balance = 65.00;
     let clickValue = 2.50;
     let level = 1;
-    let progress = 0;
+    let progress = 600;
     let totalClicks = 0;
-    let apiBase = 'https://dinod.ru/api';
-    let currentSection = 'home';
-    let previousSection = '';
-    let currentCompanyId = null;
+    let companies = [];
+    let stocks = [];
+    let walletStocks = [];
 
-    // DOM элементы
+    const apiBase = 'https://dinod.ru/api';
+
+    // DOM Elements
     const navItems = document.querySelectorAll('.nav-item');
     const sections = document.querySelectorAll('.section');
     const tapCircle = document.getElementById('tap-circle');
@@ -357,7 +211,6 @@
     const progressTextEl = document.getElementById('progress-text');
     const progressPercentEl = document.getElementById('progress-percent');
     const walletBalanceEl = document.getElementById('wallet-balance');
-    const walletSharesEl = document.getElementById('wallet-shares');
     const walletTotalEl = document.getElementById('wallet-total');
     const profileLevelEl = document.getElementById('profile-level');
     const totalClicksEl = document.getElementById('total-clicks');
@@ -366,35 +219,37 @@
     const profileUsernameEl = document.getElementById('profile-username');
     const playerIdEl = document.getElementById('player-id');
     const avatarImgEl = document.getElementById('avatar-img');
-    const businessContentEl = document.getElementById('business-content');
-    const marketContentEl = document.getElementById('market-content');
-    const holdingsContentEl = document.getElementById('holdings-content');
-    const cabinetContentEl = document.getElementById('cabinet-content');
-    const stockDetailContentEl = document.getElementById('stock-detail-content');
+    const companyListEl = document.getElementById('company-list');
+    const marketListEl = document.getElementById('market-list');
+    const walletStocksListEl = document.getElementById('wallet-stocks-list');
+    const walletStocksCountEl = document.getElementById('wallet-stocks-count');
 
-    // Инициализация профиля из Telegram
-    function initProfile() {
-      profileNameEl.textContent = (userData.first_name || 'Richman') + ' ' + (userData.last_name || '');
-      profileUsernameEl.textContent = '@' + (userData.username || 'anonymous');
-      playerIdEl.textContent = '#' + telegramId;
-      if (userData.photo_url) {
-        avatarImgEl.src = userData.photo_url;
-        avatarImgEl.style.display = 'block';
-      }
-    }
+    // Modals
+    const createCompanyModal = document.getElementById('create-company-modal');
+    const companyModal = document.getElementById('company-modal');
+    const stockModal = document.getElementById('stock-modal');
+    const companyNameInput = document.getElementById('company-name-input');
+    const confirmCreateCompanyBtn = document.getElementById('confirm-create-company');
+    const cancelCreateCompanyBtn = document.getElementById('cancel-create-company');
+    const closeCompanyModalBtn = document.getElementById('close-company-modal');
+    const issueSharesBtn = document.getElementById('issue-shares-btn');
+    const closeStockModalBtn = document.getElementById('close-stock-modal');
+    const buyStockBtn = document.getElementById('buy-stock-btn');
+    const createCompanyBtn = document.getElementById('create-company-btn');
 
-    // Переключение разделов
+    // Modal Controls
+    function showModal(modal) { modal.style.display = 'flex'; }
+    function hideModal(modal) { modal.style.display = 'none'; }
+
+    // Navigation
     function switchToSection(sectionId) {
-      sections.forEach(section => section.classList.remove('active'));
-      navItems.forEach(item => item.classList.remove('active'));
-      
+      sections.forEach(s => s.classList.remove('active'));
+      navItems.forEach(n => n.classList.remove('active'));
       document.getElementById(`${sectionId}-section`).classList.add('active');
-      const navItem = document.querySelector(`.nav-item[data-section="${sectionId}"]`);
-      if (navItem) navItem.classList.add('active');
-      
-      currentSection = sectionId;
-      loadSectionContent(sectionId);
-      updateUI();
+      document.querySelector(`.nav-item[data-section="${sectionId}"]`).classList.add('active');
+      if (sectionId === 'business') loadCompanies();
+      if (sectionId === 'market') loadMarket();
+      if (sectionId === 'wallet') loadWalletStocks();
     }
 
     navItems.forEach(item => {
@@ -404,372 +259,252 @@
       });
     });
 
-    // Открытие подраздела
-    function openSubSection(subId, data) {
-      previousSection = currentSection;
-      currentCompanyId = data.companyId;
-      switchToSection(subId);
-      tg.BackButton.show();
-    }
-
-    // Обработка back button
-    tg.BackButton.onClick(() => {
-      tg.BackButton.hide();
-      switchToSection(previousSection);
-      currentCompanyId = null;
-    });
-
-    // Загрузка контента раздела
-    async function loadSectionContent(sectionId) {
-      if (sectionId === 'business') {
-        await loadBusinessContent();
-      } else if (sectionId === 'market') {
-        await loadMarketContent();
-      } else if (sectionId === 'wallet') {
-        await loadWalletContent();
-      } else if (sectionId === 'cabinet') {
-        await loadCabinetContent();
-      } else if (sectionId === 'stock-detail') {
-        await loadStockDetailContent();
-      }
-    }
-
-    // Загрузка бизнес контента
-    async function loadBusinessContent() {
-      businessContentEl.innerHTML = '';
-      try {
-        const res = await fetch(`${apiBase}/companies/user/${telegramId}`);
-        const companies = await res.json();
-        companies.forEach(comp => {
-          const btn = document.createElement('div');
-          btn.className = 'btn';
-          btn.textContent = comp.name;
-          btn.onclick = () => openSubSection('cabinet', {companyId: comp.id});
-          businessContentEl.appendChild(btn);
-        });
-
-        const count = companies.length;
-        if (count < 2) {
-          const form = document.createElement('div');
-          form.className = 'card';
-          form.innerHTML = `
-            <p>Создать компанию (${count === 0 ? 'бесплатно' : 'за $1,000,000'})</p>
-            <input type="text" id="company-name" placeholder="Название (только английские буквы)">
-            <div class="btn" id="create-company-btn">Создать</div>
-          `;
-          businessContentEl.appendChild(form);
-
-          document.getElementById('create-company-btn').onclick = async () => {
-            const name = document.getElementById('company-name').value.trim();
-            if (!/^[a-zA-Z]+$/.test(name)) {
-              showToast('Название должно содержать только английские буквы');
-              return;
-            }
-            try {
-              const res = await fetch(`${apiBase}/company`, {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({name, telegramId})
-              });
-              if (!res.ok) throw new Error(await res.text());
-              const userRes = await fetch(`${apiBase}/user/${telegramId}`);
-              const updatedUser = await userRes.json();
-              balance = updatedUser.balance;
-              showToast('Компания создана!');
-              loadBusinessContent();
-            } catch (err) {
-              showToast(err.message || 'Ошибка создания');
-            }
-          };
-        }
-      } catch (err) {
-        showToast('Ошибка загрузки');
-      }
-    }
-
-    // Загрузка рынка
-    async function loadMarketContent() {
-      marketContentEl.innerHTML = '';
-      try {
-        const res = await fetch(`${apiBase}/companies`);
-        const companies = await res.json();
-        companies.forEach(comp => {
-          const card = document.createElement('div');
-          card.className = 'card';
-          card.innerHTML = `
-            <p>Компания: ${comp.name}</p>
-            <p>Владелец: @${comp.owner_username || 'unknown'}</p>
-            <p>Клиенты: ${comp.clients_count}</p>
-            <p>Цена акции: $${comp.current_price.toFixed(2)}</p>
-          `;
-          const btn = document.createElement('div');
-          btn.className = 'btn';
-          btn.textContent = 'Купить акции';
-          btn.onclick = () => openSubSection('stock-detail', {companyId: comp.id});
-          card.appendChild(btn);
-          marketContentEl.appendChild(card);
-        });
-      } catch (err) {
-        showToast('Ошибка загрузки рынка');
-      }
-    }
-
-    // Загрузка кошелька
-    async function loadWalletContent() {
-      holdingsContentEl.innerHTML = '';
-      let totalShares = 0;
-      let totalValue = balance;
-      try {
-        const res = await fetch(`${apiBase}/holdings/${telegramId}`);
-        const holdings = await res.json();
-        holdings.forEach(hold => {
-          totalShares += hold.shares;
-          const currentValue = hold.shares * hold.current_price;
-          totalValue += currentValue;
-          const profit = currentValue - hold.total_cost;
-          const card = document.createElement('div');
-          card.className = 'card';
-          card.innerHTML = `
-            <p>Компания: ${hold.name}</p>
-            <p>Акции: ${hold.shares}</p>
-            <p>Куплено за: $${hold.average_price.toFixed(2)} в среднем</p>
-            <p>Доход: $${profit.toFixed(2)}</p>
-          `;
-          const btn = document.createElement('div');
-          btn.className = 'btn';
-          btn.textContent = 'Управлять акциями';
-          btn.onclick = () => openSubSection('stock-detail', {companyId: hold.company_id});
-          card.appendChild(btn);
-          holdingsContentEl.appendChild(card);
-        });
-        walletSharesEl.textContent = totalShares;
-        walletTotalEl.textContent = '$ ' + totalValue.toFixed(2).replace('.', ',');
-      } catch (err) {
-        showToast('Ошибка загрузки кошелька');
-      }
-    }
-
-    // Загрузка кабинета
-    async function loadCabinetContent() {
-      cabinetContentEl.innerHTML = '';
-      if (!currentCompanyId) return;
-      try {
-        const res = await fetch(`${apiBase}/company/${currentCompanyId}`);
-        const comp = await res.json();
-        if (comp.owner_id !== telegramId) {
-          showToast('Не ваша компания');
-          return;
-        }
-        const allowed = 100000 + 1000 * comp.clients_count;
-        const available = allowed - comp.issued_shares;
-        const card = document.createElement('div');
-        card.className = 'card';
-        card.innerHTML = `
-          <p>Компания: ${comp.name}</p>
-          <p>Выпущено акций: ${comp.issued_shares}</p>
-          <p>Клиенты: ${comp.clients_count}</p>
-          <p>Доступно для выпуска: ${available}</p>
-          <input type="number" id="issue-amount" placeholder="Количество для выпуска" min="1" max="${available}">
-          <div class="btn" id="issue-btn">Выпустить акции</div>
-        `;
-        cabinetContentEl.appendChild(card);
-
-        document.getElementById('issue-btn').onclick = async () => {
-          const amount = parseInt(document.getElementById('issue-amount').value);
-          if (isNaN(amount) || amount <= 0 || amount > available) {
-            showToast('Неверное количество');
-            return;
-          }
-          try {
-            const res = await fetch(`${apiBase}/issue_shares/${currentCompanyId}`, {
-              method: 'POST',
-              headers: {'Content-Type': 'application/json'},
-              body: JSON.stringify({amount, telegramId})
-            });
-            if (!res.ok) throw new Error(await res.text());
-            showToast('Акции выпущены!');
-            loadCabinetContent();
-          } catch (err) {
-            showToast(err.message || 'Ошибка выпуска');
-          }
-        };
-      } catch (err) {
-        showToast('Ошибка загрузки кабинета');
-      }
-    }
-
-    // Загрузка деталей акций
-    async function loadStockDetailContent() {
-      stockDetailContentEl.innerHTML = '';
-      if (!currentCompanyId) return;
-      try {
-        const compRes = await fetch(`${apiBase}/company/${currentCompanyId}`);
-        const comp = await compRes.json();
-        const holdRes = await fetch(`${apiBase}/holding/${telegramId}/${currentCompanyId}`);
-        const hold = await holdRes.json() || {shares: 0, total_cost: 0, average_price: 0};
-        const profit = (hold.shares * comp.current_price) - hold.total_cost;
-
-        const card = document.createElement('div');
-        card.className = 'card';
-        card.innerHTML = `
-          <p>Компания: ${comp.name}</p>
-          <p>Цена акции: $${comp.current_price.toFixed(2)}</p>
-          <p>Ваши акции: ${hold.shares}</p>
-          <p>Средняя цена покупки: $${hold.average_price.toFixed(2)}</p>
-          <p>Доход: $${profit.toFixed(2)}</p>
-        `;
-        stockDetailContentEl.appendChild(card);
-
-        // Buy form
-        const buyForm = document.createElement('div');
-        buyForm.className = 'card';
-        buyForm.innerHTML = `
-          <p>Купить акции</p>
-          <input type="number" id="buy-amount" placeholder="Количество" min="1">
-          <div class="btn" id="buy-btn">Купить</div>
-        `;
-        stockDetailContentEl.appendChild(buyForm);
-
-        document.getElementById('buy-btn').onclick = async () => {
-          const amount = parseInt(document.getElementById('buy-amount').value);
-          if (isNaN(amount) || amount <= 0) {
-            showToast('Неверное количество');
-            return;
-          }
-          try {
-            const res = await fetch(`${apiBase}/buy_shares/${currentCompanyId}`, {
-              method: 'POST',
-              headers: {'Content-Type': 'application/json'},
-              body: JSON.stringify({amount, telegramId})
-            });
-            if (!res.ok) throw new Error(await res.text());
-            const updated = await res.json();
-            balance = updated.balance;
-            showToast('Акции куплены!');
-            loadStockDetailContent();
-          } catch (err) {
-            showToast(err.message || 'Ошибка покупки');
-          }
-        };
-
-        // Sell form if has shares
-        if (hold.shares > 0) {
-          const sellForm = document.createElement('div');
-          sellForm.className = 'card';
-          sellForm.innerHTML = `
-            <p>Продать акции</p>
-            <input type="number" id="sell-amount" placeholder="Количество" min="1" max="${hold.shares}">
-            <div class="btn" id="sell-btn">Продать</div>
-          `;
-          stockDetailContentEl.appendChild(sellForm);
-
-          document.getElementById('sell-btn').onclick = async () => {
-            const amount = parseInt(document.getElementById('sell-amount').value);
-            if (isNaN(amount) || amount <= 0 || amount > hold.shares) {
-              showToast('Неверное количество');
-              return;
-            }
-            try {
-              const res = await fetch(`${apiBase}/sell_shares/${currentCompanyId}`, {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({amount, telegramId})
-              });
-              if (!res.ok) throw new Error(await res.text());
-              const updated = await res.json();
-              balance = updated.balance;
-              showToast('Акции проданы!');
-              loadStockDetailContent();
-            } catch (err) {
-              showToast(err.message || 'Ошибка продажи');
-            }
-          };
-        }
-      } catch (err) {
-        showToast('Ошибка загрузки деталей');
-      }
-    }
-
-    // Обработка клика
+    // Click Handler
     async function handleClick() {
       if (!telegramId) return;
-
       try {
-        const response = await fetch(`${apiBase}/click/${telegramId}`, {
+        const res = await fetch(`${apiBase}/click/${telegramId}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ balance, total_clicks: totalClicks })
         });
-        const updatedUser = await response.json();
-        if (updatedUser) {
-          balance = parseFloat(updatedUser.balance);
-          level = updatedUser.level;
-          progress = parseFloat(updatedUser.progress);
-          totalClicks = updatedUser.total_clicks;
+        const user = await res.json();
+        if (user) {
+          balance = parseFloat(user.balance);
+          level = user.level;
+          progress = parseFloat(user.progress);
+          totalClicks = user.total_clicks;
           clickValue = 2.50 * level;
+          updateUI();
         }
-      } catch (err) {
-        console.error('Click error:', err);
-      }
-
-      updateUI();
-
-      // Простая анимация
-      tapCircle.animate([
-        { transform: 'scale(1)' },
-        { transform: 'scale(0.95)' },
-        { transform: 'scale(1)' }
-      ], { duration: 200 });
+      } catch (err) { console.error(err); }
     }
 
     tapCircle.addEventListener('click', handleClick);
 
-    // Обновление UI
+    // UI Update
     function updateUI() {
-      const formattedBalance = '$ ' + balance.toFixed(2).replace('.', ',');
-      cardBalanceEl.textContent = formattedBalance;
-      walletBalanceEl.textContent = formattedBalance;
-      cardLevelEl.textContent = level;
-      profileLevelEl.textContent = level;
-      
-      const nextThreshold = level * 1000;
-      const progressPercent = Math.min(100, Math.round((progress / nextThreshold) * 100));
-      progressFillEl.style.width = `${progressPercent}%`;
-      progressTextEl.textContent = `$${progress.toFixed(0)} / $${nextThreshold.toFixed(0)}`;
-      progressPercentEl.textContent = `${progressPercent}%`;
-
+      const formatted = '$ ' + balance.toFixed(2).replace('.', ',');
+      cardBalanceEl.textContent = walletBalanceEl.textContent = walletTotalEl.textContent = formatted;
+      cardLevelEl.textContent = profileLevelEl.textContent = level;
+      const next = level * 1000;
+      const percent = Math.min(100, Math.round((progress / next) * 100));
+      progressFillEl.style.width = `${percent}%`;
+      progressTextEl.textContent = `$${progress.toFixed(0)} / $${next.toFixed(0)}`;
+      progressPercentEl.textContent = `${percent}%`;
       totalClicksEl.textContent = totalClicks;
-    }
-
-    // Toast уведомления
-    function showToast(message) {
-      const toast = document.getElementById('toast');
-      toast.textContent = message;
-      toast.classList.add('show');
-      setTimeout(() => {
-        toast.classList.remove('show');
-      }, 3000);
-    }
-
-    // Инициализация
-    async function init() {
-      initProfile();
-      try {
-        const res = await fetch(`${apiBase}/user/${telegramId}`);
-        const user = await res.json();
-        balance = parseFloat(user.balance);
-        level = user.level;
-        progress = parseFloat(user.progress);
-        totalClicks = user.total_clicks;
-        updateUI();
-      } catch (err) {
-        showToast('Ошибка инициализации');
+      playerIdEl.textContent = `#${telegramId}`;
+      profileNameEl.textContent = userData.first_name || 'Richman Player';
+      profileUsernameEl.textContent = userData.username ? `@${userData.username}` : '@username';
+      if (userData.photo_url) {
+        avatarImgEl.src = userData.photo_url;
+        avatarImgEl.style.display = 'block';
       }
-      tg.BackButton.hide();
     }
 
-    init();
-  </script>
+    // Toast
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 3000);
+    }
 
+    // Business
+    createCompanyBtn.addEventListener('click', () => {
+      showModal(createCompanyModal);
+    });
+
+    cancelCreateCompanyBtn.addEventListener('click', () => {
+      hideModal(createCompanyModal);
+    });
+
+    confirmCreateCompanyBtn.addEventListener('click', async () => {
+      const name = companyNameInput.value.trim();
+      if (!/^[a-zA-Z]+$/.test(name)) {
+        showToast("Только английские буквы!");
+        return;
+      }
+      try {
+        const res = await fetch(`${apiBase}/company/create`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ telegram_id: telegramId, name })
+        });
+        const result = await res.json();
+        if (result.success) {
+          showToast("Компания создана!");
+          hideModal(createCompanyModal);
+          companyNameInput.value = '';
+          loadCompanies();
+        } else {
+          showToast(result.error || "Ошибка");
+        }
+      } catch (err) {
+        console.error(err);
+        showToast("Ошибка сервера");
+      }
+    });
+
+    // Load Companies
+    async function loadCompanies() {
+      try {
+        const res = await fetch(`${apiBase}/company/list?telegram_id=${telegramId}`);
+        const data = await res.json();
+        companies = data.companies || [];
+        companyListEl.innerHTML = '';
+        companies.forEach(c => {
+          const btn = document.createElement('div');
+          btn.className = 'btn';
+          btn.textContent = c.name;
+          btn.addEventListener('click', () => openCompanyModal(c));
+          companyListEl.appendChild(btn);
+        });
+      } catch (err) { console.error(err); }
+    }
+
+    // Company Modal
+    function openCompanyModal(company) {
+      document.getElementById('company-modal-title').textContent = company.name;
+      document.getElementById('company-clients').textContent = company.clients;
+      document.getElementById('company-available-shares').textContent = company.available_shares;
+      issueSharesBtn.onclick = async () => {
+        try {
+          const res = await fetch(`${apiBase}/company/issue-shares`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ telegram_id: telegramId, company_id: company.id })
+          });
+          const result = await res.json();
+          if (result.success) {
+            showToast("Акции выпущены!");
+            openCompanyModal(company); // refresh
+            loadMarket();
+          } else {
+            showToast(result.error);
+          }
+        } catch (err) {
+          console.error(err);
+          showToast("Ошибка");
+        }
+      };
+      showModal(companyModal);
+    }
+
+    closeCompanyModalBtn.addEventListener('click', () => hideModal(companyModal));
+
+    // Market
+    async function loadMarket() {
+      try {
+        const res = await fetch(`${apiBase}/market/list`);
+        const data = await res.json();
+        stocks = data.stocks || [];
+        marketListEl.innerHTML = '';
+        stocks.forEach(s => {
+          const item = document.createElement('div');
+          item.className = 'stock-item';
+          item.innerHTML = `
+            <strong>${s.company_name}</strong><br>
+            Владелец: ${s.owner_username}<br>
+            Клиентов: ${s.clients}<br>
+            Цена: $${s.price.toFixed(2)}
+          `;
+          item.addEventListener('click', () => openStockModal(s));
+          marketListEl.appendChild(item);
+        });
+      } catch (err) { console.error(err); }
+    }
+
+    // Stock Modal
+    function openStockModal(stock) {
+      document.getElementById('stock-modal-title').textContent = stock.company_name;
+      document.getElementById('stock-owner').textContent = stock.owner_username;
+      document.getElementById('stock-clients').textContent = stock.clients;
+      document.getElementById('stock-price').textContent = `$${stock.price.toFixed(2)}`;
+      document.getElementById('stock-quantity').value = 1;
+      buyStockBtn.onclick = async () => {
+        const qty = parseInt(document.getElementById('stock-quantity').value);
+        if (qty < 1) return showToast("Минимум 1 акция");
+        try {
+          const res = await fetch(`${apiBase}/market/buy`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ telegram_id: telegramId, stock_id: stock.id, quantity: qty })
+          });
+          const result = await res.json();
+          if (result.success) {
+            showToast("Акции куплены!");
+            hideModal(stockModal);
+            loadWalletStocks();
+            loadMarket();
+            loadCompanies(); // обновить клиентов
+          } else {
+            showToast(result.error);
+          }
+        } catch (err) {
+          console.error(err);
+          showToast("Ошибка");
+        }
+      };
+      showModal(stockModal);
+    }
+
+    closeStockModalBtn.addEventListener('click', () => hideModal(stockModal));
+
+    // Wallet Stocks
+    async function loadWalletStocks() {
+      try {
+        const res = await fetch(`${apiBase}/wallet/stocks?telegram_id=${telegramId}`);
+        const data = await res.json();
+        walletStocks = data.stocks || [];
+        walletStocksListEl.innerHTML = '';
+        let totalShares = 0;
+        walletStocks.forEach(ws => {
+          totalShares += ws.quantity;
+          const item = document.createElement('div');
+          item.className = 'wallet-stock';
+          const currentPrice = ws.current_price || ws.purchase_price;
+          const profit = (currentPrice - ws.purchase_price) * ws.quantity;
+          const profitClass = profit >= 0 ? 'profit' : 'loss';
+          const profitText = profit >= 0 ? `+ $${profit.toFixed(2)}` : `- $${Math.abs(profit).toFixed(2)}`;
+          item.innerHTML = `
+            <strong>${ws.company_name}</strong> (${ws.quantity} шт.)<br>
+            Куплено за: $${ws.purchase_price.toFixed(2)}<br>
+            Сейчас: $${currentPrice.toFixed(2)}<br>
+            <span class="${profitClass}">${profitText}</span><br>
+            <button class="btn sell-btn" data-id="${ws.id}">Продать</button>
+          `;
+          walletStocksListEl.appendChild(item);
+        });
+        walletStocksCountEl.textContent = totalShares;
+        document.querySelectorAll('.sell-btn').forEach(btn => {
+          btn.addEventListener('click', async () => {
+            const id = btn.getAttribute('data-id');
+            try {
+              const res = await fetch(`${apiBase}/wallet/sell`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ telegram_id: telegramId, wallet_stock_id: id })
+              });
+              const result = await res.json();
+              if (result.success) {
+                showToast("Акции проданы!");
+                loadWalletStocks();
+                loadMarket();
+              } else {
+                showToast(result.error);
+              }
+            } catch (err) {
+              console.error(err);
+              showToast("Ошибка");
+            }
+          });
+        });
+      } catch (err) { console.error(err); }
+    }
+
+    // Init
+    updateUI();
+  </script>
 </body>
 </html>
