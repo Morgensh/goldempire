@@ -182,96 +182,15 @@
       width: 0%;
     }
 
-    /* Новый: Для компании и рынка */
-    .company-list, .market-list {
-      margin-top: 16px;
-    }
-
-    .company-item, .market-item {
-      display: flex;
-      align-items: center;
-      padding: 12px;
-      border: 1px solid #ccc;
-      margin-bottom: 8px;
-      cursor: pointer;
-    }
-
-    .company-avatar, .owner-avatar {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      background: #eee;
-      margin-right: 12px;
-    }
-
-    .company-info, .market-info {
-      flex: 1;
-    }
-
-    .company-name, .market-name {
-      font-weight: bold;
-    }
-
-    .sub-page {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: white;
-      z-index: 10;
-      overflow-y: auto;
-      padding: 20px;
-    }
-
-    .sub-page.active {
-      display: block;
-    }
-
+    /* Back button for sub-pages */
     .back-btn {
-      margin-bottom: 16px;
-      cursor: pointer;
-    }
-
-    .tab-container {
-      display: flex;
-      margin-bottom: 16px;
-    }
-
-    .tab {
-      padding: 8px 16px;
+      padding: 12px;
+      background: white;
       border: 1px solid #ccc;
       cursor: pointer;
-    }
-
-    .tab.active {
-      background: #eee;
-    }
-
-    .tab-content {
-      display: none;
-    }
-
-    .tab-content.active {
+      margin: 8px 0;
+      text-align: center;
       display: block;
-    }
-
-    .card-list {
-      margin-top: 16px;
-    }
-
-    .card-item {
-      padding: 12px;
-      border: 1px solid #ccc;
-      margin-bottom: 8px;
-    }
-
-    .owned-stock {
-      padding: 12px;
-      border: 1px solid #ccc;
-      margin-bottom: 8px;
-      cursor: pointer;
     }
   </style>
 </head>
@@ -306,14 +225,16 @@
     <!-- Бизнес -->
     <div class="section" id="business-section">
       <h2 class="section-title">Бизнес</h2>
-      <div class="btn" id="create-company-btn">Создать компанию</div>
-      <div class="company-list" id="company-list"></div>
+      <div class="card">
+        <div class="btn" id="create-company-btn">Создать компанию</div>
+        <div id="companies-list"></div>
+      </div>
     </div>
 
     <!-- Рынок -->
     <div class="section" id="market-section">
       <h2 class="section-title">Рынок акций</h2>
-      <div class="market-list" id="market-list"></div>
+      <div id="market-list"></div>
     </div>
 
     <!-- Кошелек -->
@@ -333,7 +254,7 @@
           <span id="wallet-total">$ 65,00</span>
         </div>
       </div>
-      <div class="owned-stocks" id="owned-stocks"></div>
+      <div id="wallet-shares-list"></div>
     </div>
 
     <!-- Профиль -->
@@ -372,53 +293,83 @@
       </div>
     </div>
 
-  </div>
-
-  <!-- Подстраницы -->
-  <div class="sub-page" id="create-company-page">
-    <div class="back-btn" id="create-company-back"><i class="fas fa-arrow-left"></i> Назад</div>
-    <h2>Создать компанию</h2>
-    <input type="text" id="company-name-input" placeholder="Название (английские буквы)">
-    <div class="btn" id="submit-create-company">Создать</div>
-  </div>
-
-  <div class="sub-page" id="company-dashboard-page">
-    <div class="back-btn" id="company-dashboard-back"><i class="fas fa-arrow-left"></i> Назад</div>
-    <h2 id="company-dashboard-title">Компания</h2>
-    <div class="tab-container">
-      <div class="tab active" data-tab="info">Инфо</div>
-      <div class="tab" data-tab="personnel">Персонал</div>
+    <!-- Личный кабинет компании (отдельная "страница") -->
+    <div class="section" id="company-cabinet-section">
+      <div class="back-btn" id="back-to-business">Назад в Бизнес</div>
+      <h2 class="section-title" id="company-cabinet-title">Личный кабинет компании</h2>
+      <div class="card">
+        <div class="stat-row">
+          <span>Клиенты</span>
+          <span id="company-clients">0</span>
+        </div>
+        <div class="stat-row">
+          <span>Акций выпущено</span>
+          <span id="company-issued">100000</span>
+        </div>
+        <div class="stat-row">
+          <span>Акций доступно для выпуска</span>
+          <span id="company-available-issue">0</span>
+        </div>
+        <div class="btn" id="issue-shares-btn">Выпустить акции (1000 за клиента)</div>
+      </div>
     </div>
-    <div class="tab-content active" id="company-info-tab">
-      <div>Акций доступно: <span id="company-shares-available"></span></div>
-      <div>Проданных акций: <span id="company-shares-sold"></span></div>
-      <div>Клиентов: <span id="company-clients"></span></div>
-      <div>Текущая цена: <span id="company-price"></span></div>
-      <div class="btn" id="issue-shares-btn">Выпустить новые акции (+1000 за клиента)</div>
-    </div>
-    <div class="tab-content" id="company-personnel-tab">
-      <div class="card-list" id="personnel-cards"></div>
-    </div>
-  </div>
 
-  <div class="sub-page" id="stock-trade-page">
-    <div class="back-btn" id="stock-trade-back"><i class="fas fa-arrow-left"></i> Назад</div>
-    <h2 id="stock-trade-title">Торговля акциями</h2>
-    <div>Текущая цена: <span id="stock-price"></span></div>
-    <div>Доступно акций: <span id="stock-available"></span></div>
-    <input type="number" id="buy-amount" placeholder="Количество для покупки">
-    <div class="btn" id="buy-shares-btn">Купить</div>
-    <input type="number" id="sell-amount" placeholder="Количество для продажи">
-    <div class="btn" id="sell-shares-btn">Продать</div>
-  </div>
+    <!-- Страница покупки акций (отдельная "страница") -->
+    <div class="section" id="stock-purchase-section">
+      <div class="back-btn" id="back-to-market">Назад на Рынок</div>
+      <h2 class="section-title" id="stock-purchase-title">Покупка акций</h2>
+      <div class="card">
+        <div class="stat-row">
+          <span>Владелец</span>
+          <span id="stock-owner"></span>
+        </div>
+        <div class="stat-row">
+          <span>Клиенты</span>
+          <span id="stock-clients">0</span>
+        </div>
+        <div class="stat-row">
+          <span>Цена за акцию</span>
+          <span id="stock-price">$1.00</span>
+        </div>
+        <div class="stat-row">
+          <span>Доступно акций</span>
+          <span id="stock-available">100000</span>
+        </div>
+        <input type="number" id="buy-amount" placeholder="Количество акций" min="1" style="width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc;">
+        <div class="btn" id="buy-shares-btn">Купить</div>
+      </div>
+    </div>
 
-  <div class="sub-page" id="owned-stock-detail-page">
-    <div class="back-btn" id="owned-stock-detail-back"><i class="fas fa-arrow-left"></i> Назад</div>
-    <h2 id="owned-stock-detail-title">Детали акций</h2>
-    <div>Владеете: <span id="owned-shares"></span></div>
-    <div>Текущая цена: <span id="owned-price"></span></div>
-    <div>Доход (ежедневный): <span id="owned-income"></span></div>
-    <div class="btn" id="sell-all-btn">Продать все</div>
+    <!-- Страница акций в кошельке (отдельная "страница" для продажи) -->
+    <div class="section" id="wallet-stock-detail-section">
+      <div class="back-btn" id="back-to-wallet">Назад в Кошелек</div>
+      <h2 class="section-title" id="wallet-stock-title">Детали акций</h2>
+      <div class="card">
+        <div class="stat-row">
+          <span>Компания</span>
+          <span id="wallet-company-name"></span>
+        </div>
+        <div class="stat-row">
+          <span>Ваши акции</span>
+          <span id="wallet-owned-shares">0</span>
+        </div>
+        <div class="stat-row">
+          <span>Цена покупки (ср.)</span>
+          <span id="wallet-purchase-price">$0.00</span>
+        </div>
+        <div class="stat-row">
+          <span>Текущая цена</span>
+          <span id="wallet-current-price">$0.00</span>
+        </div>
+        <div class="stat-row">
+          <span>Доход</span>
+          <span id="wallet-profit">$0.00</span>
+        </div>
+        <input type="number" id="sell-amount" placeholder="Количество для продажи" min="1" style="width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc;">
+        <div class="btn" id="sell-shares-btn">Продать</div>
+      </div>
+    </div>
+
   </div>
 
   <!-- Нижняя навигация -->
@@ -465,10 +416,6 @@
     let apiBase = 'https://dinod.ru/api';
     let currentCompanyId = null;
     let currentStockCompanyId = null;
-    let currentOwnedStockCompanyId = null;
-    let userCompanies = [];
-    let marketCompanies = [];
-    let ownedStocks = [];
 
     // DOM элементы
     const navItems = document.querySelectorAll('.nav-item');
@@ -490,41 +437,32 @@
     const playerIdEl = document.getElementById('player-id');
     const avatarImgEl = document.getElementById('avatar-img');
     const createCompanyBtn = document.getElementById('create-company-btn');
-    const companyListEl = document.getElementById('company-list');
-    const marketListEl = document.getElementById('market-list');
-    const ownedStocksEl = document.getElementById('owned-stocks');
-    const createCompanyPage = document.getElementById('create-company-page');
-    const createCompanyBack = document.getElementById('create-company-back');
-    const companyNameInput = document.getElementById('company-name-input');
-    const submitCreateCompany = document.getElementById('submit-create-company');
-    const companyDashboardPage = document.getElementById('company-dashboard-page');
-    const companyDashboardBack = document.getElementById('company-dashboard-back');
-    const companyDashboardTitle = document.getElementById('company-dashboard-title');
-    const companySharesAvailable = document.getElementById('company-shares-available');
-    const companySharesSold = document.getElementById('company-shares-sold');
+    const companiesList = document.getElementById('companies-list');
+    const marketList = document.getElementById('market-list');
+    const walletSharesList = document.getElementById('wallet-shares-list');
+    const backToBusiness = document.getElementById('back-to-business');
+    const companyCabinetTitle = document.getElementById('company-cabinet-title');
     const companyClients = document.getElementById('company-clients');
-    const companyPrice = document.getElementById('company-price');
+    const companyIssued = document.getElementById('company-issued');
+    const companyAvailableIssue = document.getElementById('company-available-issue');
     const issueSharesBtn = document.getElementById('issue-shares-btn');
-    const personnelCardsEl = document.getElementById('personnel-cards');
-    const stockTradePage = document.getElementById('stock-trade-page');
-    const stockTradeBack = document.getElementById('stock-trade-back');
-    const stockTradeTitle = document.getElementById('stock-trade-title');
+    const backToMarket = document.getElementById('back-to-market');
+    const stockPurchaseTitle = document.getElementById('stock-purchase-title');
+    const stockOwner = document.getElementById('stock-owner');
+    const stockClients = document.getElementById('stock-clients');
     const stockPrice = document.getElementById('stock-price');
     const stockAvailable = document.getElementById('stock-available');
     const buyAmount = document.getElementById('buy-amount');
     const buySharesBtn = document.getElementById('buy-shares-btn');
+    const backToWallet = document.getElementById('back-to-wallet');
+    const walletStockTitle = document.getElementById('wallet-stock-title');
+    const walletCompanyName = document.getElementById('wallet-company-name');
+    const walletOwnedShares = document.getElementById('wallet-owned-shares');
+    const walletPurchasePrice = document.getElementById('wallet-purchase-price');
+    const walletCurrentPrice = document.getElementById('wallet-current-price');
+    const walletProfit = document.getElementById('wallet-profit');
     const sellAmount = document.getElementById('sell-amount');
     const sellSharesBtn = document.getElementById('sell-shares-btn');
-    const ownedStockDetailPage = document.getElementById('owned-stock-detail-page');
-    const ownedStockDetailBack = document.getElementById('owned-stock-detail-back');
-    const ownedStockDetailTitle = document.getElementById('owned-stock-detail-title');
-    const ownedShares = document.getElementById('owned-shares');
-    const ownedPrice = document.getElementById('owned-price');
-    const ownedIncome = document.getElementById('owned-income');
-    const sellAllBtn = document.getElementById('sell-all-btn');
-
-    const tabs = companyDashboardPage.querySelectorAll('.tab');
-    const tabContents = companyDashboardPage.querySelectorAll('.tab-content');
 
     // Переключение разделов
     function switchToSection(sectionId) {
@@ -532,12 +470,10 @@
       navItems.forEach(item => item.classList.remove('active'));
       
       document.getElementById(`${sectionId}-section`).classList.add('active');
-      document.querySelector(`.nav-item[data-section="${sectionId}"]`).classList.add('active');
+      const navItem = document.querySelector(`.nav-item[data-section="${sectionId}"]`);
+      if (navItem) navItem.classList.add('active');
       
-      if (sectionId === 'business') loadUserCompanies();
-      if (sectionId === 'market') loadMarket();
-      if (sectionId === 'wallet') loadOwnedStocks();
-      updateUI();
+      updateUI(sectionId);
     }
 
     navItems.forEach(item => {
@@ -582,7 +518,7 @@
     tapCircle.addEventListener('click', handleClick);
 
     // Обновление UI
-    function updateUI() {
+    async function updateUI(sectionId = null) {
       const formattedBalance = '$ ' + balance.toFixed(2).replace('.', ',');
       cardBalanceEl.textContent = formattedBalance;
       walletBalanceEl.textContent = formattedBalance;
@@ -598,13 +534,18 @@
       walletTotalEl.textContent = formattedBalance;
       totalClicksEl.textContent = totalClicks;
 
-      // Для профиля
-      profileNameEl.textContent = userData.first_name || 'Richman Player';
-      profileUsernameEl.textContent = `@${userData.username || 'username'}`;
-      playerIdEl.textContent = `#${telegramId}`;
-      if (userData.photo_url) {
-        avatarImgEl.src = userData.photo_url;
-        avatarImgEl.style.display = 'block';
+      if (sectionId === 'business') {
+        await loadCompanies();
+      } else if (sectionId === 'market') {
+        await loadMarket();
+      } else if (sectionId === 'wallet') {
+        await loadWalletShares();
+      } else if (sectionId === 'company-cabinet') {
+        await loadCompanyCabinet(currentCompanyId);
+      } else if (sectionId === 'stock-purchase') {
+        await loadStockPurchase(currentStockCompanyId);
+      } else if (sectionId === 'wallet-stock-detail') {
+        await loadWalletStockDetail(currentStockCompanyId);
       }
     }
 
@@ -619,41 +560,16 @@
       }, 3000);
     }
 
-    // Загрузка данных пользователя
-    async function loadUserData() {
-      try {
-        const response = await fetch(`${apiBase}/user/${telegramId}`);
-        const user = await response.json();
-        if (user) {
-          balance = parseFloat(user.balance);
-          level = user.level;
-          progress = parseFloat(user.progress);
-          totalClicks = user.total_clicks;
-          clickValue = 2.50 * level;
-          updateUI();
-        }
-      } catch (err) {
-        console.error('Load user error:', err);
-      }
-    }
-
     // Создание компании
-    createCompanyBtn.addEventListener('click', () => {
-      createCompanyPage.classList.add('active');
-    });
-
-    createCompanyBack.addEventListener('click', () => {
-      createCompanyPage.classList.remove('active');
-    });
-
-    submitCreateCompany.addEventListener('click', async () => {
-      const name = companyNameInput.value.trim();
-      if (!/^[a-zA-Z0-9]+$/.test(name)) {
-        showToast('Название должно содержать только английские буквы и цифры');
+    createCompanyBtn.addEventListener('click', async () => {
+      const name = prompt('Введите название компании (только английские буквы):');
+      if (!name || !/^[a-zA-Z]+$/.test(name)) {
+        showToast('Неверное название: только английские буквы.');
         return;
       }
+
       try {
-        const response = await fetch(`${apiBase}/companies/create/${telegramId}`, {
+        const response = await fetch(`${apiBase}/company/create/${telegramId}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ name })
@@ -663,180 +579,129 @@
           showToast(result.error);
         } else {
           showToast('Компания создана!');
-          createCompanyPage.classList.remove('active');
-          loadUserCompanies();
+          balance = result.balance; // Update balance if cost deducted
+          loadCompanies();
         }
       } catch (err) {
-        showToast('Ошибка создания');
+        showToast('Ошибка создания компании.');
       }
     });
 
     // Загрузка компаний пользователя
-    async function loadUserCompanies() {
+    async function loadCompanies() {
       try {
-        const response = await fetch(`${apiBase}/companies/user/${telegramId}`);
-        userCompanies = await response.json();
-        companyListEl.innerHTML = '';
-        userCompanies.forEach(company => {
-          const item = document.createElement('div');
-          item.classList.add('company-item');
-          item.innerHTML = `
-            <div class="company-avatar"></div>
-            <div class="company-info">
-              <div class="company-name">${company.name}</div>
-              <div>Клиентов: ${company.clients_count}</div>
-            </div>
-          `;
-          item.addEventListener('click', () => {
+        const response = await fetch(`${apiBase}/companies/owned/${telegramId}`);
+        const companies = await response.json();
+        companiesList.innerHTML = '';
+        companies.forEach(company => {
+          const btn = document.createElement('div');
+          btn.classList.add('btn');
+          btn.textContent = company.name;
+          btn.addEventListener('click', () => {
             currentCompanyId = company.id;
-            loadCompanyDashboard();
-            companyDashboardPage.classList.add('active');
+            switchToSection('company-cabinet');
           });
-          companyListEl.appendChild(item);
+          companiesList.appendChild(btn);
         });
       } catch (err) {
-        console.error('Load companies error:', err);
+        showToast('Ошибка загрузки компаний.');
       }
     }
 
-    // Личный кабинет компании
-    async function loadCompanyDashboard() {
+    // Назад в бизнес
+    backToBusiness.addEventListener('click', () => switchToSection('business'));
+
+    // Загрузка личного кабинета компании
+    async function loadCompanyCabinet(companyId) {
       try {
-        const response = await fetch(`${apiBase}/companies/${currentCompanyId}`);
+        const response = await fetch(`${apiBase}/company/${companyId}/${telegramId}`);
         const company = await response.json();
-        companyDashboardTitle.textContent = company.name;
-        companySharesAvailable.textContent = company.shares_available;
-        companySharesSold.textContent = company.shares_sold;
+        if (company.error) {
+          showToast(company.error);
+          switchToSection('business');
+          return;
+        }
+        companyCabinetTitle.textContent = `Личный кабинет: ${company.name}`;
         companyClients.textContent = company.clients_count;
-        companyPrice.textContent = `$${company.current_price.toFixed(2)}`;
-
-        // Персонал (карточки)
-        const cardsResponse = await fetch(`${apiBase}/personnel/${currentCompanyId}`);
-        const cards = await cardsResponse.json();
-        personnelCardsEl.innerHTML = '';
-        cards.forEach(card => {
-          const item = document.createElement('div');
-          item.classList.add('card-item');
-          item.innerHTML = `
-            <div>${card.name} (Уровень: ${card.level})</div>
-            <div>Стоимость улучшения: $${card.upgrade_cost.toFixed(2)}</div>
-            <div class="btn upgrade-card-btn" data-card-id="${card.id}">Улучшить</div>
-          `;
-          personnelCardsEl.appendChild(item);
-        });
-
-        // Добавляем обработчики улучшения
-        personnelCardsEl.querySelectorAll('.upgrade-card-btn').forEach(btn => {
-          btn.addEventListener('click', async () => {
-            const cardId = btn.dataset.cardId;
-            try {
-              const res = await fetch(`${apiBase}/personnel/upgrade/${cardId}/${telegramId}`, { method: 'POST' });
-              const result = await res.json();
-              if (result.error) {
-                showToast(result.error);
-              } else {
-                showToast('Карточка улучшена!');
-                loadCompanyDashboard();
-                loadUserData(); // Обновить баланс
-              }
-            } catch (err) {
-              showToast('Ошибка улучшения');
-            }
-          });
-        });
+        companyIssued.textContent = company.shares_issued;
+        const availableIssue = company.clients_count * 1000 - (company.shares_issued - 100000);
+        companyAvailableIssue.textContent = Math.max(0, availableIssue);
       } catch (err) {
-        console.error('Load dashboard error:', err);
+        showToast('Ошибка загрузки кабинета.');
       }
     }
 
-    companyDashboardBack.addEventListener('click', () => {
-      companyDashboardPage.classList.remove('active');
-    });
-
-    // Выпуск новых акций
+    // Выпуск акций
     issueSharesBtn.addEventListener('click', async () => {
       try {
-        const response = await fetch(`${apiBase}/companies/issue-shares/${currentCompanyId}/${telegramId}`, { method: 'POST' });
+        const response = await fetch(`${apiBase}/company/issue/${currentCompanyId}/${telegramId}`, {
+          method: 'POST'
+        });
         const result = await response.json();
         if (result.error) {
           showToast(result.error);
         } else {
-          showToast('Новые акции выпущены!');
-          loadCompanyDashboard();
+          showToast('Акции выпущены!');
+          loadCompanyCabinet(currentCompanyId);
         }
       } catch (err) {
-        showToast('Ошибка выпуска');
+        showToast('Ошибка выпуска акций.');
       }
-    });
-
-    // Переключение табов в дашборде
-    tabs.forEach(tab => {
-      tab.addEventListener('click', () => {
-        tabs.forEach(t => t.classList.remove('active'));
-        tab.classList.add('active');
-        tabContents.forEach(c => c.classList.remove('active'));
-        document.getElementById(`company-${tab.dataset.tab}-tab`).classList.add('active');
-      });
     });
 
     // Загрузка рынка
     async function loadMarket() {
       try {
         const response = await fetch(`${apiBase}/market`);
-        marketCompanies = await response.json();
-        // Сортировка по успеху (на основе суммарного уровня карточек)
-        marketCompanies.sort((a, b) => b.success_score - a.success_score);
-        marketListEl.innerHTML = '';
-        marketCompanies.forEach(company => {
-          const item = document.createElement('div');
-          item.classList.add('market-item');
-          item.innerHTML = `
-            <img class="owner-avatar" src="${company.owner_avatar || ''}" alt="Avatar">
-            <div class="market-info">
-              <div class="market-name">${company.name} (@${company.owner_username})</div>
-              <div>Клиентов: ${company.clients_count}</div>
-              <div>Цена: $${company.current_price.toFixed(2)}</div>
-            </div>
+        const stocks = await response.json();
+        marketList.innerHTML = '';
+        stocks.forEach(stock => {
+          const card = document.createElement('div');
+          card.classList.add('card');
+          card.innerHTML = `
+            <div class="stat-row"><span>Компания</span><span>${stock.name}</span></div>
+            <div class="stat-row"><span>Владелец</span><span>${stock.owner_username || 'Unknown'}</span></div>
+            <div class="stat-row"><span>Клиенты</span><span>${stock.clients_count}</span></div>
+            <div class="stat-row"><span>Цена</span><span>$${stock.price.toFixed(2)}</span></div>
           `;
-          item.addEventListener('click', () => {
-            currentStockCompanyId = company.id;
-            loadStockTrade();
-            stockTradePage.classList.add('active');
+          card.addEventListener('click', () => {
+            currentStockCompanyId = stock.id;
+            switchToSection('stock-purchase');
           });
-          marketListEl.appendChild(item);
+          marketList.appendChild(card);
         });
       } catch (err) {
-        console.error('Load market error:', err);
+        showToast('Ошибка загрузки рынка.');
       }
     }
 
-    // Торговля акциями
-    async function loadStockTrade() {
+    // Назад на рынок
+    backToMarket.addEventListener('click', () => switchToSection('market'));
+
+    // Загрузка страницы покупки
+    async function loadStockPurchase(companyId) {
       try {
-        const response = await fetch(`${apiBase}/companies/${currentStockCompanyId}`);
-        const company = await response.json();
-        stockTradeTitle.textContent = `Акции ${company.name}`;
-        stockPrice.textContent = `$${company.current_price.toFixed(2)}`;
-        stockAvailable.textContent = company.shares_available;
-
-        // Получить owned shares для продажи
-        const ownedResponse = await fetch(`${apiBase}/stocks/owned/${telegramId}/${currentStockCompanyId}`);
-        const owned = await ownedResponse.json();
-        sellAmount.max = owned.shares_owned || 0;
+        const response = await fetch(`${apiBase}/company/${companyId}`);
+        const stock = await response.json();
+        stockPurchaseTitle.textContent = `Акции: ${stock.name}`;
+        stockOwner.textContent = stock.owner_username || 'Unknown';
+        stockClients.textContent = stock.clients_count;
+        stockPrice.textContent = `$${stock.price.toFixed(2)}`;
+        stockAvailable.textContent = stock.shares_available;
       } catch (err) {
-        console.error('Load trade error:', err);
+        showToast('Ошибка загрузки акций.');
       }
     }
 
-    stockTradeBack.addEventListener('click', () => {
-      stockTradePage.classList.remove('active');
-    });
-
+    // Покупка акций
     buySharesBtn.addEventListener('click', async () => {
       const amount = parseInt(buyAmount.value);
-      if (amount <= 0) return;
+      if (isNaN(amount) || amount <= 0) {
+        showToast('Неверное количество.');
+        return;
+      }
       try {
-        const response = await fetch(`${apiBase}/stocks/buy/${telegramId}/${currentStockCompanyId}`, {
+        const response = await fetch(`${apiBase}/shares/buy/${currentStockCompanyId}/${telegramId}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ amount })
@@ -846,20 +711,68 @@
           showToast(result.error);
         } else {
           showToast('Акции куплены!');
-          loadStockTrade();
-          loadUserData();
+          balance = result.balance;
           buyAmount.value = '';
+          loadStockPurchase(currentStockCompanyId);
+          updateUI();
         }
       } catch (err) {
-        showToast('Ошибка покупки');
+        showToast('Ошибка покупки.');
       }
     });
 
+    // Загрузка акций в кошельке
+    async function loadWalletShares() {
+      try {
+        const response = await fetch(`${apiBase}/shares/owned/${telegramId}`);
+        const shares = await response.json();
+        walletSharesList.innerHTML = '';
+        let totalShares = 0;
+        shares.forEach(share => {
+          totalShares += share.shares_owned;
+          const btn = document.createElement('div');
+          btn.classList.add('btn');
+          btn.textContent = `${share.company_name}: ${share.shares_owned} акций`;
+          btn.addEventListener('click', () => {
+            currentStockCompanyId = share.company_id;
+            switchToSection('wallet-stock-detail');
+          });
+          walletSharesList.appendChild(btn);
+        });
+        walletSharesCountEl.textContent = totalShares;
+      } catch (err) {
+        showToast('Ошибка загрузки кошелька.');
+      }
+    }
+
+    // Назад в кошелек
+    backToWallet.addEventListener('click', () => switchToSection('wallet'));
+
+    // Загрузка деталей акций в кошельке
+    async function loadWalletStockDetail(companyId) {
+      try {
+        const response = await fetch(`${apiBase}/shares/detail/${companyId}/${telegramId}`);
+        const detail = await response.json();
+        walletStockTitle.textContent = `Акции: ${detail.company_name}`;
+        walletCompanyName.textContent = detail.company_name;
+        walletOwnedShares.textContent = detail.shares_owned;
+        walletPurchasePrice.textContent = `$${detail.average_purchase_price.toFixed(2)}`;
+        walletCurrentPrice.textContent = `$${detail.current_price.toFixed(2)}`;
+        walletProfit.textContent = `$${detail.profit.toFixed(2)}`;
+      } catch (err) {
+        showToast('Ошибка загрузки деталей.');
+      }
+    }
+
+    // Продажа акций
     sellSharesBtn.addEventListener('click', async () => {
       const amount = parseInt(sellAmount.value);
-      if (amount <= 0) return;
+      if (isNaN(amount) || amount <= 0) {
+        showToast('Неверное количество.');
+        return;
+      }
       try {
-        const response = await fetch(`${apiBase}/stocks/sell/${telegramId}/${currentStockCompanyId}`, {
+        const response = await fetch(`${apiBase}/shares/sell/${currentStockCompanyId}/${telegramId}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ amount })
@@ -869,81 +782,17 @@
           showToast(result.error);
         } else {
           showToast('Акции проданы!');
-          loadStockTrade();
-          loadUserData();
+          balance = result.balance;
           sellAmount.value = '';
+          loadWalletStockDetail(currentStockCompanyId);
+          updateUI();
         }
       } catch (err) {
-        showToast('Ошибка продажи');
-      }
-    });
-
-    // Загрузка owned stocks
-    async function loadOwnedStocks() {
-      try {
-        const response = await fetch(`${apiBase}/stocks/owned/${telegramId}`);
-        ownedStocks = await response.json();
-        ownedStocksEl.innerHTML = '';
-        let totalShares = 0;
-        ownedStocks.forEach(stock => {
-          totalShares += stock.shares_owned;
-          const item = document.createElement('div');
-          item.classList.add('owned-stock');
-          item.innerHTML = `
-            <div>${stock.company_name}</div>
-            <div>Владеете: ${stock.shares_owned}</div>
-            <div>Цена: $${stock.current_price.toFixed(2)}</div>
-          `;
-          item.addEventListener('click', () => {
-            currentOwnedStockCompanyId = stock.company_id;
-            loadOwnedStockDetail();
-            ownedStockDetailPage.classList.add('active');
-          });
-          ownedStocksEl.appendChild(item);
-        });
-        walletSharesCountEl.textContent = totalShares;
-      } catch (err) {
-        console.error('Load owned stocks error:', err);
-      }
-    }
-
-    // Детали owned stock
-    async function loadOwnedStockDetail() {
-      try {
-        const response = await fetch(`${apiBase}/stocks/owned/${telegramId}/${currentOwnedStockCompanyId}`);
-        const stock = await response.json();
-        ownedStockDetailTitle.textContent = `Акции ${stock.company_name}`;
-        ownedShares.textContent = stock.shares_owned;
-        ownedPrice.textContent = `$${stock.current_price.toFixed(2)}`;
-        ownedIncome.textContent = `$${stock.daily_income.toFixed(2)}`; // Рассчитывается на бэке
-      } catch (err) {
-        console.error('Load owned detail error:', err);
-      }
-    }
-
-    ownedStockDetailBack.addEventListener('click', () => {
-      ownedStockDetailPage.classList.remove('active');
-    });
-
-    sellAllBtn.addEventListener('click', async () => {
-      try {
-        const response = await fetch(`${apiBase}/stocks/sell-all/${telegramId}/${currentOwnedStockCompanyId}`, { method: 'POST' });
-        const result = await response.json();
-        if (result.error) {
-          showToast(result.error);
-        } else {
-          showToast('Все акции проданы!');
-          ownedStockDetailPage.classList.remove('active');
-          loadOwnedStocks();
-          loadUserData();
-        }
-      } catch (err) {
-        showToast('Ошибка продажи');
+        showToast('Ошибка продажи.');
       }
     });
 
     // Инициализация
-    loadUserData();
     updateUI();
   </script>
 
