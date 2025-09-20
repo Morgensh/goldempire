@@ -181,6 +181,98 @@
       background: #ccc;
       width: 0%;
     }
+
+    /* Новый: Для компании и рынка */
+    .company-list, .market-list {
+      margin-top: 16px;
+    }
+
+    .company-item, .market-item {
+      display: flex;
+      align-items: center;
+      padding: 12px;
+      border: 1px solid #ccc;
+      margin-bottom: 8px;
+      cursor: pointer;
+    }
+
+    .company-avatar, .owner-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: #eee;
+      margin-right: 12px;
+    }
+
+    .company-info, .market-info {
+      flex: 1;
+    }
+
+    .company-name, .market-name {
+      font-weight: bold;
+    }
+
+    .sub-page {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: white;
+      z-index: 10;
+      overflow-y: auto;
+      padding: 20px;
+    }
+
+    .sub-page.active {
+      display: block;
+    }
+
+    .back-btn {
+      margin-bottom: 16px;
+      cursor: pointer;
+    }
+
+    .tab-container {
+      display: flex;
+      margin-bottom: 16px;
+    }
+
+    .tab {
+      padding: 8px 16px;
+      border: 1px solid #ccc;
+      cursor: pointer;
+    }
+
+    .tab.active {
+      background: #eee;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .card-list {
+      margin-top: 16px;
+    }
+
+    .card-item {
+      padding: 12px;
+      border: 1px solid #ccc;
+      margin-bottom: 8px;
+    }
+
+    .owned-stock {
+      padding: 12px;
+      border: 1px solid #ccc;
+      margin-bottom: 8px;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
@@ -214,17 +306,14 @@
     <!-- Бизнес -->
     <div class="section" id="business-section">
       <h2 class="section-title">Бизнес</h2>
-      <div class="card">
-        <p>Функционал бизнеса отключен</p>
-      </div>
+      <div class="btn" id="create-company-btn">Создать компанию</div>
+      <div class="company-list" id="company-list"></div>
     </div>
 
     <!-- Рынок -->
     <div class="section" id="market-section">
       <h2 class="section-title">Рынок акций</h2>
-      <div class="card">
-        <p>Функционал рынка отключен</p>
-      </div>
+      <div class="market-list" id="market-list"></div>
     </div>
 
     <!-- Кошелек -->
@@ -237,13 +326,14 @@
         </div>
         <div class="stat-row">
           <span>Акции</span>
-          <span>0</span>
+          <span id="wallet-shares-count">0</span>
         </div>
         <div class="stat-row">
           <span>Общая стоимость</span>
           <span id="wallet-total">$ 65,00</span>
         </div>
       </div>
+      <div class="owned-stocks" id="owned-stocks"></div>
     </div>
 
     <!-- Профиль -->
@@ -282,6 +372,53 @@
       </div>
     </div>
 
+  </div>
+
+  <!-- Подстраницы -->
+  <div class="sub-page" id="create-company-page">
+    <div class="back-btn" id="create-company-back"><i class="fas fa-arrow-left"></i> Назад</div>
+    <h2>Создать компанию</h2>
+    <input type="text" id="company-name-input" placeholder="Название (английские буквы)">
+    <div class="btn" id="submit-create-company">Создать</div>
+  </div>
+
+  <div class="sub-page" id="company-dashboard-page">
+    <div class="back-btn" id="company-dashboard-back"><i class="fas fa-arrow-left"></i> Назад</div>
+    <h2 id="company-dashboard-title">Компания</h2>
+    <div class="tab-container">
+      <div class="tab active" data-tab="info">Инфо</div>
+      <div class="tab" data-tab="personnel">Персонал</div>
+    </div>
+    <div class="tab-content active" id="company-info-tab">
+      <div>Акций доступно: <span id="company-shares-available"></span></div>
+      <div>Проданных акций: <span id="company-shares-sold"></span></div>
+      <div>Клиентов: <span id="company-clients"></span></div>
+      <div>Текущая цена: <span id="company-price"></span></div>
+      <div class="btn" id="issue-shares-btn">Выпустить новые акции (+1000 за клиента)</div>
+    </div>
+    <div class="tab-content" id="company-personnel-tab">
+      <div class="card-list" id="personnel-cards"></div>
+    </div>
+  </div>
+
+  <div class="sub-page" id="stock-trade-page">
+    <div class="back-btn" id="stock-trade-back"><i class="fas fa-arrow-left"></i> Назад</div>
+    <h2 id="stock-trade-title">Торговля акциями</h2>
+    <div>Текущая цена: <span id="stock-price"></span></div>
+    <div>Доступно акций: <span id="stock-available"></span></div>
+    <input type="number" id="buy-amount" placeholder="Количество для покупки">
+    <div class="btn" id="buy-shares-btn">Купить</div>
+    <input type="number" id="sell-amount" placeholder="Количество для продажи">
+    <div class="btn" id="sell-shares-btn">Продать</div>
+  </div>
+
+  <div class="sub-page" id="owned-stock-detail-page">
+    <div class="back-btn" id="owned-stock-detail-back"><i class="fas fa-arrow-left"></i> Назад</div>
+    <h2 id="owned-stock-detail-title">Детали акций</h2>
+    <div>Владеете: <span id="owned-shares"></span></div>
+    <div>Текущая цена: <span id="owned-price"></span></div>
+    <div>Доход (ежедневный): <span id="owned-income"></span></div>
+    <div class="btn" id="sell-all-btn">Продать все</div>
   </div>
 
   <!-- Нижняя навигация -->
@@ -326,6 +463,12 @@
     let progress = 600;
     let totalClicks = 0;
     let apiBase = 'https://dinod.ru/api';
+    let currentCompanyId = null;
+    let currentStockCompanyId = null;
+    let currentOwnedStockCompanyId = null;
+    let userCompanies = [];
+    let marketCompanies = [];
+    let ownedStocks = [];
 
     // DOM элементы
     const navItems = document.querySelectorAll('.nav-item');
@@ -338,6 +481,7 @@
     const progressPercentEl = document.getElementById('progress-percent');
     const walletBalanceEl = document.getElementById('wallet-balance');
     const walletTotalEl = document.getElementById('wallet-total');
+    const walletSharesCountEl = document.getElementById('wallet-shares-count');
     const profileLevelEl = document.getElementById('profile-level');
     const totalClicksEl = document.getElementById('total-clicks');
     const profileAvatarEl = document.getElementById('profile-avatar');
@@ -345,6 +489,42 @@
     const profileUsernameEl = document.getElementById('profile-username');
     const playerIdEl = document.getElementById('player-id');
     const avatarImgEl = document.getElementById('avatar-img');
+    const createCompanyBtn = document.getElementById('create-company-btn');
+    const companyListEl = document.getElementById('company-list');
+    const marketListEl = document.getElementById('market-list');
+    const ownedStocksEl = document.getElementById('owned-stocks');
+    const createCompanyPage = document.getElementById('create-company-page');
+    const createCompanyBack = document.getElementById('create-company-back');
+    const companyNameInput = document.getElementById('company-name-input');
+    const submitCreateCompany = document.getElementById('submit-create-company');
+    const companyDashboardPage = document.getElementById('company-dashboard-page');
+    const companyDashboardBack = document.getElementById('company-dashboard-back');
+    const companyDashboardTitle = document.getElementById('company-dashboard-title');
+    const companySharesAvailable = document.getElementById('company-shares-available');
+    const companySharesSold = document.getElementById('company-shares-sold');
+    const companyClients = document.getElementById('company-clients');
+    const companyPrice = document.getElementById('company-price');
+    const issueSharesBtn = document.getElementById('issue-shares-btn');
+    const personnelCardsEl = document.getElementById('personnel-cards');
+    const stockTradePage = document.getElementById('stock-trade-page');
+    const stockTradeBack = document.getElementById('stock-trade-back');
+    const stockTradeTitle = document.getElementById('stock-trade-title');
+    const stockPrice = document.getElementById('stock-price');
+    const stockAvailable = document.getElementById('stock-available');
+    const buyAmount = document.getElementById('buy-amount');
+    const buySharesBtn = document.getElementById('buy-shares-btn');
+    const sellAmount = document.getElementById('sell-amount');
+    const sellSharesBtn = document.getElementById('sell-shares-btn');
+    const ownedStockDetailPage = document.getElementById('owned-stock-detail-page');
+    const ownedStockDetailBack = document.getElementById('owned-stock-detail-back');
+    const ownedStockDetailTitle = document.getElementById('owned-stock-detail-title');
+    const ownedShares = document.getElementById('owned-shares');
+    const ownedPrice = document.getElementById('owned-price');
+    const ownedIncome = document.getElementById('owned-income');
+    const sellAllBtn = document.getElementById('sell-all-btn');
+
+    const tabs = companyDashboardPage.querySelectorAll('.tab');
+    const tabContents = companyDashboardPage.querySelectorAll('.tab-content');
 
     // Переключение разделов
     function switchToSection(sectionId) {
@@ -354,6 +534,9 @@
       document.getElementById(`${sectionId}-section`).classList.add('active');
       document.querySelector(`.nav-item[data-section="${sectionId}"]`).classList.add('active');
       
+      if (sectionId === 'business') loadUserCompanies();
+      if (sectionId === 'market') loadMarket();
+      if (sectionId === 'wallet') loadOwnedStocks();
       updateUI();
     }
 
@@ -414,6 +597,15 @@
 
       walletTotalEl.textContent = formattedBalance;
       totalClicksEl.textContent = totalClicks;
+
+      // Для профиля
+      profileNameEl.textContent = userData.first_name || 'Richman Player';
+      profileUsernameEl.textContent = `@${userData.username || 'username'}`;
+      playerIdEl.textContent = `#${telegramId}`;
+      if (userData.photo_url) {
+        avatarImgEl.src = userData.photo_url;
+        avatarImgEl.style.display = 'block';
+      }
     }
 
     // Toast уведомления
@@ -427,7 +619,331 @@
       }, 3000);
     }
 
+    // Загрузка данных пользователя
+    async function loadUserData() {
+      try {
+        const response = await fetch(`${apiBase}/user/${telegramId}`);
+        const user = await response.json();
+        if (user) {
+          balance = parseFloat(user.balance);
+          level = user.level;
+          progress = parseFloat(user.progress);
+          totalClicks = user.total_clicks;
+          clickValue = 2.50 * level;
+          updateUI();
+        }
+      } catch (err) {
+        console.error('Load user error:', err);
+      }
+    }
+
+    // Создание компании
+    createCompanyBtn.addEventListener('click', () => {
+      createCompanyPage.classList.add('active');
+    });
+
+    createCompanyBack.addEventListener('click', () => {
+      createCompanyPage.classList.remove('active');
+    });
+
+    submitCreateCompany.addEventListener('click', async () => {
+      const name = companyNameInput.value.trim();
+      if (!/^[a-zA-Z0-9]+$/.test(name)) {
+        showToast('Название должно содержать только английские буквы и цифры');
+        return;
+      }
+      try {
+        const response = await fetch(`${apiBase}/companies/create/${telegramId}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name })
+        });
+        const result = await response.json();
+        if (result.error) {
+          showToast(result.error);
+        } else {
+          showToast('Компания создана!');
+          createCompanyPage.classList.remove('active');
+          loadUserCompanies();
+        }
+      } catch (err) {
+        showToast('Ошибка создания');
+      }
+    });
+
+    // Загрузка компаний пользователя
+    async function loadUserCompanies() {
+      try {
+        const response = await fetch(`${apiBase}/companies/user/${telegramId}`);
+        userCompanies = await response.json();
+        companyListEl.innerHTML = '';
+        userCompanies.forEach(company => {
+          const item = document.createElement('div');
+          item.classList.add('company-item');
+          item.innerHTML = `
+            <div class="company-avatar"></div>
+            <div class="company-info">
+              <div class="company-name">${company.name}</div>
+              <div>Клиентов: ${company.clients_count}</div>
+            </div>
+          `;
+          item.addEventListener('click', () => {
+            currentCompanyId = company.id;
+            loadCompanyDashboard();
+            companyDashboardPage.classList.add('active');
+          });
+          companyListEl.appendChild(item);
+        });
+      } catch (err) {
+        console.error('Load companies error:', err);
+      }
+    }
+
+    // Личный кабинет компании
+    async function loadCompanyDashboard() {
+      try {
+        const response = await fetch(`${apiBase}/companies/${currentCompanyId}`);
+        const company = await response.json();
+        companyDashboardTitle.textContent = company.name;
+        companySharesAvailable.textContent = company.shares_available;
+        companySharesSold.textContent = company.shares_sold;
+        companyClients.textContent = company.clients_count;
+        companyPrice.textContent = `$${company.current_price.toFixed(2)}`;
+
+        // Персонал (карточки)
+        const cardsResponse = await fetch(`${apiBase}/personnel/${currentCompanyId}`);
+        const cards = await cardsResponse.json();
+        personnelCardsEl.innerHTML = '';
+        cards.forEach(card => {
+          const item = document.createElement('div');
+          item.classList.add('card-item');
+          item.innerHTML = `
+            <div>${card.name} (Уровень: ${card.level})</div>
+            <div>Стоимость улучшения: $${card.upgrade_cost.toFixed(2)}</div>
+            <div class="btn upgrade-card-btn" data-card-id="${card.id}">Улучшить</div>
+          `;
+          personnelCardsEl.appendChild(item);
+        });
+
+        // Добавляем обработчики улучшения
+        personnelCardsEl.querySelectorAll('.upgrade-card-btn').forEach(btn => {
+          btn.addEventListener('click', async () => {
+            const cardId = btn.dataset.cardId;
+            try {
+              const res = await fetch(`${apiBase}/personnel/upgrade/${cardId}/${telegramId}`, { method: 'POST' });
+              const result = await res.json();
+              if (result.error) {
+                showToast(result.error);
+              } else {
+                showToast('Карточка улучшена!');
+                loadCompanyDashboard();
+                loadUserData(); // Обновить баланс
+              }
+            } catch (err) {
+              showToast('Ошибка улучшения');
+            }
+          });
+        });
+      } catch (err) {
+        console.error('Load dashboard error:', err);
+      }
+    }
+
+    companyDashboardBack.addEventListener('click', () => {
+      companyDashboardPage.classList.remove('active');
+    });
+
+    // Выпуск новых акций
+    issueSharesBtn.addEventListener('click', async () => {
+      try {
+        const response = await fetch(`${apiBase}/companies/issue-shares/${currentCompanyId}/${telegramId}`, { method: 'POST' });
+        const result = await response.json();
+        if (result.error) {
+          showToast(result.error);
+        } else {
+          showToast('Новые акции выпущены!');
+          loadCompanyDashboard();
+        }
+      } catch (err) {
+        showToast('Ошибка выпуска');
+      }
+    });
+
+    // Переключение табов в дашборде
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        tabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        tabContents.forEach(c => c.classList.remove('active'));
+        document.getElementById(`company-${tab.dataset.tab}-tab`).classList.add('active');
+      });
+    });
+
+    // Загрузка рынка
+    async function loadMarket() {
+      try {
+        const response = await fetch(`${apiBase}/market`);
+        marketCompanies = await response.json();
+        // Сортировка по успеху (на основе суммарного уровня карточек)
+        marketCompanies.sort((a, b) => b.success_score - a.success_score);
+        marketListEl.innerHTML = '';
+        marketCompanies.forEach(company => {
+          const item = document.createElement('div');
+          item.classList.add('market-item');
+          item.innerHTML = `
+            <img class="owner-avatar" src="${company.owner_avatar || ''}" alt="Avatar">
+            <div class="market-info">
+              <div class="market-name">${company.name} (@${company.owner_username})</div>
+              <div>Клиентов: ${company.clients_count}</div>
+              <div>Цена: $${company.current_price.toFixed(2)}</div>
+            </div>
+          `;
+          item.addEventListener('click', () => {
+            currentStockCompanyId = company.id;
+            loadStockTrade();
+            stockTradePage.classList.add('active');
+          });
+          marketListEl.appendChild(item);
+        });
+      } catch (err) {
+        console.error('Load market error:', err);
+      }
+    }
+
+    // Торговля акциями
+    async function loadStockTrade() {
+      try {
+        const response = await fetch(`${apiBase}/companies/${currentStockCompanyId}`);
+        const company = await response.json();
+        stockTradeTitle.textContent = `Акции ${company.name}`;
+        stockPrice.textContent = `$${company.current_price.toFixed(2)}`;
+        stockAvailable.textContent = company.shares_available;
+
+        // Получить owned shares для продажи
+        const ownedResponse = await fetch(`${apiBase}/stocks/owned/${telegramId}/${currentStockCompanyId}`);
+        const owned = await ownedResponse.json();
+        sellAmount.max = owned.shares_owned || 0;
+      } catch (err) {
+        console.error('Load trade error:', err);
+      }
+    }
+
+    stockTradeBack.addEventListener('click', () => {
+      stockTradePage.classList.remove('active');
+    });
+
+    buySharesBtn.addEventListener('click', async () => {
+      const amount = parseInt(buyAmount.value);
+      if (amount <= 0) return;
+      try {
+        const response = await fetch(`${apiBase}/stocks/buy/${telegramId}/${currentStockCompanyId}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ amount })
+        });
+        const result = await response.json();
+        if (result.error) {
+          showToast(result.error);
+        } else {
+          showToast('Акции куплены!');
+          loadStockTrade();
+          loadUserData();
+          buyAmount.value = '';
+        }
+      } catch (err) {
+        showToast('Ошибка покупки');
+      }
+    });
+
+    sellSharesBtn.addEventListener('click', async () => {
+      const amount = parseInt(sellAmount.value);
+      if (amount <= 0) return;
+      try {
+        const response = await fetch(`${apiBase}/stocks/sell/${telegramId}/${currentStockCompanyId}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ amount })
+        });
+        const result = await response.json();
+        if (result.error) {
+          showToast(result.error);
+        } else {
+          showToast('Акции проданы!');
+          loadStockTrade();
+          loadUserData();
+          sellAmount.value = '';
+        }
+      } catch (err) {
+        showToast('Ошибка продажи');
+      }
+    });
+
+    // Загрузка owned stocks
+    async function loadOwnedStocks() {
+      try {
+        const response = await fetch(`${apiBase}/stocks/owned/${telegramId}`);
+        ownedStocks = await response.json();
+        ownedStocksEl.innerHTML = '';
+        let totalShares = 0;
+        ownedStocks.forEach(stock => {
+          totalShares += stock.shares_owned;
+          const item = document.createElement('div');
+          item.classList.add('owned-stock');
+          item.innerHTML = `
+            <div>${stock.company_name}</div>
+            <div>Владеете: ${stock.shares_owned}</div>
+            <div>Цена: $${stock.current_price.toFixed(2)}</div>
+          `;
+          item.addEventListener('click', () => {
+            currentOwnedStockCompanyId = stock.company_id;
+            loadOwnedStockDetail();
+            ownedStockDetailPage.classList.add('active');
+          });
+          ownedStocksEl.appendChild(item);
+        });
+        walletSharesCountEl.textContent = totalShares;
+      } catch (err) {
+        console.error('Load owned stocks error:', err);
+      }
+    }
+
+    // Детали owned stock
+    async function loadOwnedStockDetail() {
+      try {
+        const response = await fetch(`${apiBase}/stocks/owned/${telegramId}/${currentOwnedStockCompanyId}`);
+        const stock = await response.json();
+        ownedStockDetailTitle.textContent = `Акции ${stock.company_name}`;
+        ownedShares.textContent = stock.shares_owned;
+        ownedPrice.textContent = `$${stock.current_price.toFixed(2)}`;
+        ownedIncome.textContent = `$${stock.daily_income.toFixed(2)}`; // Рассчитывается на бэке
+      } catch (err) {
+        console.error('Load owned detail error:', err);
+      }
+    }
+
+    ownedStockDetailBack.addEventListener('click', () => {
+      ownedStockDetailPage.classList.remove('active');
+    });
+
+    sellAllBtn.addEventListener('click', async () => {
+      try {
+        const response = await fetch(`${apiBase}/stocks/sell-all/${telegramId}/${currentOwnedStockCompanyId}`, { method: 'POST' });
+        const result = await response.json();
+        if (result.error) {
+          showToast(result.error);
+        } else {
+          showToast('Все акции проданы!');
+          ownedStockDetailPage.classList.remove('active');
+          loadOwnedStocks();
+          loadUserData();
+        }
+      } catch (err) {
+        showToast('Ошибка продажи');
+      }
+    });
+
     // Инициализация
+    loadUserData();
     updateUI();
   </script>
 
