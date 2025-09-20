@@ -9,50 +9,51 @@
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     :root {
-      /* Светлая тема */
-      --bg-primary: #f8f9ff;
+      /* Светлая тема по умолчанию */
+      --bg-primary: #f0f4f8;
       --bg-secondary: #ffffff;
-      --text-primary: #0f172a;
-      --text-secondary: #64748b;
+      --text-primary: #1a1a1a;
+      --text-secondary: #6b7280;
       --card-bg: #ffffff;
-      --card-border: #e2e8f0;
-      --accent-green: #10b981;
-      --accent-red: #ef4444;
-      --accent-blue: #3b82f6;
-      --accent-light: #ecfdf5;
+      --card-border: #e5e7eb;
+      --accent: #29d9a0;
+      --accent-light: #e0f7f0;
       --nav-bg: #ffffff;
-      --nav-shadow: 0 -4px 20px rgba(0, 0, 0, 0.05);
-      --progress-bg: #e2e8f0;
-      --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
-      --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
-      --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
-      --border-radius: 12px;
-      --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      --nav-shadow: 0 -2px 20px rgba(0, 0, 0, 0.08);
+      --progress-bg: #e5e7eb;
+      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08);
+      --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.12);
+      --border-radius: 18px;
+      --transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
       
-      /* Биржевые цвета */
-      --stock-up: #10b981;
-      --stock-down: #ef4444;
-      --stock-bg: linear-gradient(135deg, #f8fafc, #f1f5f9);
+      /* Цвета для банковской карты */
+      --card-gradient-1: #1a2980;
+      --card-gradient-2: #26d0ce;
+      --card-chip: #c9a66b;
+      --card-text: #ffffff;
     }
 
     [data-theme="dark"] {
-      --bg-primary: #0f0f23;
-      --bg-secondary: #1a1a2e;
+      --bg-primary: #0f172a;
+      --bg-secondary: #1e293b;
       --text-primary: #f8fafc;
-      --text-secondary: #cbd5e1;
-      --card-bg: #1a1a2e;
+      --text-secondary: #94a3b8;
+      --card-bg: #1e293b;
       --card-border: #334155;
-      --accent-green: #34d399;
-      --accent-red: #f87171;
-      --accent-blue: #60a5fa;
-      --accent-light: rgba(16, 185, 129, 0.1);
-      --nav-bg: #1a1a2e;
-      --nav-shadow: 0 -4px 20px rgba(0, 0, 0, 0.4);
+      --accent: #4FFFB0;
+      --accent-light: rgba(79, 255, 176, 0.1);
+      --nav-bg: #1e293b;
+      --nav-shadow: 0 -2px 20px rgba(0, 0, 0, 0.4);
       --progress-bg: #334155;
-      --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
-      --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
-      --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
-      --stock-bg: linear-gradient(135deg, #1a1a2e, #16213e);
+      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.2);
+      --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.3);
+      --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.4);
+      
+      /* Цвета для банковской карты в темной теме */
+      --card-gradient-1: #0f2027;
+      --card-gradient-2: #203a43;
+      --card-chip: #d4af37;
     }
 
     * {
@@ -74,58 +75,59 @@
       padding-bottom: 80px;
     }
 
+    /* Верхняя панель */
     .header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 16px 20px 12px;
+      padding: 20px 20px 12px;
       position: relative;
       z-index: 10;
-      background: var(--bg-secondary);
-      box-shadow: var(--shadow-sm);
     }
 
     .logo {
       font-size: 24px;
       font-weight: 700;
-      background: linear-gradient(90deg, var(--accent-blue), var(--accent-green));
+      background: linear-gradient(90deg, var(--accent), #10b981);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
 
+    /* Основной контент */
     .main-content {
       flex: 1;
-      padding: 0 16px;
+      padding: 0 20px;
       overflow-y: auto;
       scrollbar-width: none;
     }
 
-    .main-content::-webkit-scrollbar { display: none; }
-
-    .section {
+    .main-content::-webkit-scrollbar {
       display: none;
-      animation: fadeIn 0.4s ease;
     }
 
-    .section.active { display: block; }
+    /* Секции */
+    .section {
+      display: none;
+      animation: fadeIn 0.5s ease;
+    }
+
+    .section.active {
+      display: block;
+    }
 
     @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(8px); }
+      from { opacity: 0; transform: translateY(10px); }
       to { opacity: 1; transform: translateY(0); }
     }
 
     .section-title {
-      font-size: 28px;
+      font-size: 26px;
       font-weight: 700;
-      margin: 24px 0 20px;
+      margin: 24px 0 16px;
       color: var(--text-primary);
-      display: flex;
-      align-items: center;
-      gap: 8px;
     }
 
-    .section-title i { color: var(--accent-green); }
-
+    /* Карточки */
     .card {
       background: var(--card-bg);
       border-radius: var(--border-radius);
@@ -137,21 +139,21 @@
     }
 
     .card:hover {
-      transform: translateY(-1px);
+      transform: translateY(-2px);
       box-shadow: var(--shadow-lg);
     }
 
-    /* Банковская карта - стиль биржи */
+    /* Банковская карта */
     .bank-card {
-      background: linear-gradient(135deg, var(--accent-blue), var(--accent-green));
-      border-radius: var(--border-radius);
+      background: linear-gradient(135deg, var(--card-gradient-1), var(--card-gradient-2));
+      border-radius: 18px;
       padding: 24px;
       margin-bottom: 24px;
       box-shadow: var(--shadow-lg);
-      color: #ffffff;
+      color: var(--card-text);
       position: relative;
       overflow: hidden;
-      height: 180px;
+      height: 200px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
@@ -160,46 +162,104 @@
     .bank-card::before {
       content: "";
       position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
-      opacity: 0.3;
+      top: -50px;
+      right: -50px;
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.1);
     }
 
-    .bank-card-top { display: flex; justify-content: space-between; align-items: center; position: relative; z-index: 1; }
+    .bank-card::after {
+      content: "";
+      position: absolute;
+      bottom: -80px;
+      right: -30px;
+      width: 200px;
+      height: 200px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.05);
+    }
 
-    .bank-card-logo { font-weight: 700; font-size: 18px; letter-spacing: 1px; }
+    .bank-card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .bank-card-logo {
+      font-weight: 700;
+      font-size: 20px;
+      letter-spacing: 1px;
+    }
 
     .bank-card-chip {
-      width: 45px;
-      height: 35px;
-      background: linear-gradient(145deg, #c9a66b, #d4af37);
-      border-radius: 6px;
+      width: 50px;
+      height: 40px;
+      background: var(--card-chip);
+      border-radius: 8px;
       position: relative;
       overflow: hidden;
     }
 
-    .bank-card-number {
-      font-size: 20px;
-      font-weight: 600;
-      letter-spacing: 1.5px;
-      margin: 12px 0;
-      position: relative; z-index: 1;
+    .bank-card-chip::before {
+      content: "";
+      position: absolute;
+      top: 5px;
+      left: 5px;
+      right: 5px;
+      height: 10px;
+      background: rgba(0, 0, 0, 0.1);
     }
 
-    .bank-card-bottom { display: flex; justify-content: space-between; align-items: flex-end; position: relative; z-index: 1; }
+    .bank-card-chip::after {
+      content: "";
+      position: absolute;
+      top: 20px;
+      left: 5px;
+      right: 5px;
+      height: 10px;
+      background: rgba(0, 0, 0, 0.1);
+    }
 
-    .bank-card-info { display: flex; flex-direction: column; }
+    .bank-card-number {
+      font-size: 22px;
+      font-weight: 600;
+      letter-spacing: 2px;
+      margin: 15px 0;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    }
 
-    .bank-card-label { font-size: 9px; text-transform: uppercase; opacity: 0.9; margin-bottom: 3px; }
+    .bank-card-bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+    }
 
-    .bank-card-value { font-size: 14px; font-weight: 600; }
+    .bank-card-info {
+      display: flex;
+      flex-direction: column;
+    }
 
-    .bank-card-balance { font-size: 26px; font-weight: 700; }
+    .bank-card-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      opacity: 0.8;
+      margin-bottom: 4px;
+    }
 
-    /* Кликер */
+    .bank-card-value {
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .bank-card-balance {
+      font-size: 28px;
+      font-weight: 700;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Кликер на главной */
     .clicker-area {
       display: flex;
       flex-direction: column;
@@ -208,36 +268,43 @@
     }
 
     .tap-circle {
-      width: 120px;
-      height: 120px;
+      width: 130px;
+      height: 130px;
       border-radius: 50%;
-      background: var(--stock-bg);
+      background: linear-gradient(145deg, var(--accent-light), rgba(79, 255, 176, 0.2));
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
       transition: var(--transition);
       box-shadow: var(--shadow-md);
-      border: 2px solid var(--accent-green);
+      border: 3px solid var(--accent);
       margin: 20px 0;
       z-index: 2;
     }
 
-    .tap-circle:active { transform: scale(0.96); }
+    .tap-circle:active {
+      transform: scale(0.95);
+    }
 
-    .tap-icon { font-size: 48px; color: var(--accent-green); }
+    .tap-icon {
+      font-size: 52px;
+      color: var(--accent);
+    }
 
     .tap-text {
-      margin-top: 12px;
-      font-size: 15px;
+      margin-top: 10px;
+      font-size: 16px;
       color: var(--text-secondary);
       text-align: center;
       max-width: 80%;
-      line-height: 1.4;
+      line-height: 1.5;
     }
 
     /* Форма создания компании */
-    .form-group { margin-bottom: 20px; }
+    .form-group {
+      margin-bottom: 18px;
+    }
 
     .form-label {
       display: block;
@@ -250,7 +317,7 @@
     .form-input {
       width: 100%;
       padding: 14px;
-      border-radius: 8px;
+      border-radius: 12px;
       background: var(--bg-secondary);
       border: 1px solid var(--card-border);
       color: var(--text-primary);
@@ -260,18 +327,14 @@
 
     .form-input:focus {
       outline: none;
-      border-color: var(--accent-green);
-      box-shadow: 0 0 0 3px var(--accent-light);
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(79, 255, 176, 0.2);
     }
 
-    .form-input.error { border-color: var(--accent-red); }
-
-    .error-message { color: var(--accent-red); font-size: 13px; margin-top: 4px; }
-
-    /* Кнопки - биржевый стиль */
+    /* Кнопки */
     .btn {
       padding: 14px 24px;
-      border-radius: 8px;
+      border-radius: 50px;
       font-weight: 600;
       font-size: 15px;
       cursor: pointer;
@@ -284,222 +347,43 @@
       align-items: center;
       justify-content: center;
       gap: 8px;
-      position: relative;
-      overflow: hidden;
     }
-
-    .btn::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-      transition: left 0.5s;
-    }
-
-    .btn:hover::before { left: 100%; }
 
     .btn-primary {
-      background: linear-gradient(90deg, var(--accent-green), #059669);
-      color: #ffffff;
-      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+      background: linear-gradient(90deg, var(--accent), #10b981);
+      color: #000000;
+      box-shadow: 0 4px 15px rgba(79, 255, 176, 0.3);
     }
 
-    .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4); }
-
-    .btn-secondary {
-      background: transparent;
-      color: var(--accent-green);
-      border: 1px solid var(--accent-green);
-    }
-
-    .btn-secondary:hover { background: var(--accent-light); }
-
-    .btn-danger {
-      background: linear-gradient(90deg, var(--accent-red), #dc2626);
-      color: #ffffff;
-    }
-
-    /* Список компаний */
-    .company-list { display: grid; gap: 16px; }
-
-    .company-card {
-      background: var(--stock-bg);
-      border-left: 4px solid var(--accent-green);
-      padding: 20px;
-      border-radius: var(--border-radius);
-      cursor: pointer;
-      transition: var(--transition);
-      border: 1px solid var(--card-border);
-    }
-
-    .company-card:hover {
+    .btn-primary:hover {
       transform: translateY(-2px);
-      box-shadow: var(--shadow-lg);
+      box-shadow: 0 6px 20px rgba(79, 255, 176, 0.5);
     }
 
-    .company-name { font-size: 18px; font-weight: 600; margin-bottom: 4px; color: var(--text-primary); }
-
-    .company-meta { font-size: 13px; color: var(--text-secondary); display: flex; justify-content: space-between; }
-
-    /* Детали компании */
-    .company-detail-header {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 20px;
-      padding-bottom: 16px;
-      border-bottom: 1px solid var(--card-border);
+    .btn-outline {
+      background: transparent;
+      color: var(--accent);
+      border: 2px solid var(--accent);
     }
 
-    .company-detail-icon { font-size: 32px; color: var(--accent-green); }
-
-    .company-detail-title { font-size: 24px; font-weight: 700; }
-
-    .stock-info {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-      gap: 16px;
-      margin: 20px 0;
+    .btn-outline:hover {
+      background: var(--accent-light);
     }
-
-    .stock-stat {
-      text-align: center;
-      padding: 16px;
-      background: var(--bg-secondary);
-      border-radius: var(--border-radius);
-      border: 1px solid var(--card-border);
-    }
-
-    .stock-stat-value { font-size: 24px; font-weight: 700; color: var(--accent-green); }
-
-    .stock-stat-label { font-size: 12px; color: var(--text-secondary); margin-top: 4px; text-transform: uppercase; }
-
-    /* Рынок акций */
-    .stock-list { display: grid; gap: 16px; }
-
-    .stock-card {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 20px;
-      background: var(--stock-bg);
-      border-radius: var(--border-radius);
-      border: 1px solid var(--card-border);
-      cursor: pointer;
-      transition: var(--transition);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .stock-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 4px;
-      height: 100%;
-      background: var(--accent-green);
-    }
-
-    .stock-card:hover { transform: translateY(-1px); box-shadow: var(--shadow-lg); }
-
-    .stock-info-left { flex: 1; }
-
-    .stock-name { font-size: 18px; font-weight: 600; color: var(--text-primary); }
-
-    .stock-meta { font-size: 13px; color: var(--text-secondary); margin-top: 4px; }
-
-    .stock-price { font-size: 20px; font-weight: 700; color: var(--accent-green); }
-
-    .stock-available { font-size: 12px; color: var(--text-secondary); margin-top: 4px; }
-
-    /* Модал покупки */
-    .modal {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.5);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 1000;
-      backdrop-filter: blur(4px);
-    }
-
-    .modal.active { display: flex; }
-
-    .modal-content {
-      background: var(--card-bg);
-      border-radius: var(--border-radius);
-      padding: 24px;
-      max-width: 90%;
-      width: 320px;
-      box-shadow: var(--shadow-lg);
-      animation: modalSlideIn 0.3s ease;
-    }
-
-    @keyframes modalSlideIn {
-      from { opacity: 0; transform: scale(0.95) translateY(20px); }
-      to { opacity: 1; transform: scale(1) translateY(0); }
-    }
-
-    .modal-header { text-align: center; margin-bottom: 20px; }
-
-    .modal-title { font-size: 20px; font-weight: 700; }
-
-    .modal-body .form-group { margin-bottom: 20px; }
-
-    .modal-footer { display: flex; gap: 12px; }
-
-    .modal-footer .btn { flex: 1; }
 
     /* Пустое состояние */
     .empty-state {
       text-align: center;
-      padding: 48px 20px;
+      padding: 40px 20px;
       color: var(--text-secondary);
     }
 
-    .empty-state i { font-size: 52px; margin-bottom: 16px; opacity: 0.6; }
-
-    /* Кошелек - обновленный */
-    .portfolio-list { display: grid; gap: 12px; margin-top: 16px; }
-
-    .portfolio-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 16px;
-      background: var(--stock-bg);
-      border-radius: var(--border-radius);
-      border: 1px solid var(--card-border);
+    .empty-state i {
+      font-size: 48px;
+      margin-bottom: 16px;
+      opacity: 0.5;
     }
 
-    .portfolio-left { display: flex; align-items: center; gap: 12px; }
-
-    .portfolio-icon { font-size: 20px; color: var(--accent-green); }
-
-    .portfolio-name { font-weight: 500; }
-
-    .portfolio-value { font-weight: 600; color: var(--accent-green); }
-
-    .portfolio-total {
-      font-size: 20px;
-      font-weight: 700;
-      text-align: center;
-      margin-top: 20px;
-      padding: 16px;
-      background: var(--accent-light);
-      border-radius: var(--border-radius);
-      color: var(--accent-green);
-    }
-
-    /* Профиль - без изменений */
+    /* Профиль */
     .profile-header {
       display: flex;
       flex-direction: column;
@@ -512,28 +396,41 @@
       width: 80px;
       height: 80px;
       border-radius: 50%;
-      background: linear-gradient(45deg, var(--accent-blue), var(--accent-green));
+      background: linear-gradient(45deg, var(--accent), #10b981);
       display: flex;
       align-items: center;
       justify-content: center;
       margin-bottom: 16px;
       font-size: 32px;
       font-weight: bold;
-      color: #ffffff;
+      color: #000;
+      object-fit: cover;
     }
 
-    .profile-avatar img { width: 100%; height: 100%; border-radius: 50%; }
+    .profile-avatar img {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+    }
 
-    .profile-name { font-size: 22px; font-weight: 700; color: var(--text-primary); }
+    .profile-name {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
 
-    .profile-username { font-size: 14px; color: var(--text-secondary); margin-top: 4px; }
+    .profile-username {
+      font-size: 14px;
+      color: var(--text-secondary);
+      margin-top: 4px;
+    }
 
     .profile-level {
       background: var(--accent-light);
-      color: var(--accent-green);
-      padding: 6px 16px;
+      color: var(--accent);
+      padding: 4px 12px;
       border-radius: 50px;
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 600;
       margin-top: 8px;
     }
@@ -545,10 +442,16 @@
       border-bottom: 1px solid var(--card-border);
     }
 
-    .stat-label { color: var(--text-secondary); }
+    .stat-label {
+      color: var(--text-secondary);
+    }
 
-    .stat-value { font-weight: 600; color: var(--text-primary); }
+    .stat-value {
+      font-weight: 600;
+      color: var(--text-primary);
+    }
 
+    /* Прогресс бар */
     .progress-container {
       width: 100%;
       height: 8px;
@@ -560,11 +463,12 @@
 
     .progress-fill {
       height: 100%;
-      background: linear-gradient(90deg, var(--accent-green), var(--accent-blue));
+      background: linear-gradient(90deg, var(--accent), #10b981);
       width: 0%;
       transition: width 0.3s ease;
     }
 
+    /* Тема переключатель */
     .theme-toggle-container {
       display: flex;
       align-items: center;
@@ -573,7 +477,10 @@
       border-bottom: 1px solid var(--card-border);
     }
 
-    .theme-toggle-label { font-size: 16px; color: var(--text-primary); }
+    .theme-toggle-label {
+      font-size: 16px;
+      color: var(--text-primary);
+    }
 
     .theme-toggle {
       width: 50px;
@@ -598,7 +505,9 @@
       transition: var(--transition);
     }
 
-    [data-theme="dark"] .theme-toggle::after { transform: translateX(24px); }
+    [data-theme="dark"] .theme-toggle::after {
+      transform: translateX(24px);
+    }
 
     /* Нижняя навигация */
     .bottom-nav {
@@ -637,13 +546,30 @@
       transition: var(--transition);
     }
 
-    .nav-item.active { color: var(--accent-green); }
+    .nav-item.active {
+      color: var(--accent);
+    }
 
-    .nav-item.active i { transform: translateY(-2px); }
+    .nav-item.active i {
+      transform: translateY(-2px);
+    }
 
-    .nav-item:hover:not(.active) { color: var(--text-primary); }
+    .nav-item:hover:not(.active) {
+      color: var(--text-primary);
+    }
 
-    /* Toast */
+    /* Анимация пульсации */
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(79, 255, 176, 0.7); }
+      70% { box-shadow: 0 0 0 10px rgba(79, 255, 176, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(79, 255, 176, 0); }
+    }
+
+    .btn-pulse {
+      animation: pulse 2s infinite;
+    }
+
+    /* Toast уведомления */
     #toast {
       position: fixed;
       bottom: 100px;
@@ -667,31 +593,48 @@
       transform: translateX(-50%) translateY(0);
     }
 
-    /* Адаптив */
+    /* Адаптивность */
     @media (max-width: 480px) {
-      .bank-card { height: 160px; padding: 20px; }
-      .bank-card-number { font-size: 18px; }
-      .bank-card-balance { font-size: 22px; }
-      .tap-circle { width: 100px; height: 100px; }
-      .tap-icon { font-size: 40px; }
-      .stock-card { flex-direction: column; align-items: flex-start; gap: 12px; }
-      .stock-price { align-self: flex-end; }
+      .bank-card {
+        height: 180px;
+        padding: 20px;
+      }
+      
+      .bank-card-number {
+        font-size: 18px;
+      }
+      
+      .bank-card-balance {
+        font-size: 24px;
+      }
+      
+      .tap-circle {
+        width: 110px;
+        height: 110px;
+      }
+      
+      .tap-icon {
+        font-size: 42px;
+      }
     }
   </style>
 </head>
 <body>
 
+  <!-- Верхняя панель -->
   <div class="header">
-    <div class="logo">Richman Exchange</div>
+    <div class="logo">Richman</div>
   </div>
 
+  <!-- Основной контент -->
   <div class="main-content">
     
-    <!-- Главная -->
+    <!-- Главная (кликер) -->
     <div class="section active" id="home-section">
+      <!-- Банковская карта -->
       <div class="bank-card">
         <div class="bank-card-top">
-          <div class="bank-card-logo">EXCHANGE</div>
+          <div class="bank-card-logo">RICHMAN</div>
           <div class="bank-card-chip"></div>
         </div>
         <div class="bank-card-number">•••• •••• •••• 1234</div>
@@ -711,55 +654,116 @@
         <div class="tap-circle" id="tap-circle">
           <i class="fas fa-hand-point-up tap-icon"></i>
         </div>
-        <div class="tap-text">Кликайте для заработка капитала</div>
+        <div class="tap-text">Кликайте, чтобы зарабатывать деньги</div>
       </div>
     </div>
 
     <!-- Бизнес -->
     <div class="section" id="business-section">
-      <h2 class="section-title"><i class="fas fa-building"></i>Ваши компании</h2>
-      <div id="business-content">
-        <!-- Динамический контент -->
+      <h2 class="section-title">Бизнес</h2>
+      <div class="card" id="create-company-form">
+        <div class="form-group">
+          <label class="form-label" for="company-name">Название компании (только английские буквы)</label>
+          <input type="text" id="company-name" class="form-input" placeholder="Enter name">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="share-price">Начальная цена акции ($)</label>
+          <input type="number" id="share-price" class="form-input" placeholder="Enter price" min="0.01" step="0.01">
+        </div>
+        <div class="btn btn-primary" id="create-company-btn">Создать (<span id="create-cost">Free</span>)</div>
+      </div>
+      <div class="card">
+        <div id="business-list"></div>
+        <div id="business-empty" class="empty-state" style="display: none;">
+          <i class="fas fa-building"></i>
+          <p>Нет компаний</p>
+        </div>
       </div>
     </div>
 
     <!-- Детали компании -->
-    <div class="section" id="company-detail-section">
-      <h2 class="section-title"><i class="fas fa-chart-line"></i>Детали компании</h2>
-      <div id="company-detail-content">
-        <!-- Динамический контент -->
-      </div>
+    <div class="section" id="company-details-section">
+      <h2 class="section-title">Детали компании</h2>
       <div class="card">
-        <button class="btn btn-secondary" onclick="backToBusiness()"><i class="fas fa-arrow-left"></i> Назад к бизнесу</button>
+        <div class="stat-row">
+          <span class="stat-label">Название</span>
+          <span class="stat-value" id="company-name-detail"></span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">Владелец</span>
+          <span class="stat-value" id="company-owner-detail"></span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">Цена акции</span>
+          <span class="stat-value" id="company-price-detail"></span>
+        </div>
       </div>
+      <div class="btn btn-outline" id="back-to-business">Назад</div>
     </div>
 
     <!-- Рынок -->
     <div class="section" id="market-section">
-      <h2 class="section-title"><i class="fas fa-chart-line"></i>Рынок акций</h2>
-      <div id="market-content">
-        <!-- Динамический контент -->
+      <h2 class="section-title">Рынок акций</h2>
+      <div class="card">
+        <div id="market-list"></div>
+        <div id="market-empty" class="empty-state" style="display: none;">
+          <i class="fas fa-chart-line"></i>
+          <p>Нет акций</p>
+        </div>
       </div>
+    </div>
+
+    <!-- Покупка акций -->
+    <div class="section" id="buy-stock-section">
+      <h2 class="section-title">Покупка акций</h2>
+      <div class="card">
+        <div class="stat-row">
+          <span class="stat-label">Компания</span>
+          <span class="stat-value" id="buy-company-name"></span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">Владелец</span>
+          <span class="stat-value" id="buy-company-owner"></span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">Цена за акцию</span>
+          <span class="stat-value" id="buy-share-price"></span>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="buy-quantity">Количество акций</label>
+          <input type="number" id="buy-quantity" class="form-input" min="1" step="1" value="1">
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">Общая стоимость</span>
+          <span class="stat-value" id="buy-total-cost">$0.00</span>
+        </div>
+        <div class="btn btn-primary" id="buy-shares-btn">Купить</div>
+      </div>
+      <div class="btn btn-outline" id="back-to-market">Назад</div>
     </div>
 
     <!-- Кошелек -->
     <div class="section" id="wallet-section">
-      <h2 class="section-title"><i class="fas fa-wallet"></i>Портфель</h2>
+      <h2 class="section-title">Кошелек</h2>
       <div class="card">
-        <div class="stat-row">
-          <span class="stat-label">Денежный баланс</span>
+        <div class="stat-row" style="border-bottom: 1px solid var(--card-border);">
+          <span class="stat-label">Баланс</span>
           <span class="stat-value" id="wallet-balance">$ 65,00</span>
         </div>
-        <div id="portfolio-list" class="portfolio-list">
-          <!-- Динамический список акций -->
+        <div class="stat-row" style="border-bottom: 1px solid var(--card-border);">
+          <span class="stat-label">Акции</span>
+          <span class="stat-value" id="wallet-stocks">0</span>
         </div>
-        <div class="portfolio-total" id="portfolio-total">Общая стоимость: $ 65,00</div>
+        <div class="stat-row" style="border-bottom: none;">
+          <span class="stat-label">Общая стоимость</span>
+          <span class="stat-value" id="wallet-total">$ 65,00</span>
+        </div>
       </div>
     </div>
 
     <!-- Профиль -->
     <div class="section" id="profile-section">
-      <h2 class="section-title"><i class="fas fa-user"></i>Профиль</h2>
+      <h2 class="section-title">Профиль</h2>
       
       <div class="profile-header">
         <div class="profile-avatar" id="profile-avatar">
@@ -772,7 +776,7 @@
 
       <div class="card">
         <div class="stat-row">
-          <span class="stat-label">ID трейдера</span>
+          <span class="stat-label">ID игрока</span>
           <span class="stat-value" id="player-id">#74291</span>
         </div>
         <div class="stat-row">
@@ -780,7 +784,7 @@
           <span class="stat-value" id="total-clicks">0</span>
         </div>
         <div class="stat-row">
-          <span class="stat-label">Прогресс</span>
+          <span class="stat-label">Прогресс до следующего уровня</span>
           <span class="stat-value" id="progress-percent">60%</span>
         </div>
       </div>
@@ -789,7 +793,7 @@
         <div class="progress-container">
           <div class="progress-fill" id="progress-fill"></div>
         </div>
-        <div class="stat-label" style="text-align: center; margin-top: 8px;" id="progress-text">$1 000 / $2 000</div>
+        <div class="stat-label" style="text-align: center; margin-top: 8px;" id="progress-text">$1 000,00 / $2 000,00</div>
       </div>
       
       <div class="card">
@@ -802,6 +806,7 @@
 
   </div>
 
+  <!-- Нижняя навигация -->
   <div class="bottom-nav">
     <div class="nav-item active" data-section="home">
       <i class="fas fa-home"></i>
@@ -817,7 +822,7 @@
     </div>
     <div class="nav-item" data-section="wallet">
       <i class="fas fa-wallet"></i>
-      <span>Портфель</span>
+      <span>Кошелек</span>
     </div>
     <div class="nav-item" data-section="profile">
       <i class="fas fa-user"></i>
@@ -825,123 +830,85 @@
     </div>
   </div>
 
+  <!-- Toast уведомление -->
   <div id="toast"></div>
 
-  <!-- Модал покупки -->
-  <div class="modal" id="buy-modal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h3 class="modal-title" id="modal-title">Покупка акций</h3>
-      </div>
-      <div class="modal-body">
-        <div class="form-group">
-          <label class="form-label">Компания</label>
-          <input type="text" class="form-input" id="modal-company" readonly>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Цена за акцию</label>
-          <input type="text" class="form-input" id="modal-price" readonly>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Количество</label>
-          <input type="number" class="form-input" id="modal-quantity" min="1" placeholder="Введите количество">
-          <div class="error-message" id="modal-error"></div>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button class="btn btn-secondary" onclick="closeModal()">Отмена</button>
-        <button class="btn btn-primary" onclick="confirmBuy()">Купить</button>
-      </div>
-    </div>
-  </div>
-
   <script>
+    // Telegram WebApp init
     const tg = window.Telegram.WebApp;
     tg.ready();
     tg.expand();
 
+    // Глобальные переменные
     let userData = tg.initDataUnsafe.user || {};
     let telegramId = userData.id || 0;
     let balance = 65.00;
     let clickValue = 2.50;
     let level = 1;
-    let progress = 600;
+    let progress = 600; // из 1000
     let totalClicks = 0;
-    let apiBase = 'https://dinod.ru/api';
-    let currentCompanyId = null;
-    let currentBuyCompany = null;
+    let apiBase = 'https://dinod.ru/api'; // Use your domain
+    let currentCompany = null;
 
-    const elements = {
-      themeToggle: document.getElementById('theme-toggle'),
-      htmlRoot: document.getElementById('html-root'),
-      navItems: document.querySelectorAll('.nav-item'),
-      sections: document.querySelectorAll('.section'),
-      tapCircle: document.getElementById('tap-circle'),
-      cardBalanceEl: document.getElementById('card-balance'),
-      cardLevelEl: document.getElementById('card-level'),
-      progressFillEl: document.getElementById('progress-fill'),
-      progressTextEl: document.getElementById('progress-text'),
-      progressPercentEl: document.getElementById('progress-percent'),
-      walletBalanceEl: document.getElementById('wallet-balance'),
-      portfolioTotalEl: document.getElementById('portfolio-total'),
-      profileLevelEl: document.getElementById('profile-level'),
-      totalClicksEl: document.getElementById('total-clicks'),
-      profileAvatarEl: document.getElementById('profile-avatar'),
-      profileNameEl: document.getElementById('profile-name'),
-      profileUsernameEl: document.getElementById('profile-username'),
-      playerIdEl: document.getElementById('player-id'),
-      avatarImgEl: document.getElementById('avatar-img'),
-      businessContent: document.getElementById('business-content'),
-      companyDetailContent: document.getElementById('company-detail-content'),
-      marketContent: document.getElementById('market-content'),
-      portfolioList: document.getElementById('portfolio-list'),
-      buyModal: document.getElementById('buy-modal'),
-      modalCompany: document.getElementById('modal-company'),
-      modalPrice: document.getElementById('modal-price'),
-      modalQuantity: document.getElementById('modal-quantity'),
-      modalError: document.getElementById('modal-error'),
-      modalTitle: document.getElementById('modal-title')
-    };
+    // DOM элементы
+    const themeToggle = document.getElementById('theme-toggle');
+    const htmlRoot = document.getElementById('html-root');
+    const navItems = document.querySelectorAll('.nav-item');
+    const sections = document.querySelectorAll('.section');
+    const tapCircle = document.getElementById('tap-circle');
+    const cardBalanceEl = document.getElementById('card-balance');
+    const cardLevelEl = document.getElementById('card-level');
+    const progressFillEl = document.getElementById('progress-fill');
+    const progressTextEl = document.getElementById('progress-text');
+    const progressPercentEl = document.getElementById('progress-percent');
+    const walletBalanceEl = document.getElementById('wallet-balance');
+    const walletTotalEl = document.getElementById('wallet-total');
+    const walletStocksEl = document.getElementById('wallet-stocks');
+    const profileLevelEl = document.getElementById('profile-level');
+    const totalClicksEl = document.getElementById('total-clicks');
+    const profileAvatarEl = document.getElementById('profile-avatar');
+    const profileNameEl = document.getElementById('profile-name');
+    const profileUsernameEl = document.getElementById('profile-username');
+    const playerIdEl = document.getElementById('player-id');
+    const avatarImgEl = document.getElementById('avatar-img');
+    const createCompanyBtn = document.getElementById('create-company-btn');
+    const companyNameInput = document.getElementById('company-name');
+    const sharePriceInput = document.getElementById('share-price');
+    const createCostEl = document.getElementById('create-cost');
+    const businessList = document.getElementById('business-list');
+    const businessEmpty = document.getElementById('business-empty');
+    const companyNameDetail = document.getElementById('company-name-detail');
+    const companyOwnerDetail = document.getElementById('company-owner-detail');
+    const companyPriceDetail = document.getElementById('company-price-detail');
+    const backToBusiness = document.getElementById('back-to-business');
+    const marketList = document.getElementById('market-list');
+    const marketEmpty = document.getElementById('market-empty');
+    const buyCompanyName = document.getElementById('buy-company-name');
+    const buyCompanyOwner = document.getElementById('buy-company-owner');
+    const buySharePrice = document.getElementById('buy-share-price');
+    const buyQuantity = document.getElementById('buy-quantity');
+    const buyTotalCost = document.getElementById('buy-total-cost');
+    const buySharesBtn = document.getElementById('buy-shares-btn');
+    const backToMarket = document.getElementById('back-to-market');
 
-    // Тема
-    const savedTheme = localStorage.getItem('theme') || 'light';
-    elements.htmlRoot.setAttribute('data-theme', savedTheme);
-
-    elements.themeToggle.addEventListener('click', () => {
-      const current = elements.htmlRoot.getAttribute('data-theme');
-      const newTheme = current === 'light' ? 'dark' : 'light';
-      elements.htmlRoot.setAttribute('data-theme', newTheme);
-      localStorage.setItem('theme', newTheme);
-    });
-
-    // Переключение секций
-    function switchToSection(sectionId) {
-      elements.sections.forEach(s => s.classList.remove('active'));
-      elements.navItems.forEach(i => i.classList.remove('active'));
-      
-      document.getElementById(`${sectionId}-section`).classList.add('active');
-      document.querySelector(`.nav-item[data-section="${sectionId}"]`).classList.add('active');
-      
-      if (sectionId === 'business') loadUserCompanies();
-      if (sectionId === 'market') loadMarketStocks();
-      if (sectionId === 'wallet') loadPortfolio();
-      if (sectionId === 'company-detail') loadCompanyDetails();
-      
-      updateUI();
-    }
-
-    elements.navItems.forEach(item => {
-      item.addEventListener('click', () => {
-        const sectionId = item.getAttribute('data-section');
-        switchToSection(sectionId);
-      });
-    });
-
-    // Загрузка данных пользователя
+    // Load user data from server
     async function loadUserData() {
       if (!telegramId) return;
       try {
-        const response = await fetch(`${apiBase}/user/${telegramId}`);
+        let response = await fetch(`${apiBase}/user/${telegramId}`);
+        if (!response.ok) {
+          response = await fetch(`${apiBase}/user`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              telegram_id: telegramId,
+              first_name: userData.first_name || 'Player',
+              last_name: userData.last_name || '',
+              username: userData.username || '',
+              avatar_url: null
+            })
+          });
+        }
         const user = await response.json();
         if (user) {
           balance = parseFloat(user.balance) || 65.00;
@@ -950,17 +917,24 @@
           totalClicks = user.total_clicks || 0;
           clickValue = 2.50 * level;
 
-          elements.profileNameEl.textContent = user.first_name || 'Player';
-          elements.profileUsernameEl.textContent = user.username ? `@${user.username}` : '';
-          elements.playerIdEl.textContent = `#${user.telegram_id}`;
-
-          if (user.avatar_url) {
-            elements.avatarImgEl.src = user.avatar_url;
-            elements.avatarImgEl.style.display = 'block';
-            elements.profileAvatarEl.style.background = 'none';
+          // Update profile
+          profileNameEl.textContent = user.first_name || 'Player';
+          if (user.username) {
+            profileUsernameEl.textContent = `@${user.username}`;
           } else {
+            profileUsernameEl.textContent = '';
+          }
+          playerIdEl.textContent = `#${user.telegram_id}`;
+
+          // Avatar
+          if (user.avatar_url) {
+            avatarImgEl.src = user.avatar_url;
+            avatarImgEl.style.display = 'block';
+            profileAvatarEl.style.background = 'none';
+          } else {
+            // Fallback initials
             const initials = (user.first_name || 'P').charAt(0).toUpperCase();
-            elements.profileAvatarEl.innerHTML = initials;
+            profileAvatarEl.textContent = initials;
           }
         }
       } catch (err) {
@@ -969,9 +943,49 @@
       updateUI();
     }
 
-    // Клик
+    // Инициализация темы
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    htmlRoot.setAttribute('data-theme', savedTheme);
+
+    // Переключение темы
+    themeToggle.addEventListener('click', () => {
+      const currentTheme = htmlRoot.getAttribute('data-theme');
+      const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+      htmlRoot.setAttribute('data-theme', newTheme);
+      localStorage.setItem('theme', newTheme);
+    });
+
+    // Переключение разделов
+    function switchToSection(sectionId) {
+      sections.forEach(section => section.classList.remove('active'));
+      navItems.forEach(item => item.classList.remove('active'));
+      
+      const targetSection = document.getElementById(`${sectionId}-section`);
+      if (targetSection) {
+        targetSection.classList.add('active');
+      }
+      const navItem = document.querySelector(`.nav-item[data-section="${sectionId}"]`);
+      if (navItem) {
+        navItem.classList.add('active');
+      }
+      
+      updateUI();
+    }
+
+    navItems.forEach(item => {
+      item.addEventListener('click', () => {
+        const sectionId = item.getAttribute('data-section');
+        switchToSection(sectionId);
+        if (sectionId === 'business') loadBusiness();
+        if (sectionId === 'market') loadMarket();
+        if (sectionId === 'wallet') loadWallet();
+      });
+    });
+
+    // Handle click with server sync
     async function handleClick() {
       if (!telegramId) return;
+
       try {
         const response = await fetch(`${apiBase}/click/${telegramId}`, {
           method: 'POST',
@@ -985,20 +999,31 @@
           progress = parseFloat(updatedUser.progress);
           totalClicks = updatedUser.total_clicks;
           clickValue = 2.50 * level;
-          if (updatedUser.level > level) {
-            showToast(`🎉 Уровень повышен! Заработок: $${clickValue.toFixed(2)}`);
+
+          if (updatedUser.level > level) { // Level up check
+            showToast(`🎉 Новый уровень! Теперь вы зарабатываете $${clickValue.toFixed(2)} за клик`);
           }
         }
       } catch (err) {
         console.error('Click error:', err);
       }
+
       updateUI();
-      tapCircle.animate([{ transform: 'scale(1)' }, { transform: 'scale(0.95)' }, { transform: 'scale(1)' }], { duration: 150, easing: 'ease-out' });
+
+      // Анимация клика
+      tapCircle.animate([
+        { transform: 'scale(1)' },
+        { transform: 'scale(0.95)' },
+        { transform: 'scale(1)' }
+      ], {
+        duration: 200,
+        easing: 'ease-out'
+      });
     }
 
-    elements.tapCircle.addEventListener('click', handleClick);
+    tapCircle.addEventListener('click', handleClick);
 
-    // Синхронизация баланса
+    // Sync balance every 30 seconds
     setInterval(async () => {
       if (!telegramId) return;
       try {
@@ -1014,307 +1039,208 @@
 
     // Обновление UI
     function updateUI() {
-      const formatted = '$ ' + balance.toFixed(2).replace('.', ',');
-      elements.cardBalanceEl.textContent = formatted;
-      elements.walletBalanceEl.textContent = formatted;
-      elements.cardLevelEl.textContent = level;
-      elements.profileLevelEl.textContent = level;
+      const formattedBalance = '$ ' + balance.toFixed(2).replace('.', ',');
+      cardBalanceEl.textContent = formattedBalance;
+      walletBalanceEl.textContent = formattedBalance;
+      cardLevelEl.textContent = level;
+      profileLevelEl.textContent = level;
       
-      const next = level * 1000;
-      const percent = Math.min(100, Math.round((progress / next) * 100));
-      elements.progressFillEl.style.width = `${percent}%`;
-      elements.progressTextEl.textContent = `$${progress.toFixed(0)} / $${next.toFixed(0)}`;
-      elements.progressPercentEl.textContent = `${percent}%`;
-      elements.totalClicksEl.textContent = totalClicks;
+      const nextThreshold = level * 1000;
+      const progressPercent = Math.min(100, Math.round((progress / nextThreshold) * 100));
+      progressFillEl.style.width = `${progressPercent}%`;
+      progressTextEl.textContent = `$${progress.toFixed(0)} / $${nextThreshold.toFixed(0)}`;
+      progressPercentEl.textContent = `${progressPercent}%`;
+
+      totalClicksEl.textContent = totalClicks;
     }
 
-    // Toast
+    // Toast уведомления
     function showToast(message) {
       const toast = document.getElementById('toast');
       toast.textContent = message;
       toast.classList.add('show');
-      setTimeout(() => toast.classList.remove('show'), 3000);
+      
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3000);
+    }
+
+    // Загрузка бизнеса
+    async function loadBusiness() {
+      try {
+        const response = await fetch(`${apiBase}/companies/owned/${telegramId}`);
+        const companies = await response.json();
+        businessList.innerHTML = '';
+        if (companies.length === 0) {
+          businessEmpty.style.display = 'block';
+        } else {
+          businessEmpty.style.display = 'none';
+          companies.forEach(c => {
+            const btn = document.createElement('div');
+            btn.classList.add('btn', 'btn-outline');
+            btn.textContent = c.name;
+            btn.addEventListener('click', () => viewCompany(c));
+            businessList.appendChild(btn);
+          });
+        }
+        const createForm = document.getElementById('create-company-form');
+        if (companies.length < 2) {
+          createForm.style.display = 'block';
+          const cost = companies.length === 0 ? 0 : 1000000;
+          createCostEl.textContent = cost === 0 ? 'Free' : `$ ${cost.toLocaleString()}`;
+        } else {
+          createForm.style.display = 'none';
+        }
+      } catch (err) {
+        console.error('Load business error:', err);
+      }
     }
 
     // Создание компании
-    async function createCompany(name) {
-      if (!telegramId) return;
-      try {
-        const response = await fetch(`${apiBase}/companies`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name, telegram_id: telegramId })
-        });
-        const result = await response.json();
-        if (result.success) {
-          showToast('✅ Компания создана!');
-          loadUserCompanies();
-        } else {
-          showToast(`❌ ${result.error}`);
-        }
-      } catch (err) {
-        showToast('❌ Ошибка сервера');
-      }
-    }
-
-    // Валидация имени
-    function validateCompanyName(name) {
-      const englishRegex = /^[a-zA-Z]+$/;
-      if (!englishRegex.test(name)) return 'Только английские буквы';
-      if (name.length < 3 || name.length > 50) return 'Имя от 3 до 50 букв';
-      return null;
-    }
-
-    // Загрузка компаний пользователя
-    async function loadUserCompanies() {
-      if (!telegramId) return;
-      try {
-        const response = await fetch(`${apiBase}/companies/user/${telegramId}`);
-        const companies = await response.json();
-        const content = elements.businessContent;
-        if (companies.length === 0) {
-          content.innerHTML = `
-            <div class="card">
-              <div class="empty-state">
-                <i class="fas fa-building"></i>
-                <p>Создайте первую компанию бесплатно</p>
-              </div>
-              <div class="form-group">
-                <label class="form-label">Название компании</label>
-                <input type="text" class="form-input" id="company-name-input" placeholder="Только английские буквы">
-                <div class="error-message" id="company-name-error"></div>
-              </div>
-              <button class="btn btn-primary" onclick="createCompanyFromInput()">Создать компанию</button>
-            </div>
-          `;
-          document.getElementById('company-name-input').addEventListener('input', (e) => {
-            const error = validateCompanyName(e.target.value);
-            const errEl = document.getElementById('company-name-error');
-            errEl.textContent = error || '';
-            e.target.classList.toggle('error', !!error);
-          });
-        } else {
-          const list = document.createElement('div');
-          list.className = 'company-list';
-          companies.forEach(company => {
-            const card = document.createElement('div');
-            card.className = 'company-card';
-            card.innerHTML = `
-              <div class="company-name">${company.name}</div>
-              <div class="company-meta">
-                <span>Акции: ${company.available_shares} доступно</span>
-                <span>Цена: $${company.price}</span>
-              </div>
-            `;
-            card.onclick = () => { currentCompanyId = company.id; switchToSection('company-detail'); };
-            list.appendChild(card);
-          });
-          content.innerHTML = list.outerHTML;
-        }
-      } catch (err) {
-        console.error('Load companies error:', err);
-      }
-    }
-
-    function createCompanyFromInput() {
-      const input = document.getElementById('company-name-input');
-      const name = input.value.trim();
-      const error = validateCompanyName(name);
-      if (error) {
-        document.getElementById('company-name-error').textContent = error;
-        input.classList.add('error');
+    createCompanyBtn.addEventListener('click', async () => {
+      const name = companyNameInput.value.trim();
+      const price = parseFloat(sharePriceInput.value);
+      if (!name.match(/^[a-zA-Z]+$/)) {
+        showToast('Название должно содержать только английские буквы');
         return;
       }
-      createCompany(name);
-    }
-
-    function backToBusiness() {
-      currentCompanyId = null;
-      switchToSection('business');
-    }
-
-    // Детали компании
-    async function loadCompanyDetails() {
-      if (!currentCompanyId || !telegramId) return;
-      try {
-        const response = await fetch(`${apiBase}/companies/${currentCompanyId}`);
-        const company = await response.json();
-        if (company) {
-          const portfolioRes = await fetch(`${apiBase}/portfolio/${telegramId}`);
-          const portfolio = await portfolioRes.json();
-          const userShares = portfolio.find(p => p.company_id === currentCompanyId)?.quantity || 0;
-          elements.companyDetailContent.innerHTML = `
-            <div class="company-detail-header">
-              <i class="fas fa-building company-detail-icon"></i>
-              <div>
-                <div class="company-detail-title">${company.name}</div>
-                <div style="font-size: 14px; color: var(--text-secondary);">Ваша компания</div>
-              </div>
-            </div>
-            <div class="stock-info">
-              <div class="stock-stat">
-                <div class="stock-stat-value">$${company.price}</div>
-                <div class="stock-stat-label">Цена акции</div>
-              </div>
-              <div class="stock-stat">
-                <div class="stock-stat-value">${company.available_shares}</div>
-                <div class="stock-stat-label">Доступно</div>
-              </div>
-              <div class="stock-stat">
-                <div class="stock-stat-value">${userShares}</div>
-                <div class="stock-stat-label">В портфеле</div>
-              </div>
-              <div class="stock-stat">
-                <div class="stock-stat-value">$${ (userShares * company.price).toFixed(2) }</div>
-                <div class="stock-stat-label">Стоимость</div>
-              </div>
-            </div>
-          `;
-        }
-      } catch (err) {
-        console.error('Load company details error:', err);
+      if (isNaN(price) || price <= 0) {
+        showToast('Цена акции должна быть положительной');
+        return;
       }
+      try {
+        const response = await fetch(`${apiBase}/companies/${telegramId}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, share_price: price })
+        });
+        if (!response.ok) {
+          const err = await response.json();
+          showToast(err.error);
+          return;
+        }
+        const data = await response.json();
+        balance = data.new_balance;
+        updateUI();
+        showToast('Компания создана');
+        companyNameInput.value = '';
+        sharePriceInput.value = '';
+        loadBusiness();
+      } catch (err) {
+        console.error('Create company error:', err);
+      }
+    });
+
+    // Просмотр компании
+    function viewCompany(company) {
+      companyNameDetail.textContent = company.name;
+      companyOwnerDetail.textContent = company.owner_username ? `@${company.owner_username}` : company.first_name;
+      companyPriceDetail.textContent = `$ ${company.share_price.toFixed(2)}`;
+      switchToSection('company-details');
     }
+
+    backToBusiness.addEventListener('click', () => {
+      switchToSection('business');
+      loadBusiness();
+    });
 
     // Загрузка рынка
-    async function loadMarketStocks() {
+    async function loadMarket() {
       try {
         const response = await fetch(`${apiBase}/companies`);
         const companies = await response.json();
-        const content = elements.marketContent;
+        marketList.innerHTML = '';
         if (companies.length === 0) {
-          content.innerHTML = `
-            <div class="card">
-              <div class="empty-state">
-                <i class="fas fa-chart-line"></i>
-                <p>Нет акций на рынке</p>
-                <p>Создайте компанию в разделе Бизнес</p>
-              </div>
-            </div>
-          `;
+          marketEmpty.style.display = 'block';
         } else {
-          const list = document.createElement('div');
-          list.className = 'stock-list';
-          companies.forEach(company => {
-            const card = document.createElement('div');
-            card.className = 'stock-card';
-            card.innerHTML = `
-              <div class="stock-info-left">
-                <div class="stock-name">${company.name}</div>
-                <div class="stock-meta">Владелец: ${company.owner_name}</div>
-                <div class="stock-available">${company.available_shares} доступно</div>
-              </div>
-              <div style="text-align: right;">
-                <div class="stock-price">$${company.price}</div>
-                <button class="btn btn-primary" style="width: auto; padding: 8px 16px; margin-top: 8px;" onclick="openBuyModal(${company.id}, '${company.name}', ${company.price})">Купить</button>
-              </div>
-            `;
-            list.appendChild(card);
+          marketEmpty.style.display = 'none';
+          companies.forEach(c => {
+            const btn = document.createElement('div');
+            btn.classList.add('btn', 'btn-outline');
+            const owner = c.owner_username ? `@${c.owner_username}` : c.first_name;
+            btn.textContent = `${c.name} by ${owner} - $ ${c.share_price.toFixed(2)}`;
+            btn.addEventListener('click', () => viewStock(c));
+            marketList.appendChild(btn);
           });
-          content.innerHTML = list.outerHTML;
         }
       } catch (err) {
         console.error('Load market error:', err);
       }
     }
 
-    // Модал покупки
-    function openBuyModal(id, name, price) {
-      currentBuyCompany = { id, name, price };
-      elements.modalCompany.value = name;
-      elements.modalPrice.value = `$${price}`;
-      elements.modalQuantity.value = 1;
-      elements.modalTitle.textContent = `Покупка ${name}`;
-      elements.modalError.textContent = '';
-      elements.buyModal.classList.add('active');
+    // Просмотр акции для покупки
+    function viewStock(company) {
+      currentCompany = company;
+      buyCompanyName.textContent = company.name;
+      buyCompanyOwner.textContent = company.owner_username ? `@${company.owner_username}` : company.first_name;
+      buySharePrice.textContent = `$ ${company.share_price.toFixed(2)}`;
+      buyQuantity.value = 1;
+      updateBuyTotal();
+      switchToSection('buy-stock');
     }
 
-    function closeModal() {
-      elements.buyModal.classList.remove('active');
-      elements.modalQuantity.value = '';
-      currentBuyCompany = null;
+    function updateBuyTotal() {
+      const qty = parseInt(buyQuantity.value) || 0;
+      const total = qty * currentCompany.share_price;
+      buyTotalCost.textContent = `$ ${total.toFixed(2)}`;
     }
 
-    async function confirmBuy() {
-      const quantity = parseInt(elements.modalQuantity.value);
-      if (!quantity || quantity < 1) {
-        elements.modalError.textContent = 'Введите количество';
-        return;
-      }
-      const { id, name, price } = currentBuyCompany;
-      const totalCost = quantity * price;
-      if (balance < totalCost) {
-        elements.modalError.textContent = 'Недостаточно средств';
+    buyQuantity.addEventListener('input', updateBuyTotal);
+
+    buySharesBtn.addEventListener('click', async () => {
+      const quantity = parseInt(buyQuantity.value);
+      if (quantity <= 0) {
+        showToast('Количество должно быть положительным');
         return;
       }
       try {
-        const response = await fetch(`${apiBase}/buy-stock`, {
+        const response = await fetch(`${apiBase}/buy-shares/${currentCompany.id}/${telegramId}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ telegram_id: telegramId, company_id: id, quantity, total_cost: totalCost })
+          body: JSON.stringify({ quantity })
         });
-        const result = await response.json();
-        if (result.success) {
-          balance -= totalCost;
-          showToast(`✅ Куплено ${quantity} акций ${name} за $${totalCost.toFixed(2)}`);
-          closeModal();
-          updateUI();
-          if (document.querySelector('.nav-item[data-section="wallet"]').classList.contains('active')) loadPortfolio();
-          if (document.querySelector('.nav-item[data-section="market"]').classList.contains('active')) loadMarketStocks();
-          if (document.querySelector('.nav-item[data-section="company-detail"]').classList.contains('active')) loadCompanyDetails();
-        } else {
-          elements.modalError.textContent = result.error;
+        if (!response.ok) {
+          const err = await response.json();
+          showToast(err.error);
+          return;
         }
+        const data = await response.json();
+        balance = data.new_balance;
+        updateUI();
+        showToast('Акции куплены');
+        switchToSection('market');
+        loadMarket();
       } catch (err) {
-        elements.modalError.textContent = 'Ошибка сервера';
+        console.error('Buy shares error:', err);
       }
-    }
+    });
 
-    // Портфель
-    async function loadPortfolio() {
-      if (!telegramId) return;
+    backToMarket.addEventListener('click', () => {
+      switchToSection('market');
+      loadMarket();
+    });
+
+    // Загрузка кошелька
+    async function loadWallet() {
       try {
-        const response = await fetch(`${apiBase}/portfolio/${telegramId}`);
-        const portfolio = await response.json();
-        const list = elements.portfolioList;
-        let totalValue = balance;
-        if (portfolio.length === 0) {
-          list.innerHTML = '<div class="empty-state" style="padding: 20px;"><i class="fas fa-briefcase"></i><p>Портфель пуст</p></div>';
-        } else {
-          list.innerHTML = '';
-          portfolio.forEach(item => {
-            const value = item.quantity * item.current_price;
-            totalValue += value;
-            const div = document.createElement('div');
-            div.className = 'portfolio-item';
-            div.innerHTML = `
-              <div class="portfolio-left">
-                <i class="fas fa-chart-line portfolio-icon"></i>
-                <div class="portfolio-name">${item.company_name}</div>
-              </div>
-              <div>
-                <div>${item.quantity} шт.</div>
-                <div class="portfolio-value">$${value.toFixed(2)}</div>
-              </div>
-            `;
-            list.appendChild(div);
-          });
-        }
-        elements.portfolioTotalEl.textContent = `Общая стоимость: $${totalValue.toFixed(2)}`;
+        const response = await fetch(`${apiBase}/owned-shares/${telegramId}`);
+        const owned = await response.json();
+        let totalShares = 0;
+        let stocksValue = 0;
+        owned.forEach(o => {
+          totalShares += o.shares;
+          stocksValue += o.shares * o.share_price;
+        });
+        walletStocksEl.textContent = totalShares;
+        const totalValue = balance + stocksValue;
+        walletTotalEl.textContent = '$ ' + totalValue.toFixed(2).replace('.', ',');
       } catch (err) {
-        console.error('Load portfolio error:', err);
+        console.error('Load wallet error:', err);
       }
     }
 
     // Инициализация
     loadUserData();
-    switchToSection('home');
-
-    // Обработчики модала
-    document.addEventListener('click', (e) => {
-      if (e.target === elements.buyModal) closeModal();
-    });
-    elements.modalQuantity.addEventListener('input', () => elements.modalError.textContent = '');
   </script>
 
 </body>
