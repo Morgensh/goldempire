@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
+    /* Только базовые сбросы и белый фон */
     * {
       margin: 0;
       padding: 0;
@@ -18,19 +19,22 @@
       background: white;
       color: black;
       min-height: 100vh;
-      padding-bottom: 72px;
+      padding-bottom: 72px; /* место под навигацию */
     }
 
+    /* Простой заголовок */
     .header {
       padding: 20px;
       font-size: 24px;
       font-weight: bold;
     }
 
+    /* Основной контент */
     .main-content {
       padding: 0 20px;
     }
 
+    /* Секции — только блок/скрыто */
     .section {
       display: none;
     }
@@ -39,6 +43,7 @@
       display: block;
     }
 
+    /* Карточки — просто белый фон, граница и отступы */
     .card {
       background: white;
       border: 1px solid #ccc;
@@ -46,6 +51,7 @@
       margin-bottom: 16px;
     }
 
+    /* Банковская карта — просто прямоугольник */
     .bank-card {
       background: white;
       border: 1px solid #ccc;
@@ -53,6 +59,7 @@
       margin-bottom: 24px;
     }
 
+    /* Кликер — просто круглая кнопка */
     .tap-circle {
       width: 120px;
       height: 120px;
@@ -71,6 +78,7 @@
       margin: 10px 0;
     }
 
+    /* Кнопки — просто прямоугольники */
     .btn {
       padding: 12px;
       background: white;
@@ -80,6 +88,7 @@
       text-align: center;
     }
 
+    /* Нижняя навигация — просто ряд иконок */
     .bottom-nav {
       display: flex;
       justify-content: space-around;
@@ -106,6 +115,7 @@
       font-weight: bold;
     }
 
+    /* Toast — просто белый блок с текстом */
     #toast {
       position: fixed;
       bottom: 100px;
@@ -124,12 +134,14 @@
       opacity: 1;
     }
 
+    /* Заголовки секций */
     .section-title {
       font-size: 22px;
       font-weight: bold;
       margin: 20px 0 10px;
     }
 
+    /* Профиль — просто структура */
     .profile-header {
       text-align: center;
       margin-bottom: 20px;
@@ -144,6 +156,10 @@
       display: flex;
       align-items: center;
       justify-content: center;
+    }
+
+    .profile-level, .stat-row {
+      margin: 8px 0;
     }
 
     .stat-row {
@@ -166,69 +182,12 @@
       width: 0%;
     }
 
-    /* Стили для модальных окон и страниц */
-    .modal {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(255,255,255,0.95);
-      z-index: 2000;
-      display: none;
-      flex-direction: column;
-      padding: 20px;
-    }
-
-    .modal.active {
-      display: flex;
-    }
-
-    .modal-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-    }
-
-    .modal-title {
-      font-size: 22px;
-      font-weight: bold;
-    }
-
-    .modal-close {
-      cursor: pointer;
-      font-size: 24px;
-    }
-
-    .input-field {
+    /* Дополнительно для форм */
+    input[type="text"], input[type="number"] {
       width: 100%;
       padding: 12px;
-      margin: 8px 0;
-      border: 1px solid #ccc;
-    }
-
-    .stock-item {
-      padding: 16px;
       border: 1px solid #ccc;
       margin: 8px 0;
-      cursor: pointer;
-    }
-
-    .stock-info {
-      margin: 8px 0;
-    }
-
-    .wallet-stock-item {
-      padding: 16px;
-      border: 1px solid #ccc;
-      margin: 8px 0;
-    }
-
-    .wallet-stock-actions {
-      display: flex;
-      gap: 8px;
-      margin-top: 8px;
     }
   </style>
 </head>
@@ -242,11 +201,12 @@
     
     <!-- Главная (кликер) -->
     <div class="section active" id="home-section">
+      <!-- Банковская карта -->
       <div class="bank-card">
         <div>RICHMAN</div>
         <div>•••• •••• •••• 1234</div>
         <div>
-          <div>Баланс: <span id="card-balance">$ 65,00</span></div>
+          <div>Баланс: <span id="card-balance">$ 0,00</span></div>
           <div>Уровень: <span id="card-level">1</span></div>
         </div>
       </div>
@@ -262,18 +222,13 @@
     <!-- Бизнес -->
     <div class="section" id="business-section">
       <h2 class="section-title">Бизнес</h2>
-      <div id="business-list">
-        <!-- Список компаний будет здесь -->
-      </div>
-      <button class="btn" id="create-company-btn">Создать компанию</button>
+      <div id="business-content"></div>
     </div>
 
     <!-- Рынок -->
     <div class="section" id="market-section">
       <h2 class="section-title">Рынок акций</h2>
-      <div id="market-list">
-        <!-- Список акций будет здесь -->
-      </div>
+      <div id="market-content"></div>
     </div>
 
     <!-- Кошелек -->
@@ -282,20 +237,18 @@
       <div class="card">
         <div class="stat-row">
           <span>Баланс</span>
-          <span id="wallet-balance">$ 65,00</span>
+          <span id="wallet-balance">$ 0,00</span>
         </div>
         <div class="stat-row">
           <span>Акции</span>
-          <span id="wallet-stocks-count">0</span>
+          <span id="wallet-shares">0</span>
         </div>
         <div class="stat-row">
           <span>Общая стоимость</span>
-          <span id="wallet-total">$ 65,00</span>
+          <span id="wallet-total">$ 0,00</span>
         </div>
       </div>
-      <div id="wallet-stocks-list">
-        <!-- Акции в кошельке -->
-      </div>
+      <div id="holdings-content"></div>
     </div>
 
     <!-- Профиль -->
@@ -314,7 +267,7 @@
       <div class="card">
         <div class="stat-row">
           <span>ID игрока</span>
-          <span id="player-id">#74291</span>
+          <span id="player-id">#0</span>
         </div>
         <div class="stat-row">
           <span>Всего кликов</span>
@@ -322,7 +275,7 @@
         </div>
         <div class="stat-row">
           <span>Прогресс до следующего уровня</span>
-          <span id="progress-percent">60%</span>
+          <span id="progress-percent">0%</span>
         </div>
       </div>
       
@@ -330,8 +283,20 @@
         <div class="progress-container">
           <div class="progress-fill" id="progress-fill"></div>
         </div>
-        <div style="text-align: center; margin-top: 8px;" id="progress-text">$1 000,00 / $2 000,00</div>
+        <div style="text-align: center; margin-top: 8px;" id="progress-text">$0 / $1 000</div>
       </div>
+    </div>
+
+    <!-- Личный кабинет компании (динамический) -->
+    <div class="section" id="cabinet-section">
+      <h2 class="section-title">Личный кабинет компании</h2>
+      <div id="cabinet-content"></div>
+    </div>
+
+    <!-- Детали акций (динамический) -->
+    <div class="section" id="stock-detail-section">
+      <h2 class="section-title">Детали акций</h2>
+      <div id="stock-detail-content"></div>
     </div>
 
   </div>
@@ -363,74 +328,6 @@
   <!-- Toast уведомление -->
   <div id="toast"></div>
 
-  <!-- Модальное окно создания компании -->
-  <div class="modal" id="create-company-modal">
-    <div class="modal-header">
-      <div class="modal-title">Создать компанию</div>
-      <div class="modal-close" id="close-create-modal">&times;</div>
-    </div>
-    <input type="text" class="input-field" id="company-name-input" placeholder="Название компании (только английские буквы)">
-    <button class="btn" id="confirm-create-company">Создать</button>
-  </div>
-
-  <!-- Личный кабинет компании -->
-  <div class="modal" id="company-cabinet-modal">
-    <div class="modal-header">
-      <div class="modal-title" id="company-cabinet-title">Личный кабинет компании</div>
-      <div class="modal-close" id="close-company-cabinet">&times;</div>
-    </div>
-    <div class="card">
-      <div class="stat-row">
-        <span>Название</span>
-        <span id="cabinet-company-name">-</span>
-      </div>
-      <div class="stat-row">
-        <span>Клиентов</span>
-        <span id="cabinet-clients">0</span>
-      </div>
-      <div class="stat-row">
-        <span>Выпущено акций</span>
-        <span id="cabinet-issued">0</span>
-      </div>
-      <div class="stat-row">
-        <span>Доступно к выпуску</span>
-        <span id="cabinet-available">0</span>
-      </div>
-    </div>
-    <button class="btn" id="issue-more-shares">Выпустить ещё акций</button>
-  </div>
-
-  <!-- Страница акции на рынке -->
-  <div class="modal" id="stock-detail-modal">
-    <div class="modal-header">
-      <div class="modal-title" id="stock-detail-title">Акция</div>
-      <div class="modal-close" id="close-stock-detail">&times;</div>
-    </div>
-    <div class="card">
-      <div class="stat-row">
-        <span>Компания</span>
-        <span id="stock-company-name">-</span>
-      </div>
-      <div class="stat-row">
-        <span>Владелец</span>
-        <span id="stock-owner">-</span>
-      </div>
-      <div class="stat-row">
-        <span>Клиентов</span>
-        <span id="stock-clients">0</span>
-      </div>
-      <div class="stat-row">
-        <span>Цена за акцию</span>
-        <span id="stock-price">-</span>
-      </div>
-      <div class="stat-row">
-        <span>Количество</span>
-        <input type="number" class="input-field" id="buy-amount" value="1" min="1">
-      </div>
-    </div>
-    <button class="btn" id="buy-stock-btn">Купить</button>
-  </div>
-
   <script>
     // Telegram WebApp init
     const tg = window.Telegram.WebApp;
@@ -440,17 +337,15 @@
     // Глобальные переменные
     let userData = tg.initDataUnsafe.user || {};
     let telegramId = userData.id || 0;
-    let balance = 65.00;
+    let balance = 0.00;
     let clickValue = 2.50;
     let level = 1;
-    let progress = 600;
+    let progress = 0;
     let totalClicks = 0;
     let apiBase = 'https://dinod.ru/api';
-
-    // Новые глобальные переменные
-    let companies = []; // [{ id, name, ownerId, issuedShares, clients }]
-    let ownedStocks = []; // [{ companyId, companyName, amount, buyPrice, currentPrice }]
-    let marketStocks = []; // [{ companyId, companyName, ownerId, clients, price }]
+    let currentSection = 'home';
+    let previousSection = '';
+    let currentCompanyId = null;
 
     // DOM элементы
     const navItems = document.querySelectorAll('.nav-item');
@@ -462,8 +357,8 @@
     const progressTextEl = document.getElementById('progress-text');
     const progressPercentEl = document.getElementById('progress-percent');
     const walletBalanceEl = document.getElementById('wallet-balance');
+    const walletSharesEl = document.getElementById('wallet-shares');
     const walletTotalEl = document.getElementById('wallet-total');
-    const walletStocksCountEl = document.getElementById('wallet-stocks-count');
     const profileLevelEl = document.getElementById('profile-level');
     const totalClicksEl = document.getElementById('total-clicks');
     const profileAvatarEl = document.getElementById('profile-avatar');
@@ -471,24 +366,22 @@
     const profileUsernameEl = document.getElementById('profile-username');
     const playerIdEl = document.getElementById('player-id');
     const avatarImgEl = document.getElementById('avatar-img');
+    const businessContentEl = document.getElementById('business-content');
+    const marketContentEl = document.getElementById('market-content');
+    const holdingsContentEl = document.getElementById('holdings-content');
+    const cabinetContentEl = document.getElementById('cabinet-content');
+    const stockDetailContentEl = document.getElementById('stock-detail-content');
 
-    // Модальные окна
-    const createCompanyModal = document.getElementById('create-company-modal');
-    const companyCabinetModal = document.getElementById('company-cabinet-modal');
-    const stockDetailModal = document.getElementById('stock-detail-modal');
-
-    // Кнопки
-    const createCompanyBtn = document.getElementById('create-company-btn');
-    const closeCreateModal = document.getElementById('close-create-modal');
-    const confirmCreateCompany = document.getElementById('confirm-create-company');
-    const closeCompanyCabinet = document.getElementById('close-company-cabinet');
-    const closeStockDetail = document.getElementById('close-stock-detail');
-    const buyStockBtn = document.getElementById('buy-stock-btn');
-    const issueMoreSharesBtn = document.getElementById('issue-more-shares');
-
-    // Поля ввода
-    const companyNameInput = document.getElementById('company-name-input');
-    const buyAmountInput = document.getElementById('buy-amount');
+    // Инициализация профиля из Telegram
+    function initProfile() {
+      profileNameEl.textContent = (userData.first_name || 'Richman') + ' ' + (userData.last_name || '');
+      profileUsernameEl.textContent = '@' + (userData.username || 'anonymous');
+      playerIdEl.textContent = '#' + telegramId;
+      if (userData.photo_url) {
+        avatarImgEl.src = userData.photo_url;
+        avatarImgEl.style.display = 'block';
+      }
+    }
 
     // Переключение разделов
     function switchToSection(sectionId) {
@@ -496,8 +389,11 @@
       navItems.forEach(item => item.classList.remove('active'));
       
       document.getElementById(`${sectionId}-section`).classList.add('active');
-      document.querySelector(`.nav-item[data-section="${sectionId}"]`).classList.add('active');
+      const navItem = document.querySelector(`.nav-item[data-section="${sectionId}"]`);
+      if (navItem) navItem.classList.add('active');
       
+      currentSection = sectionId;
+      loadSectionContent(sectionId);
       updateUI();
     }
 
@@ -507,6 +403,292 @@
         switchToSection(sectionId);
       });
     });
+
+    // Открытие подраздела
+    function openSubSection(subId, data) {
+      previousSection = currentSection;
+      currentCompanyId = data.companyId;
+      switchToSection(subId);
+      tg.BackButton.show();
+    }
+
+    // Обработка back button
+    tg.BackButton.onClick(() => {
+      tg.BackButton.hide();
+      switchToSection(previousSection);
+      currentCompanyId = null;
+    });
+
+    // Загрузка контента раздела
+    async function loadSectionContent(sectionId) {
+      if (sectionId === 'business') {
+        await loadBusinessContent();
+      } else if (sectionId === 'market') {
+        await loadMarketContent();
+      } else if (sectionId === 'wallet') {
+        await loadWalletContent();
+      } else if (sectionId === 'cabinet') {
+        await loadCabinetContent();
+      } else if (sectionId === 'stock-detail') {
+        await loadStockDetailContent();
+      }
+    }
+
+    // Загрузка бизнес контента
+    async function loadBusinessContent() {
+      businessContentEl.innerHTML = '';
+      try {
+        const res = await fetch(`${apiBase}/companies/user/${telegramId}`);
+        const companies = await res.json();
+        companies.forEach(comp => {
+          const btn = document.createElement('div');
+          btn.className = 'btn';
+          btn.textContent = comp.name;
+          btn.onclick = () => openSubSection('cabinet', {companyId: comp.id});
+          businessContentEl.appendChild(btn);
+        });
+
+        const count = companies.length;
+        if (count < 2) {
+          const form = document.createElement('div');
+          form.className = 'card';
+          form.innerHTML = `
+            <p>Создать компанию (${count === 0 ? 'бесплатно' : 'за $1,000,000'})</p>
+            <input type="text" id="company-name" placeholder="Название (только английские буквы)">
+            <div class="btn" id="create-company-btn">Создать</div>
+          `;
+          businessContentEl.appendChild(form);
+
+          document.getElementById('create-company-btn').onclick = async () => {
+            const name = document.getElementById('company-name').value.trim();
+            if (!/^[a-zA-Z]+$/.test(name)) {
+              showToast('Название должно содержать только английские буквы');
+              return;
+            }
+            try {
+              const res = await fetch(`${apiBase}/company`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({name, telegramId})
+              });
+              if (!res.ok) throw new Error(await res.text());
+              const userRes = await fetch(`${apiBase}/user/${telegramId}`);
+              const updatedUser = await userRes.json();
+              balance = updatedUser.balance;
+              showToast('Компания создана!');
+              loadBusinessContent();
+            } catch (err) {
+              showToast(err.message || 'Ошибка создания');
+            }
+          };
+        }
+      } catch (err) {
+        showToast('Ошибка загрузки');
+      }
+    }
+
+    // Загрузка рынка
+    async function loadMarketContent() {
+      marketContentEl.innerHTML = '';
+      try {
+        const res = await fetch(`${apiBase}/companies`);
+        const companies = await res.json();
+        companies.forEach(comp => {
+          const card = document.createElement('div');
+          card.className = 'card';
+          card.innerHTML = `
+            <p>Компания: ${comp.name}</p>
+            <p>Владелец: @${comp.owner_username || 'unknown'}</p>
+            <p>Клиенты: ${comp.clients_count}</p>
+            <p>Цена акции: $${comp.current_price.toFixed(2)}</p>
+          `;
+          const btn = document.createElement('div');
+          btn.className = 'btn';
+          btn.textContent = 'Купить акции';
+          btn.onclick = () => openSubSection('stock-detail', {companyId: comp.id});
+          card.appendChild(btn);
+          marketContentEl.appendChild(card);
+        });
+      } catch (err) {
+        showToast('Ошибка загрузки рынка');
+      }
+    }
+
+    // Загрузка кошелька
+    async function loadWalletContent() {
+      holdingsContentEl.innerHTML = '';
+      let totalShares = 0;
+      let totalValue = balance;
+      try {
+        const res = await fetch(`${apiBase}/holdings/${telegramId}`);
+        const holdings = await res.json();
+        holdings.forEach(hold => {
+          totalShares += hold.shares;
+          const currentValue = hold.shares * hold.current_price;
+          totalValue += currentValue;
+          const profit = currentValue - hold.total_cost;
+          const card = document.createElement('div');
+          card.className = 'card';
+          card.innerHTML = `
+            <p>Компания: ${hold.name}</p>
+            <p>Акции: ${hold.shares}</p>
+            <p>Куплено за: $${hold.average_price.toFixed(2)} в среднем</p>
+            <p>Доход: $${profit.toFixed(2)}</p>
+          `;
+          const btn = document.createElement('div');
+          btn.className = 'btn';
+          btn.textContent = 'Управлять акциями';
+          btn.onclick = () => openSubSection('stock-detail', {companyId: hold.company_id});
+          card.appendChild(btn);
+          holdingsContentEl.appendChild(card);
+        });
+        walletSharesEl.textContent = totalShares;
+        walletTotalEl.textContent = '$ ' + totalValue.toFixed(2).replace('.', ',');
+      } catch (err) {
+        showToast('Ошибка загрузки кошелька');
+      }
+    }
+
+    // Загрузка кабинета
+    async function loadCabinetContent() {
+      cabinetContentEl.innerHTML = '';
+      if (!currentCompanyId) return;
+      try {
+        const res = await fetch(`${apiBase}/company/${currentCompanyId}`);
+        const comp = await res.json();
+        if (comp.owner_id !== telegramId) {
+          showToast('Не ваша компания');
+          return;
+        }
+        const allowed = 100000 + 1000 * comp.clients_count;
+        const available = allowed - comp.issued_shares;
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = `
+          <p>Компания: ${comp.name}</p>
+          <p>Выпущено акций: ${comp.issued_shares}</p>
+          <p>Клиенты: ${comp.clients_count}</p>
+          <p>Доступно для выпуска: ${available}</p>
+          <input type="number" id="issue-amount" placeholder="Количество для выпуска" min="1" max="${available}">
+          <div class="btn" id="issue-btn">Выпустить акции</div>
+        `;
+        cabinetContentEl.appendChild(card);
+
+        document.getElementById('issue-btn').onclick = async () => {
+          const amount = parseInt(document.getElementById('issue-amount').value);
+          if (isNaN(amount) || amount <= 0 || amount > available) {
+            showToast('Неверное количество');
+            return;
+          }
+          try {
+            const res = await fetch(`${apiBase}/issue_shares/${currentCompanyId}`, {
+              method: 'POST',
+              headers: {'Content-Type': 'application/json'},
+              body: JSON.stringify({amount, telegramId})
+            });
+            if (!res.ok) throw new Error(await res.text());
+            showToast('Акции выпущены!');
+            loadCabinetContent();
+          } catch (err) {
+            showToast(err.message || 'Ошибка выпуска');
+          }
+        };
+      } catch (err) {
+        showToast('Ошибка загрузки кабинета');
+      }
+    }
+
+    // Загрузка деталей акций
+    async function loadStockDetailContent() {
+      stockDetailContentEl.innerHTML = '';
+      if (!currentCompanyId) return;
+      try {
+        const compRes = await fetch(`${apiBase}/company/${currentCompanyId}`);
+        const comp = await compRes.json();
+        const holdRes = await fetch(`${apiBase}/holding/${telegramId}/${currentCompanyId}`);
+        const hold = await holdRes.json() || {shares: 0, total_cost: 0, average_price: 0};
+        const profit = (hold.shares * comp.current_price) - hold.total_cost;
+
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = `
+          <p>Компания: ${comp.name}</p>
+          <p>Цена акции: $${comp.current_price.toFixed(2)}</p>
+          <p>Ваши акции: ${hold.shares}</p>
+          <p>Средняя цена покупки: $${hold.average_price.toFixed(2)}</p>
+          <p>Доход: $${profit.toFixed(2)}</p>
+        `;
+        stockDetailContentEl.appendChild(card);
+
+        // Buy form
+        const buyForm = document.createElement('div');
+        buyForm.className = 'card';
+        buyForm.innerHTML = `
+          <p>Купить акции</p>
+          <input type="number" id="buy-amount" placeholder="Количество" min="1">
+          <div class="btn" id="buy-btn">Купить</div>
+        `;
+        stockDetailContentEl.appendChild(buyForm);
+
+        document.getElementById('buy-btn').onclick = async () => {
+          const amount = parseInt(document.getElementById('buy-amount').value);
+          if (isNaN(amount) || amount <= 0) {
+            showToast('Неверное количество');
+            return;
+          }
+          try {
+            const res = await fetch(`${apiBase}/buy_shares/${currentCompanyId}`, {
+              method: 'POST',
+              headers: {'Content-Type': 'application/json'},
+              body: JSON.stringify({amount, telegramId})
+            });
+            if (!res.ok) throw new Error(await res.text());
+            const updated = await res.json();
+            balance = updated.balance;
+            showToast('Акции куплены!');
+            loadStockDetailContent();
+          } catch (err) {
+            showToast(err.message || 'Ошибка покупки');
+          }
+        };
+
+        // Sell form if has shares
+        if (hold.shares > 0) {
+          const sellForm = document.createElement('div');
+          sellForm.className = 'card';
+          sellForm.innerHTML = `
+            <p>Продать акции</p>
+            <input type="number" id="sell-amount" placeholder="Количество" min="1" max="${hold.shares}">
+            <div class="btn" id="sell-btn">Продать</div>
+          `;
+          stockDetailContentEl.appendChild(sellForm);
+
+          document.getElementById('sell-btn').onclick = async () => {
+            const amount = parseInt(document.getElementById('sell-amount').value);
+            if (isNaN(amount) || amount <= 0 || amount > hold.shares) {
+              showToast('Неверное количество');
+              return;
+            }
+            try {
+              const res = await fetch(`${apiBase}/sell_shares/${currentCompanyId}`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({amount, telegramId})
+              });
+              if (!res.ok) throw new Error(await res.text());
+              const updated = await res.json();
+              balance = updated.balance;
+              showToast('Акции проданы!');
+              loadStockDetailContent();
+            } catch (err) {
+              showToast(err.message || 'Ошибка продажи');
+            }
+          };
+        }
+      } catch (err) {
+        showToast('Ошибка загрузки деталей');
+      }
+    }
 
     // Обработка клика
     async function handleClick() {
@@ -532,6 +714,7 @@
 
       updateUI();
 
+      // Простая анимация
       tapCircle.animate([
         { transform: 'scale(1)' },
         { transform: 'scale(0.95)' },
@@ -555,22 +738,7 @@
       progressTextEl.textContent = `$${progress.toFixed(0)} / $${nextThreshold.toFixed(0)}`;
       progressPercentEl.textContent = `${progressPercent}%`;
 
-      // Обновляем кошелёк
-      let totalStocksValue = 0;
-      ownedStocks.forEach(stock => {
-        totalStocksValue += stock.amount * stock.currentPrice;
-      });
-      walletTotalEl.textContent = '$ ' + (balance + totalStocksValue).toFixed(2).replace('.', ',');
-      walletStocksCountEl.textContent = ownedStocks.reduce((sum, s) => sum + s.amount, 0);
-
-      // Обновляем бизнес
-      renderBusinessList();
-
-      // Обновляем рынок
-      renderMarketList();
-
-      // Обновляем кошелёк акций
-      renderWalletStocks();
+      totalClicksEl.textContent = totalClicks;
     }
 
     // Toast уведомления
@@ -578,397 +746,29 @@
       const toast = document.getElementById('toast');
       toast.textContent = message;
       toast.classList.add('show');
-      
       setTimeout(() => {
         toast.classList.remove('show');
       }, 3000);
     }
 
-    // ================= БИЗНЕС =================
-    createCompanyBtn.addEventListener('click', () => {
-      const ownedCompanies = companies.filter(c => c.ownerId == telegramId);
-      if (ownedCompanies.length >= 2) {
-        showToast("Можно создать только 2 компании!");
-        return;
-      }
-      createCompanyModal.classList.add('active');
-    });
-
-    closeCreateModal.addEventListener('click', () => {
-      createCompanyModal.classList.remove('active');
-    });
-
-    confirmCreateCompany.addEventListener('click', async () => {
-      const name = companyNameInput.value.trim();
-      if (!name) {
-        showToast("Введите название!");
-        return;
-      }
-      if (!/^[a-zA-Z]+$/.test(name)) {
-        showToast("Только английские буквы!");
-        return;
-      }
-      if (companies.some(c => c.name === name)) {
-        showToast("Компания с таким названием уже существует!");
-        return;
-      }
-
-      const ownedCompanies = companies.filter(c => c.ownerId == telegramId);
-      const cost = ownedCompanies.length === 0 ? 0 : 1000000;
-
-      if (balance < cost) {
-        showToast(`Недостаточно средств! Нужно $${cost}`);
-        return;
-      }
-
-      try {
-        const response = await fetch(`${apiBase}/companies`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            telegram_id: telegramId,
-            name: name,
-            cost: cost
-          })
-        });
-
-        if (!response.ok) throw new Error("Ошибка создания компании");
-
-        const newCompany = await response.json();
-        companies.push(newCompany);
-
-        if (cost > 0) {
-          balance -= cost;
-          await fetch(`${apiBase}/update-balance/${telegramId}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ balance: balance })
-          });
-        }
-
-        showToast(`Компания "${name}" создана!`);
-        createCompanyModal.classList.remove('active');
-        companyNameInput.value = '';
-        updateUI();
-
-      } catch (err) {
-        console.error('Create company error:', err);
-        showToast("Ошибка при создании компании");
-      }
-    });
-
-    function renderBusinessList() {
-      const businessList = document.getElementById('business-list');
-      businessList.innerHTML = '';
-
-      const ownedCompanies = companies.filter(c => c.ownerId == telegramId);
-      if (ownedCompanies.length === 0) {
-        businessList.innerHTML = '<div class="card">У вас пока нет компаний. Создайте первую!</div>';
-        return;
-      }
-
-      ownedCompanies.forEach(company => {
-        const btn = document.createElement('button');
-        btn.className = 'btn';
-        btn.textContent = company.name;
-        btn.addEventListener('click', () => openCompanyCabinet(company));
-        businessList.appendChild(btn);
-      });
-    }
-
-    function openCompanyCabinet(company) {
-      document.getElementById('cabinet-company-name').textContent = company.name;
-      document.getElementById('cabinet-clients').textContent = company.clients || 0;
-      document.getElementById('cabinet-issued').textContent = company.issuedShares || 0;
-      document.getElementById('cabinet-available').textContent = (company.clients || 0) * 1000 - (company.issuedShares || 0);
-
-      companyCabinetModal.classList.add('active');
-      window.currentCompany = company;
-    }
-
-    closeCompanyCabinet.addEventListener('click', () => {
-      companyCabinetModal.classList.remove('active');
-    });
-
-    issueMoreSharesBtn.addEventListener('click', async () => {
-      const company = window.currentCompany;
-      if (!company) return;
-
-      const available = (company.clients || 0) * 1000 - (company.issuedShares || 0);
-      if (available <= 0) {
-        showToast("Нет доступных акций для выпуска!");
-        return;
-      }
-
-      try {
-        const response = await fetch(`${apiBase}/companies/${company.id}/issue`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ amount: available })
-        });
-
-        if (!response.ok) throw new Error("Ошибка выпуска акций");
-
-        const updatedCompany = await response.json();
-        // Обновляем компанию в списке
-        const index = companies.findIndex(c => c.id === company.id);
-        if (index !== -1) {
-          companies[index] = updatedCompany;
-        }
-
-        showToast(`Выпущено ${available} акций!`);
-        openCompanyCabinet(updatedCompany); // обновляем интерфейс кабинета
-
-      } catch (err) {
-        console.error('Issue shares error:', err);
-        showToast("Ошибка выпуска акций");
-      }
-    });
-
-    // ================= РЫНОК =================
-    function renderMarketList() {
-      const marketList = document.getElementById('market-list');
-      marketList.innerHTML = '';
-
-      if (marketStocks.length === 0) {
-        marketList.innerHTML = '<div class="card">Нет доступных акций на рынке</div>';
-        return;
-      }
-
-      marketStocks.forEach(stock => {
-        const item = document.createElement('div');
-        item.className = 'stock-item';
-        item.innerHTML = `
-          <div class="stock-info"><strong>${stock.companyName}</strong></div>
-          <div class="stock-info">Владелец: ${stock.ownerName}</div>
-          <div class="stock-info">Клиентов: ${stock.clients}</div>
-          <div class="stock-info">Цена: $${stock.price.toFixed(2)}</div>
-        `;
-        item.addEventListener('click', () => openStockDetail(stock));
-        marketList.appendChild(item);
-      });
-    }
-
-    function openStockDetail(stock) {
-      document.getElementById('stock-detail-title').textContent = stock.companyName;
-      document.getElementById('stock-company-name').textContent = stock.companyName;
-      document.getElementById('stock-owner').textContent = stock.ownerName;
-      document.getElementById('stock-clients').textContent = stock.clients;
-      document.getElementById('stock-price').textContent = '$' + stock.price.toFixed(2);
-      buyAmountInput.value = 1;
-
-      stockDetailModal.classList.add('active');
-      window.currentStock = stock;
-    }
-
-    closeStockDetail.addEventListener('click', () => {
-      stockDetailModal.classList.remove('active');
-    });
-
-    buyStockBtn.addEventListener('click', async () => {
-      const stock = window.currentStock;
-      if (!stock) return;
-
-      const amount = parseInt(buyAmountInput.value);
-      if (isNaN(amount) || amount <= 0) {
-        showToast("Введите корректное количество!");
-        return;
-      }
-
-      const totalCost = stock.price * amount;
-      if (balance < totalCost) {
-        showToast("Недостаточно средств!");
-        return;
-      }
-
-      try {
-        const response = await fetch(`${apiBase}/stocks/buy`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            buyer_telegram_id: telegramId,
-            company_id: stock.companyId,
-            amount: amount
-          })
-        });
-
-        if (!response.ok) throw new Error("Ошибка покупки акций");
-
-        const result = await response.json();
-
-        // Обновляем баланс
-        balance -= totalCost;
-        await fetch(`${apiBase}/update-balance/${telegramId}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ balance: balance })
-        });
-
-        // Обновляем список акций в кошельке
-        const existingStockIndex = ownedStocks.findIndex(s => s.companyId === stock.companyId);
-        if (existingStockIndex !== -1) {
-          ownedStocks[existingStockIndex].amount += amount;
-          // buyPrice не меняем — усредняем только при продаже или новой покупке по другой цене
-        } else {
-          ownedStocks.push({
-            companyId: stock.companyId,
-            companyName: stock.companyName,
-            amount: amount,
-            buyPrice: stock.price,
-            currentPrice: stock.price
-          });
-        }
-
-        // Обновляем компанию (клиентов)
-        const companyIndex = companies.findIndex(c => c.id === stock.companyId);
-        if (companyIndex !== -1) {
-          companies[companyIndex].clients = result.newClientCount;
-        }
-
-        showToast(`Куплено ${amount} акций компании ${stock.companyName}!`);
-        stockDetailModal.classList.remove('active');
-        updateUI();
-
-      } catch (err) {
-        console.error('Buy stock error:', err);
-        showToast("Ошибка покупки акций");
-      }
-    });
-
-    // ================= КОШЕЛЕК =================
-    function renderWalletStocks() {
-      const walletStocksList = document.getElementById('wallet-stocks-list');
-      walletStocksList.innerHTML = '';
-
-      if (ownedStocks.length === 0) {
-        walletStocksList.innerHTML = '<div class="card">У вас нет акций</div>';
-        return;
-      }
-
-      ownedStocks.forEach(stock => {
-        const item = document.createElement('div');
-        item.className = 'wallet-stock-item';
-        const profit = (stock.currentPrice - stock.buyPrice) * stock.amount;
-        item.innerHTML = `
-          <div class="stat-row">
-            <span>${stock.companyName}</span>
-            <span>${stock.amount} шт.</span>
-          </div>
-          <div class="stat-row">
-            <span>Куплено за: $${stock.buyPrice.toFixed(2)}</span>
-            <span>Текущая: $${stock.currentPrice.toFixed(2)}</span>
-          </div>
-          <div class="stat-row">
-            <span>Доход: $${profit.toFixed(2)}</span>
-            <span style="color: ${profit >= 0 ? 'green' : 'red'};">${profit >= 0 ? '+' : ''}${profit.toFixed(2)}</span>
-          </div>
-        `;
-
-        const actionsDiv = document.createElement('div');
-        actionsDiv.className = 'wallet-stock-actions';
-
-        const sellBtn = document.createElement('button');
-        sellBtn.className = 'btn';
-        sellBtn.textContent = 'Продать';
-        sellBtn.addEventListener('click', () => sellStock(stock));
-        actionsDiv.appendChild(sellBtn);
-
-        item.appendChild(actionsDiv);
-        walletStocksList.appendChild(item);
-      });
-    }
-
-    async function sellStock(stock) {
-      const amount = prompt(`Сколько акций продать? (макс: ${stock.amount})`, 1);
-      if (!amount) return;
-
-      const sellAmount = parseInt(amount);
-      if (isNaN(sellAmount) || sellAmount <= 0 || sellAmount > stock.amount) {
-        showToast("Некорректное количество!");
-        return;
-      }
-
-      try {
-        const response = await fetch(`${apiBase}/stocks/sell`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            seller_telegram_id: telegramId,
-            company_id: stock.companyId,
-            amount: sellAmount
-          })
-        });
-
-        if (!response.ok) throw new Error("Ошибка продажи акций");
-
-        const result = await response.json();
-
-        // Обновляем баланс
-        balance += result.totalReceived;
-        await fetch(`${apiBase}/update-balance/${telegramId}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ balance: balance })
-        });
-
-        // Обновляем список акций
-        const stockIndex = ownedStocks.findIndex(s => s.companyId === stock.companyId);
-        if (stockIndex !== -1) {
-          ownedStocks[stockIndex].amount -= sellAmount;
-          if (ownedStocks[stockIndex].amount <= 0) {
-            ownedStocks.splice(stockIndex, 1);
-          }
-        }
-
-        showToast(`Продано ${sellAmount} акций за $${result.totalReceived.toFixed(2)}!`);
-        updateUI();
-
-      } catch (err) {
-        console.error('Sell stock error:', err);
-        showToast("Ошибка продажи акций");
-      }
-    }
-
-    // ================= ИНИЦИАЛИЗАЦИЯ =================
-    async function initApp() {
-      try {
-        // Загружаем данные пользователя
-        const userRes = await fetch(`${apiBase}/user/${telegramId}`);
-        if (userRes.ok) {
-          const user = await userRes.json();
-          balance = parseFloat(user.balance);
-          level = user.level;
-          progress = parseFloat(user.progress);
-          totalClicks = user.total_clicks;
-        }
-
-        // Загружаем компании
-        const companiesRes = await fetch(`${apiBase}/companies`);
-        if (companiesRes.ok) {
-          companies = await companiesRes.json();
-        }
-
-        // Загружаем акции пользователя
-        const stocksRes = await fetch(`${apiBase}/stocks?telegram_id=${telegramId}`);
-        if (stocksRes.ok) {
-          ownedStocks = await stocksRes.json();
-        }
-
-        // Загружаем рынок
-        const marketRes = await fetch(`${apiBase}/market`);
-        if (marketRes.ok) {
-          marketStocks = await marketRes.json();
-        }
-
-        updateUI();
-      } catch (err) {
-        console.error('Init error:', err);
-        showToast("Ошибка загрузки данных");
-      }
-    }
-
     // Инициализация
-    initApp();
+    async function init() {
+      initProfile();
+      try {
+        const res = await fetch(`${apiBase}/user/${telegramId}`);
+        const user = await res.json();
+        balance = parseFloat(user.balance);
+        level = user.level;
+        progress = parseFloat(user.progress);
+        totalClicks = user.total_clicks;
+        updateUI();
+      } catch (err) {
+        showToast('Ошибка инициализации');
+      }
+      tg.BackButton.hide();
+    }
+
+    init();
   </script>
 
 </body>
