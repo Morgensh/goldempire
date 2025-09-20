@@ -4,118 +4,79 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Business Empire Richman</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
-    /* Только базовые сбросы и белый фон */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: Arial, sans-serif;
-    }
-
     body {
       background: white;
       color: black;
-      min-height: 100vh;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
       padding-bottom: 72px; /* место под навигацию */
     }
 
-    /* Простой заголовок */
-    .header {
-      padding: 20px;
-      font-size: 24px;
-      font-weight: bold;
-    }
-
-    /* Основной контент */
-    .main-content {
-      padding: 0 20px;
-    }
-
-    /* Секции — только блок/скрыто */
     .section {
       display: none;
+      padding: 20px;
     }
 
     .section.active {
       display: block;
     }
 
-    /* Карточки — просто белый фон, граница и отступы */
-    .card {
-      background: white;
-      border: 1px solid #ccc;
-      padding: 20px;
-      margin-bottom: 16px;
-    }
-
-    /* Банковская карта — просто прямоугольник */
     .bank-card {
       background: white;
       border: 1px solid #ccc;
       padding: 20px;
-      margin-bottom: 24px;
+      margin-bottom: 20px;
     }
 
-    /* Кликер — просто круглая кнопка */
-    .tap-circle {
-      width: 120px;
-      height: 120px;
+    .clicker-area {
+      text-align: center;
+      margin: 20px 0;
+    }
+
+    #tap-circle {
+      width: 100px;
+      height: 100px;
+      background: #e0e0e0;
       border-radius: 50%;
-      background: white;
-      border: 2px solid #ccc;
-      display: flex;
+      display: inline-flex;
       align-items: center;
       justify-content: center;
-      margin: 20px auto;
       cursor: pointer;
+      margin: 20px 0;
     }
 
-    .tap-text {
-      text-align: center;
-      margin: 10px 0;
-    }
-
-    /* Кнопки — просто прямоугольники */
-    .btn {
-      padding: 12px;
+    .card {
       background: white;
       border: 1px solid #ccc;
-      cursor: pointer;
-      margin: 8px 0;
-      text-align: center;
+      padding: 15px;
+      margin-bottom: 15px;
     }
 
-    /* Нижняя навигация — просто ряд иконок */
     .bottom-nav {
       display: flex;
       justify-content: space-around;
+      align-items: center;
+      height: 72px;
+      background: white;
+      border-top: 1px solid #ccc;
       position: fixed;
       bottom: 0;
       left: 0;
       right: 0;
-      height: 72px;
-      background: white;
-      border-top: 1px solid #ccc;
     }
 
     .nav-item {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      font-size: 12px;
-      padding: 8px 0;
+      text-align: center;
+      cursor: pointer;
     }
 
     .nav-item.active {
-      color: black;
       font-weight: bold;
     }
 
-    /* Toast — просто белый блок с текстом */
     #toast {
       position: fixed;
       bottom: 100px;
@@ -123,9 +84,9 @@
       transform: translateX(-50%);
       background: white;
       border: 1px solid #ccc;
-      padding: 12px 24px;
+      padding: 10px 20px;
       border-radius: 4px;
-      z-index: 1000;
+      font-size: 14px;
       opacity: 0;
       transition: opacity 0.3s;
     }
@@ -133,60 +94,14 @@
     #toast.show {
       opacity: 1;
     }
-
-    /* Заголовки секций */
-    .section-title {
-      font-size: 22px;
-      font-weight: bold;
-      margin: 20px 0 10px;
-    }
-
-    /* Профиль — просто структура */
-    .profile-header {
-      text-align: center;
-      margin-bottom: 20px;
-    }
-
-    .profile-avatar {
-      width: 80px;
-      height: 80px;
-      border-radius: 50%;
-      background: #eee;
-      margin: 0 auto 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .profile-level, .stat-row {
-      margin: 8px 0;
-    }
-
-    .stat-row {
-      display: flex;
-      justify-content: space-between;
-      padding: 10px 0;
-      border-bottom: 1px solid #eee;
-    }
-
-    .progress-container {
-      width: 100%;
-      height: 8px;
-      background: #eee;
-      margin: 10px 0;
-    }
-
-    .progress-fill {
-      height: 100%;
-      background: #ccc;
-      width: 0%;
-    }
   </style>
 </head>
 <body>
 
   <!-- Верхняя панель -->
-  <div class="header">Richman</div>
+  <div class="header">
+    <h1>Richman</h1>
+  </div>
 
   <!-- Основной контент -->
   <div class="main-content">
@@ -195,8 +110,10 @@
     <div class="section active" id="home-section">
       <!-- Банковская карта -->
       <div class="bank-card">
-        <div>RICHMAN</div>
-        <div>•••• •••• •••• 1234</div>
+        <div>
+          <div>RICHMAN</div>
+          <div>•••• •••• •••• 1234</div>
+        </div>
         <div>
           <div>Баланс: <span id="card-balance">$ 65,00</span></div>
           <div>Уровень: <span id="card-level">1</span></div>
@@ -204,16 +121,14 @@
       </div>
       
       <div class="clicker-area">
-        <div class="tap-circle" id="tap-circle">
-          <i class="fas fa-hand-point-up" style="font-size: 40px;"></i>
-        </div>
-        <div class="tap-text">Кликайте, чтобы зарабатывать деньги</div>
+        <div id="tap-circle">TAP</div>
+        <div>Кликайте, чтобы зарабатывать деньги</div>
       </div>
     </div>
 
     <!-- Бизнес -->
     <div class="section" id="business-section">
-      <h2 class="section-title">Бизнес</h2>
+      <h2>Бизнес</h2>
       <div class="card">
         <p>Функционал бизнеса отключен</p>
       </div>
@@ -221,7 +136,7 @@
 
     <!-- Рынок -->
     <div class="section" id="market-section">
-      <h2 class="section-title">Рынок акций</h2>
+      <h2>Рынок акций</h2>
       <div class="card">
         <p>Функционал рынка отключен</p>
       </div>
@@ -229,56 +144,40 @@
 
     <!-- Кошелек -->
     <div class="section" id="wallet-section">
-      <h2 class="section-title">Кошелек</h2>
+      <h2>Кошелек</h2>
       <div class="card">
-        <div class="stat-row">
-          <span>Баланс</span>
-          <span id="wallet-balance">$ 65,00</span>
-        </div>
-        <div class="stat-row">
-          <span>Акции</span>
-          <span>0</span>
-        </div>
-        <div class="stat-row">
-          <span>Общая стоимость</span>
-          <span id="wallet-total">$ 65,00</span>
-        </div>
+        <div>Баланс: <span id="wallet-balance">$ 65,00</span></div>
+        <div>Акции: 0</div>
+        <div>Общая стоимость: <span id="wallet-total">$ 65,00</span></div>
       </div>
     </div>
 
     <!-- Профиль -->
     <div class="section" id="profile-section">
-      <h2 class="section-title">Профиль</h2>
+      <h2>Профиль</h2>
       
-      <div class="profile-header">
-        <div class="profile-avatar" id="profile-avatar">
-          <img id="avatar-img" src="" alt="Avatar" style="display: none; width: 100%; height: 100%; border-radius: 50%;">
+      <div style="text-align: center; margin-bottom: 20px;">
+        <div id="profile-avatar" style="width: 80px; height: 80px; margin: 0 auto 10px; background: #e0e0e0; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+          <img id="avatar-img" src="" alt="Avatar" style="width: 100%; height: 100%; border-radius: 50%; display: none;">
         </div>
-        <div class="profile-name" id="profile-name">Richman Player</div>
-        <div class="profile-username" id="profile-username">@username</div>
-        <div class="profile-level">Уровень <span id="profile-level">1</span></div>
+        <div id="profile-name">Richman Player</div>
+        <div id="profile-username">@username</div>
+        <div>Уровень <span id="profile-level">1</span></div>
       </div>
 
       <div class="card">
-        <div class="stat-row">
-          <span>ID игрока</span>
-          <span id="player-id">#74291</span>
-        </div>
-        <div class="stat-row">
-          <span>Всего кликов</span>
-          <span id="total-clicks">0</span>
-        </div>
-        <div class="stat-row">
-          <span>Прогресс до следующего уровня</span>
-          <span id="progress-percent">60%</span>
-        </div>
+        <div>ID игрока: <span id="player-id">#74291</span></div>
+        <div>Всего кликов: <span id="total-clicks">0</span></div>
+        <div>Прогресс до следующего уровня: <span id="progress-percent">60%</span></div>
       </div>
       
       <div class="card">
-        <div class="progress-container">
-          <div class="progress-fill" id="progress-fill"></div>
+        <div>
+          <div style="height: 10px; background: #e0e0e0; border-radius: 5px; overflow: hidden;">
+            <div id="progress-fill" style="height: 100%; background: gray; width: 60%;"></div>
+          </div>
+          <div style="text-align: center; margin-top: 5px;" id="progress-text">$1 000,00 / $2 000,00</div>
         </div>
-        <div style="text-align: center; margin-top: 8px;" id="progress-text">$1 000,00 / $2 000,00</div>
       </div>
     </div>
 
@@ -287,24 +186,19 @@
   <!-- Нижняя навигация -->
   <div class="bottom-nav">
     <div class="nav-item active" data-section="home">
-      <i class="fas fa-home"></i>
-      <span>Главная</span>
+      <div>Главная</div>
     </div>
     <div class="nav-item" data-section="business">
-      <i class="fas fa-building"></i>
-      <span>Бизнес</span>
+      <div>Бизнес</div>
     </div>
     <div class="nav-item" data-section="market">
-      <i class="fas fa-chart-line"></i>
-      <span>Рынок</span>
+      <div>Рынок</div>
     </div>
     <div class="nav-item" data-section="wallet">
-      <i class="fas fa-wallet"></i>
-      <span>Кошелек</span>
+      <div>Кошелек</div>
     </div>
     <div class="nav-item" data-section="profile">
-      <i class="fas fa-user"></i>
-      <span>Профиль</span>
+      <div>Профиль</div>
     </div>
   </div>
 
@@ -312,22 +206,24 @@
   <div id="toast"></div>
 
   <script>
-    // Telegram WebApp init
+    // Telegram WebApp init — НЕ ТРОГАЕМ
     const tg = window.Telegram.WebApp;
     tg.ready();
     tg.expand();
 
-    // Глобальные переменные
+    // Глобальные переменные — НЕ ТРОГАЕМ
     let userData = tg.initDataUnsafe.user || {};
     let telegramId = userData.id || 0;
     let balance = 65.00;
     let clickValue = 2.50;
     let level = 1;
-    let progress = 600;
+    let progress = 600; // из 1000
     let totalClicks = 0;
     let apiBase = 'https://dinod.ru/api';
 
-    // DOM элементы
+    // DOM элементы — НЕ ТРОГАЕМ
+    const themeToggle = document.getElementById('theme-toggle');
+    const htmlRoot = document.getElementById('html-root');
     const navItems = document.querySelectorAll('.nav-item');
     const sections = document.querySelectorAll('.section');
     const tapCircle = document.getElementById('tap-circle');
@@ -346,7 +242,46 @@
     const playerIdEl = document.getElementById('player-id');
     const avatarImgEl = document.getElementById('avatar-img');
 
-    // Переключение разделов
+    // Load user data from server — НЕ ТРОГАЕМ
+    async function loadUserData() {
+      if (!telegramId) return;
+      try {
+        const response = await fetch(`${apiBase}/user/${telegramId}`);
+        const user = await response.json();
+        if (user) {
+          balance = parseFloat(user.balance) || 65.00;
+          level = user.level || 1;
+          progress = parseFloat(user.progress) || 0;
+          totalClicks = user.total_clicks || 0;
+          clickValue = 2.50 * level;
+
+          // Update profile
+          profileNameEl.textContent = user.first_name || 'Player';
+          if (user.username) {
+            profileUsernameEl.textContent = `@${user.username}`;
+          } else {
+            profileUsernameEl.textContent = '';
+          }
+          playerIdEl.textContent = `#${user.telegram_id}`;
+
+          // Avatar
+          if (user.avatar_url) {
+            avatarImgEl.src = user.avatar_url;
+            avatarImgEl.style.display = 'block';
+            profileAvatarEl.style.background = 'none';
+          } else {
+            // Fallback initials
+            const initials = (user.first_name || 'P').charAt(0).toUpperCase();
+            profileAvatarEl.innerHTML = initials;
+          }
+        }
+      } catch (err) {
+        console.error('Load user error:', err);
+      }
+      updateUI();
+    }
+
+    // Переключение разделов — НЕ ТРОГАЕМ
     function switchToSection(sectionId) {
       sections.forEach(section => section.classList.remove('active'));
       navItems.forEach(item => item.classList.remove('active'));
@@ -364,7 +299,7 @@
       });
     });
 
-    // Обработка клика
+    // Handle click with server sync — НЕ ТРОГАЕМ
     async function handleClick() {
       if (!telegramId) return;
 
@@ -381,6 +316,10 @@
           progress = parseFloat(updatedUser.progress);
           totalClicks = updatedUser.total_clicks;
           clickValue = 2.50 * level;
+
+          if (updatedUser.level > level) { // Level up check
+            showToast(`🎉 Новый уровень! Теперь вы зарабатываете $${clickValue.toFixed(2)} за клик`);
+          }
         }
       } catch (err) {
         console.error('Click error:', err);
@@ -388,17 +327,30 @@
 
       updateUI();
 
-      // Простая анимация масштаба
-      tapCircle.animate([
-        { transform: 'scale(1)' },
-        { transform: 'scale(0.95)' },
-        { transform: 'scale(1)' }
-      ], { duration: 200 });
+      // Анимация клика (упрощенная)
+      tapCircle.style.transform = 'scale(0.95)';
+      setTimeout(() => {
+        tapCircle.style.transform = 'scale(1)';
+      }, 200);
     }
 
     tapCircle.addEventListener('click', handleClick);
 
-    // Обновление UI
+    // Sync balance every 30 seconds — НЕ ТРОГАЕМ
+    setInterval(async () => {
+      if (!telegramId) return;
+      try {
+        await fetch(`${apiBase}/update-balance/${telegramId}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ balance })
+        });
+      } catch (err) {
+        console.error('Sync error:', err);
+      }
+    }, 30000);
+
+    // Обновление UI — НЕ ТРОГАЕМ
     function updateUI() {
       const formattedBalance = '$ ' + balance.toFixed(2).replace('.', ',');
       cardBalanceEl.textContent = formattedBalance;
@@ -412,11 +364,11 @@
       progressTextEl.textContent = `$${progress.toFixed(0)} / $${nextThreshold.toFixed(0)}`;
       progressPercentEl.textContent = `${progressPercent}%`;
 
-      walletTotalEl.textContent = formattedBalance;
+      walletTotalEl.textContent = '$ ' + balance.toFixed(2).replace('.', ',');
       totalClicksEl.textContent = totalClicks;
     }
 
-    // Toast уведомления
+    // Toast уведомления — НЕ ТРОГАЕМ
     function showToast(message) {
       const toast = document.getElementById('toast');
       toast.textContent = message;
@@ -427,8 +379,8 @@
       }, 3000);
     }
 
-    // Инициализация
-    updateUI();
+    // Инициализация — НЕ ТРОГАЕМ
+    loadUserData();
   </script>
 
 </body>
