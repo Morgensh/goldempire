@@ -189,6 +189,27 @@
       margin: 8px 0;
       width: 100%;
     }
+
+    /* Стили для персонала */
+    .staff-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+
+    .staff-card {
+      background: white;
+      border: 1px solid #ccc;
+      padding: 12px;
+      text-align: center;
+    }
+
+    .staff-img {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      margin-bottom: 8px;
+    }
   </style>
 </head>
 <body>
@@ -241,6 +262,13 @@
         <input type="number" id="issue-amount-input" placeholder="Количество акций для выпуска">
         <div class="btn" id="issue-shares-btn">Выпустить акции</div>
       </div>
+
+      <!-- Раздел Персонал -->
+      <div class="staff-section card">
+        <h3>Персонал</h3>
+        <div class="staff-grid" id="staff-grid"></div>
+      </div>
+
       <div class="btn" id="back-to-business-btn">Назад в Бизнес</div>
     </div>
 
@@ -374,6 +402,16 @@
     let currentCompanyId = null;
     let currentSection = 'home';
 
+    // Список типов персонала
+    const staffTypes = [
+      { type: 'director', name: 'Директор', img: 'a1.png' },
+      { type: 'accountant', name: 'Бухгалтер', img: 'a2.png' },
+      { type: 'marketer', name: 'Маркетолог', img: 'a3.png' },
+      { type: 'secretary', name: 'Секретарь', img: 'a4.png' },
+      { type: 'sales_manager', name: 'Менеджер по продажам', img: 'a5.png' },
+      { type: 'lawyer', name: 'Юрист', img: 'a6.png' }
+    ];
+
     // DOM элементы
     const navItems = document.querySelectorAll('.nav-item');
     const sections = document.querySelectorAll('.section');
@@ -418,6 +456,7 @@
     const sellAmountInput = document.getElementById('sell-amount-input');
     const sellSharesBtn = document.getElementById('sell-shares-btn');
     const backToWalletBtn = document.getElementById('back-to-wallet-btn');
+    const staffGrid = document.getElementById('staff-grid');
 
     // Переключение разделов
     function switchToSection(sectionId) {
@@ -529,6 +568,24 @@
       }, 3000);
     }
 
+    // Обновление информации пользователя на сервере
+    async function updateUserInfo() {
+      try {
+        await fetch(`${apiBase}/user/${telegramId}/update`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            first_name: userData.first_name || '',
+            last_name: userData.last_name || '',
+            username: userData.username || '',
+            avatar_url: userData.photo_url || null
+          })
+        });
+      } catch (err) {
+        console.error('Update user info error:', err);
+      }
+    }
+
     // Инициализация пользователя
     async function initUser() {
       if (!telegramId) return;
@@ -543,6 +600,18 @@
           totalClicks = user.total_clicks;
           companiesCount = user.companies_count || 0;
           clickValue = 2.50 * level;
+
+          // Если данные placeholder, обновляем
+          if (user.first_name === 'Unknown' || !user.username) {
+            await updateUserInfo();
+            // Перезагружаем данные после обновления
+            const updatedResponse = await fetch(`${apiBase}/user/${telegramId}`);
+            const updatedUser = await updatedResponse.json();
+            user.first_name = updatedUser.first_name;
+            user.last_name = updatedUser.last_name;
+            user.username = updatedUser.username;
+            user.avatar_url = updatedUser.avatar_url;
+          }
 
           profileNameEl.textContent = `${user.first_name || ''} ${user.last_name || ''}`.trim() || 'Richman Player';
           profileUsernameEl.textContent = user.username ? `@${user.username}` : '@username';
@@ -636,8 +705,51 @@
         companyClientsEl.textContent = company.clients_count;
         companyIssuedEl.textContent = company.issued_shares;
         companyAvailableIssueEl.textContent = company.available_to_issue;
+
+        // Загрузка персонала
+        staffGrid.innerHTML = '';
+        staffTypes.forEach(staff => {
+          const staffCard = document.createElement('div');
+          staffCard.classList.add('staff-card');
+          const currentLevel = company[`staff_${staff.type}_level`] || 1;
+          const cost = 100 * currentLevel; // Формула цены
+
+          staffCard.innerHTML = `
+            <img src="${staff.img}" alt="${staff.name}" class="staff-img">
+            <div>${staff.name}</div>
+            <div>Уровень: <span id="staff-${staff.type}-level">${currentLevel}</span></div>
+            <div class="btn" id="upgrade-${staff.type}-btn">Улучшить ($${cost})</div>
+          `;
+          staffGrid.appendChild(staffCard);
+
+          // Добавляем обработчик для кнопки
+          document.getElementById(`upgrade-${staff.type}-btn`).addEventListener('click', () => upgradeStaff(staff.type));
+        });
       } catch (err) {
         console.error('Load dashboard error:', err);
+      }
+    }
+
+    // Улучшение персонала
+    async function upgradeStaff(type) {
+      try {
+        const response = await fetch(`${apiBase}/company/${currentCompanyId}/upgrade_staff/${telegramId}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ staff_type: type })
+        });
+        if (!response.ok) {
+          const error = await response.json();
+          showToast(error.error || 'Ошибка улучшения');
+          return;
+        }
+        const updated = await response.json();
+        balance = parseFloat(updated.balance);
+        showToast('Персонал улучшен успешно');
+        updateUI();
+        await loadCompanyDashboard();
+      } catch (err) {
+        showToast('Ошибка улучшения');
       }
     }
 
