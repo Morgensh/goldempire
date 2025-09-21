@@ -316,11 +316,11 @@
         <div class="tab active" data-tab="stocks">Акции</div>
         <div class="tab" data-tab="servants">Слуги</div>
       </div>
-      <div id="stocks-content" class="tab-content active">
+      <div id="stocks-market-content" class="tab-content active">
         <div id="market-list"></div>
       </div>
-      <div id="servants-content" class="tab-content">
-        <div id="slave-market-list"></div>
+      <div id="servants-market-content" class="tab-content">
+        <div id="servant-market-list"></div>
       </div>
     </div>
 
@@ -339,6 +339,17 @@
       <div class="btn" id="back-to-market-btn">Назад на Рынок</div>
     </div>
 
+    <!-- Покупка слуги -->
+    <div class="section" id="servant-buy-section">
+      <h2 class="section-title">Покупка слуги</h2>
+      <div class="card">
+        <div>Слуга: <span id="buy-servant-username"></span></div>
+        <div>Цена: <span id="buy-servant-price"></span></div>
+        <div class="btn" id="buy-servant-btn">Купить</div>
+      </div>
+      <div class="btn" id="back-to-market-servant-btn">Назад на Рынок</div>
+    </div>
+
     <!-- Продажа акций -->
     <div class="section" id="stock-sell-section">
       <h2 class="section-title">Продажа акций</h2>
@@ -355,25 +366,21 @@
     <!-- Кошелек -->
     <div class="section" id="wallet-section">
       <h2 class="section-title">Кошелек</h2>
-      <div class="tabs">
-        <div class="tab active" data-tab="stocks">Акции</div>
-        <div class="tab" data-tab="servants">Слуги</div>
-      </div>
-      <div id="wallet-stocks-content" class="tab-content active">
-        <div class="card">
-          <div class="stat-row">
-            <span>Баланс</span>
-            <span id="wallet-balance">$ 0,00</span>
-          </div>
+      <div class="card">
+        <div class="stat-row">
+          <span>Баланс</span>
+          <span id="wallet-balance">$ 0,00</span>
+        </div>
+        <div class="tabs">
+          <div class="tab active" data-tab="stocks">Акции</div>
+          <div class="tab" data-tab="servants">Слуги</div>
+        </div>
+        <div id="stocks-content" class="tab-content active">
           <div id="holdings-list"></div>
         </div>
-      </div>
-      <div id="wallet-servants-content" class="tab-content">
-        <div class="card">
-          <div class="stat-row">
-            <span>Налоги в день</span>
-            <span id="total-taxes">$ 0,00</span>
-          </div>
+        <div id="servants-content" class="tab-content">
+          <div>Ежесекундный доход: <span id="sec-income">0</span></div>
+          <div>Налоги в день: <span id="daily-tax">0</span></div>
           <div id="servants-list"></div>
         </div>
       </div>
@@ -390,8 +397,8 @@
         <div class="profile-name" id="profile-name">Richman Player</div>
         <div class="profile-username" id="profile-username">@username</div>
         <div class="profile-level">Уровень <span id="profile-level">1</span></div>
-        <div id="slave-status"></div>
-        <div class="btn" id="copy-ref-link-profile">Скопировать реферальную ссылку</div>
+        <div id="servant-status"></div>
+        <div id="free-self-btn-container"></div>
       </div>
 
       <div class="card">
@@ -461,12 +468,13 @@
     let progress = 0;
     let totalClicks = 0;
     let companiesCount = 0;
+    let masterId = null;
+    let referralsCount = 0;
+    let servantsCount = 0;
     let apiBase = 'https://dinod.ru/api';
     let currentCompanyId = null;
+    let currentServantId = null;
     let currentSection = 'home';
-    let masterUsername = null;
-    let invitedCount = 0;
-    let servantsCount = 0;
 
     // Список типов персонала
     const staffTypes = [
@@ -524,11 +532,16 @@
     const backToWalletBtn = document.getElementById('back-to-wallet-btn');
     const staffGrid = document.getElementById('staff-grid');
     const copyRefLink = document.getElementById('copy-ref-link');
-    const copyRefLinkProfile = document.getElementById('copy-ref-link-profile');
-    const slaveStatusEl = document.getElementById('slave-status');
+    const servantStatusEl = document.getElementById('servant-status');
+    const freeSelfBtnContainer = document.getElementById('free-self-btn-container');
+    const secIncomeEl = document.getElementById('sec-income');
+    const dailyTaxEl = document.getElementById('daily-tax');
     const servantsList = document.getElementById('servants-list');
-    const totalTaxesEl = document.getElementById('total-taxes');
-    const slaveMarketList = document.getElementById('slave-market-list');
+    const servantMarketList = document.getElementById('servant-market-list');
+    const buyServantUsernameEl = document.getElementById('buy-servant-username');
+    const buyServantPriceEl = document.getElementById('buy-servant-price');
+    const buyServantBtn = document.getElementById('buy-servant-btn');
+    const backToMarketServantBtn = document.getElementById('back-to-market-servant-btn');
 
     // Переключение разделов
     function switchToSection(sectionId) {
@@ -552,36 +565,27 @@
       });
     });
 
-    // Переключение табов
-    function setupTabs(containerId) {
-      const container = document.getElementById(containerId) || document;
-      const tabs = container.querySelectorAll('.tab');
-      tabs.forEach(tab => {
-        tab.addEventListener('click', () => {
-          tabs.forEach(t => t.classList.remove('active'));
-          tab.classList.add('active');
-          container.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-          const contentId = tab.dataset.tab + '-content';
-          const content = container.querySelector('#' + contentId) || document.getElementById(contentId);
-          if (content) content.classList.add('active');
-          loadSectionData();
-        });
+    // Переключение табов (общий handler)
+    const allTabs = document.querySelectorAll('.tab');
+    allTabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        const tabsContainer = tab.parentElement;
+        tabsContainer.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        const tabContents = tabsContainer.nextElementSibling.parentElement.querySelectorAll('.tab-content');
+        tabContents.forEach(c => c.classList.remove('active'));
+        const targetContent = document.getElementById(`${tab.dataset.tab}-${tabsContainer.parentElement.id.split('-')[0]}-content`) || document.getElementById(`${tab.dataset.tab}-content`);
+        if (targetContent) targetContent.classList.add('active');
+        loadSectionData();
       });
-    }
-
-    setupTabs('business-section');
-    setupTabs('wallet-section');
-    setupTabs('market-section');
+    });
 
     // Копирование реферальной ссылки
-    function copyReferralLink() {
+    copyRefLink.addEventListener('click', () => {
       const refLink = `https://t.me/GoldEmpireGameBot?start=${telegramId}`;
       navigator.clipboard.writeText(refLink);
       showToast('Ссылка скопирована!');
-    }
-
-    copyRefLink.addEventListener('click', copyReferralLink);
-    copyRefLinkProfile.addEventListener('click', copyReferralLink);
+    });
 
     // Загрузка данных для секции
     async function loadSectionData() {
@@ -591,24 +595,26 @@
         const activeTab = document.querySelector('#market-section .tab.active').dataset.tab;
         if (activeTab === 'stocks') {
           await loadMarket();
-        } else if (activeTab === 'servants') {
-          await loadSlaveMarket();
+        } else {
+          await loadServantMarket();
         }
       } else if (currentSection === 'wallet') {
         const activeTab = document.querySelector('#wallet-section .tab.active').dataset.tab;
         if (activeTab === 'stocks') {
           await loadHoldings();
-        } else if (activeTab === 'servants') {
+        } else {
           await loadServants();
         }
       } else if (currentSection === 'company-dashboard') {
         await loadCompanyDashboard();
       } else if (currentSection === 'stock-buy') {
         await loadStockBuy();
+      } else if (currentSection === 'servant-buy') {
+        await loadServantBuy();
       } else if (currentSection === 'stock-sell') {
         await loadStockSell();
       } else if (currentSection === 'profile') {
-        await loadProfileData();
+        await loadProfileServantInfo();
       }
     }
 
@@ -706,17 +712,30 @@
       if (!telegramId) return;
 
       try {
-        const response = await fetch(`${apiBase}/user/${telegramId}`);
-        const user = await response.json();
+        let response = await fetch(`${apiBase}/user/${telegramId}`);
+        let user = await response.json();
         if (user) {
           balance = parseFloat(user.balance);
           level = user.level;
           progress = parseFloat(user.progress);
           totalClicks = user.total_clicks;
           companiesCount = user.companies_count || 0;
-          servantsCount = user.servants_count || 0;
-          invitedCount = user.invited_count || 0;
+          masterId = user.master_id;
+          referralsCount = user.referrals_count;
+          servantsCount = user.servants_count;
           clickValue = 2.50 * level;
+
+          // Применить налог если слуга
+          if (masterId) {
+            response = await fetch(`${apiBase}/apply_tax/${telegramId}`, { method: 'POST' });
+            user = await response.json();
+            balance = parseFloat(user.balance);
+          }
+
+          // Заявить доход если есть слуги
+          response = await fetch(`${apiBase}/claim_income/${telegramId}`, { method: 'POST' });
+          user = await response.json();
+          balance = parseFloat(user.balance);
 
           // Если данные placeholder, обновляем
           if (user.first_name === 'Unknown' || !user.username) {
@@ -728,7 +747,6 @@
             user.last_name = updatedUser.last_name;
             user.username = updatedUser.username;
             user.avatar_url = updatedUser.avatar_url;
-            user.master_id = updatedUser.master_id;
           }
 
           profileNameEl.textContent = `${user.first_name || ''} ${user.last_name || ''}`.trim() || 'Richman Player';
@@ -739,12 +757,6 @@
             avatarImgEl.src = user.avatar_url;
             avatarImgEl.style.display = 'block';
           }
-
-          if (user.master_id) {
-            const masterRes = await fetch(`${apiBase}/user/${user.master_id}`);
-            const master = await masterRes.json();
-            masterUsername = master.username;
-          }
         }
       } catch (err) {
         console.error('Init user error:', err);
@@ -754,36 +766,29 @@
       updateUI();
     }
 
-    // Загрузка данных профиля
-    async function loadProfileData() {
-      slaveStatusEl.innerHTML = '';
-      if (masterUsername) {
-        const statusText = document.createElement('div');
-        statusText.textContent = `Вы являетесь слугой @${masterUsername}. Пригласи 10 человек и ты можешь освободиться из под рабства. Приглашено: ${invitedCount}`;
-        slaveStatusEl.appendChild(statusText);
-
-        if (invitedCount >= 10) {
-          const freeBtn = document.createElement('div');
-          freeBtn.classList.add('btn');
-          freeBtn.textContent = 'Освободиться';
-          freeBtn.addEventListener('click', async () => {
-            if (confirm('Освободиться от рабства?')) {
-              try {
-                const res = await fetch(`${apiBase}/self_free/${telegramId}`, { method: 'POST' });
-                if (res.ok) {
-                  showToast('Вы освобождены!');
-                  masterUsername = null;
-                  loadProfileData();
-                } else {
-                  const err = await res.json();
-                  showToast(err.error);
-                }
-              } catch (err) {
-                showToast('Ошибка');
-              }
-            }
-          });
-          slaveStatusEl.appendChild(freeBtn);
+    // Загрузка информации о статусе слуги в профиле
+    async function loadProfileServantInfo() {
+      servantStatusEl.innerHTML = '';
+      freeSelfBtnContainer.innerHTML = '';
+      if (masterId) {
+        try {
+          const response = await fetch(`${apiBase}/user_username/${masterId}`);
+          const { username } = await response.json();
+          servantStatusEl.textContent = `Вы являетесь слугой @${username}. Пригласи 10 человек и ты можешь освободиться из под рабства.`;
+          if (referralsCount >= 10) {
+            const btn = document.createElement('div');
+            btn.classList.add('btn');
+            btn.textContent = 'Освободиться';
+            btn.addEventListener('click', async () => {
+              await fetch(`${apiBase}/free_self/${telegramId}`, { method: 'POST' });
+              showToast('Вы освобождены!');
+              masterId = null;
+              loadProfileServantInfo();
+            });
+            freeSelfBtnContainer.appendChild(btn);
+          }
+        } catch (err) {
+          console.error('Load master username error:', err);
         }
       }
     }
@@ -969,47 +974,30 @@
     }
 
     // Загрузка рынка слуг
-    async function loadSlaveMarket() {
+    async function loadServantMarket() {
       try {
-        const response = await fetch(`${apiBase}/slave_market`);
-        const slaves = await response.json();
-        slaveMarketList.innerHTML = '';
-        slaves.forEach(slave => {
+        const response = await fetch(`${apiBase}/servant_market`);
+        const servants = await response.json();
+        servantMarketList.innerHTML = '';
+        servants.forEach(servant => {
           const card = document.createElement('div');
           card.classList.add('card');
           card.innerHTML = `
-            <div>Слуга: @${slave.username}</div>
-            <div>Цена: $${slave.price}</div>
-            <div class="btn" data-action="buy-slave">Купить</div>
+            <div>Слуга: @${servant.username}</div>
+            <div>Цена: $${servant.price}</div>
           `;
-          card.querySelector('[data-action="buy-slave"]').addEventListener('click', async () => {
-            if (confirm(`Купить слугу за $${slave.price}?`)) {
-              try {
-                const res = await fetch(`${apiBase}/buy_servant/${telegramId}/${slave.id}`, { method: 'POST' });
-                if (res.ok) {
-                  const updated = await res.json();
-                  balance = parseFloat(updated.balance);
-                  servantsCount++;
-                  showToast('Слуга куплен!');
-                  updateUI();
-                  loadSlaveMarket();
-                } else {
-                  const err = await res.json();
-                  showToast(err.error);
-                }
-              } catch (err) {
-                showToast('Ошибка покупки');
-              }
-            }
+          card.addEventListener('click', () => {
+            currentServantId = servant.servant_id;
+            switchToSection('servant-buy');
           });
-          slaveMarketList.appendChild(card);
+          servantMarketList.appendChild(card);
         });
       } catch (err) {
-        console.error('Load slave market error:', err);
+        console.error('Load servant market error:', err);
       }
     }
 
-    // Загрузка страницы покупки
+    // Загрузка страницы покупки акций
     async function loadStockBuy() {
       if (!currentCompanyId) return;
 
@@ -1023,6 +1011,20 @@
         buyCompanyAvailableEl.textContent = company.available;
       } catch (err) {
         console.error('Load buy error:', err);
+      }
+    }
+
+    // Загрузка страницы покупки слуги
+    async function loadServantBuy() {
+      if (!currentServantId) return;
+
+      try {
+        const response = await fetch(`${apiBase}/servant_market/${currentServantId}`);
+        const servant = await response.json();
+        buyServantUsernameEl.textContent = `@${servant.username}`;
+        buyServantPriceEl.textContent = `$${servant.price}`;
+      } catch (err) {
+        console.error('Load servant buy error:', err);
       }
     }
 
@@ -1058,7 +1060,32 @@
 
     buySharesBtn.addEventListener('click', buyShares);
 
+    // Покупка слуги
+    async function buyServant() {
+      try {
+        const response = await fetch(`${apiBase}/buy_servant/${telegramId}/${currentServantId}`, {
+          method: 'POST'
+        });
+        if (!response.ok) {
+          const error = await response.json();
+          showToast(error.error || 'Ошибка покупки');
+          return;
+        }
+        const updated = await response.json();
+        balance = parseFloat(updated.balance);
+        servantsCount = updated.servants_count;
+        showToast('Слуга куплен успешно');
+        updateUI();
+        switchToSection('market');
+      } catch (err) {
+        showToast('Ошибка покупки');
+      }
+    }
+
+    buyServantBtn.addEventListener('click', buyServant);
+
     backToMarketBtn.addEventListener('click', () => switchToSection('market'));
+    backToMarketServantBtn.addEventListener('click', () => switchToSection('market'));
 
     // Загрузка холдингов
     async function loadHoldings() {
@@ -1097,73 +1124,49 @@
     async function loadServants() {
       try {
         const response = await fetch(`${apiBase}/servants/${telegramId}`);
-        const data = await response.json();
+        const servants = await response.json();
+        let totalSec = servants.length * 1;
+        let totalTax = 0;
         servantsList.innerHTML = '';
-        totalTaxesEl.textContent = `$ ${data.total_taxes.toFixed(2)}`;
-        data.servants.forEach(servant => {
+        servants.forEach(serv => {
+          totalTax += 0.05 * serv.balance;
           const card = document.createElement('div');
           card.classList.add('card');
           card.innerHTML = `
-            <div>Слуга: @${servant.username}</div>
+            <div>Слуга: @${serv.username}</div>
             <div>Ежесекундный доход: $1</div>
             <div class="btn" data-action="free">Освободить</div>
             <div class="btn" data-action="sell">Продать</div>
           `;
           card.querySelector('[data-action="free"]').addEventListener('click', async () => {
             if (confirm('Освободить слугу?')) {
-              try {
-                const res = await fetch(`${apiBase}/free_servant/${telegramId}/${servant.telegram_id}`, { method: 'POST' });
-                if (res.ok) {
-                  servantsCount--;
-                  showToast('Слуга освобожден!');
-                  loadServants();
-                } else {
-                  const err = await res.json();
-                  showToast(err.error);
-                }
-              } catch (err) {
-                showToast('Ошибка');
-              }
+              await fetch(`${apiBase}/free_servant/${telegramId}/${serv.telegram_id}`, { method: 'POST' });
+              showToast('Слуга освобожден');
+              loadServants();
             }
           });
-          card.querySelector('[data-action="sell"]').addEventListener('click', () => {
-            const price = prompt('Введите сумму продажи:');
-            const parsedPrice = parseFloat(price);
-            if (!isNaN(parsedPrice) && parsedPrice > 0) {
-              sellServant(servant.telegram_id, parsedPrice);
-            } else {
-              showToast('Неверная сумма');
+          card.querySelector('[data-action="sell"]').addEventListener('click', async () => {
+            const price = prompt('Сумма продажи');
+            if (price && !isNaN(price)) {
+              await fetch(`${apiBase}/sell_servant/${telegramId}/${serv.telegram_id}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ price: parseFloat(price) })
+              });
+              showToast('Слуга выставлен на продажу');
+              loadServants();
             }
           });
           servantsList.appendChild(card);
         });
+        secIncomeEl.textContent = totalSec;
+        dailyTaxEl.textContent = totalTax.toFixed(2);
       } catch (err) {
         console.error('Load servants error:', err);
       }
     }
 
-    // Продажа слуги
-    async function sellServant(slaveId, price) {
-      try {
-        const response = await fetch(`${apiBase}/sell_servant/${telegramId}/${slaveId}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ price })
-        });
-        if (!response.ok) {
-          const error = await response.json();
-          showToast(error.error || 'Ошибка продажи');
-          return;
-        }
-        servantsCount--;
-        showToast('Слуга выставлен на продажу');
-        loadServants();
-      } catch (err) {
-        showToast('Ошибка продажи');
-      }
-    }
-
-    // Загрузка страницы продажи
+    // Загрузка страницы продажи акций
     async function loadStockSell() {
       if (!currentCompanyId) return;
 
