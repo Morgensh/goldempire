@@ -212,22 +212,20 @@
     }
 
     /* Стили для табов в бизнесе */
-    .tab-container {
+    .tabs {
       display: flex;
       justify-content: space-around;
       margin-bottom: 16px;
     }
 
-    .tab-btn {
-      padding: 10px 20px;
-      background: white;
-      border: 1px solid #ccc;
+    .tab {
+      padding: 12px;
       cursor: pointer;
     }
 
-    .tab-btn.active {
-      background: #eee;
+    .tab.active {
       font-weight: bold;
+      border-bottom: 2px solid black;
     }
 
     .tab-content {
@@ -236,31 +234,6 @@
 
     .tab-content.active {
       display: block;
-    }
-
-    /* Модальное окно */
-    #modal {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: white;
-      border: 1px solid #ccc;
-      padding: 20px;
-      z-index: 1000;
-      display: none;
-      text-align: center;
-    }
-
-    #modal.show {
-      display: block;
-    }
-
-    #modal-close {
-      margin-top: 16px;
-      padding: 8px 16px;
-      background: #ccc;
-      cursor: pointer;
     }
   </style>
 </head>
@@ -295,13 +268,11 @@
     <!-- Бизнес -->
     <div class="section" id="business-section">
       <h2 class="section-title">Бизнес</h2>
-      
-      <div class="tab-container">
-        <div class="tab-btn active" data-tab="companies">Компания</div>
-        <div class="tab-btn" data-tab="referrals">Рефералы</div>
+      <div class="tabs">
+        <div class="tab active" data-tab="company">Компания</div>
+        <div class="tab" data-tab="referrals">Рефералы</div>
       </div>
-      
-      <div class="tab-content active" id="companies-tab">
+      <div id="company-content" class="tab-content active">
         <div id="create-company-area" class="card">
           <p id="create-company-cost">Первая компания бесплатно</p>
           <input type="text" id="company-name-input" placeholder="Название компании (только английские буквы)">
@@ -309,13 +280,10 @@
         </div>
         <div id="user-companies-list"></div>
       </div>
-      
-      <div class="tab-content" id="referrals-tab">
+      <div id="referrals-content" class="tab-content">
         <div class="card">
-          <p>Пригласи друга и получи 100 тысяч долларов!</p>
-          <div>Ваши рефералы: <span id="referrals-count">0</span></div>
-          <div>Заработано от рефералов: <span id="earned-from-referrals">$0</span></div>
-          <div class="btn" id="copy-referral-link">Скопировать ссылку</div>
+          <p>Пригласи друга и получи 100 тысяч долларов за каждого, кто начнёт игру по твоей ссылке!</p>
+          <div class="btn" id="copy-ref-link">Скопировать ссылку</div>
         </div>
       </div>
     </div>
@@ -452,12 +420,6 @@
   <!-- Toast уведомление -->
   <div id="toast"></div>
 
-  <!-- Модальное окно -->
-  <div id="modal">
-    <p id="modal-text"></p>
-    <div id="modal-close">OK</div>
-  </div>
-
   <script>
     // Telegram WebApp init
     const tg = window.Telegram.WebApp;
@@ -473,12 +435,9 @@
     let progress = 0;
     let totalClicks = 0;
     let companiesCount = 0;
-    let referralsCount = 0;
-    let earnedFromReferrals = 0;
     let apiBase = 'https://dinod.ru/api';
     let currentCompanyId = null;
     let currentSection = 'home';
-    let currentBusinessTab = 'companies';
 
     // Список типов персонала
     const staffTypes = [
@@ -535,14 +494,7 @@
     const sellSharesBtn = document.getElementById('sell-shares-btn');
     const backToWalletBtn = document.getElementById('back-to-wallet-btn');
     const staffGrid = document.getElementById('staff-grid');
-    const tabBtns = document.querySelectorAll('.tab-btn');
-    const tabContents = document.querySelectorAll('.tab-content');
-    const referralsCountEl = document.getElementById('referrals-count');
-    const earnedFromReferralsEl = document.getElementById('earned-from-referrals');
-    const copyReferralLinkBtn = document.getElementById('copy-referral-link');
-    const modal = document.getElementById('modal');
-    const modalText = document.getElementById('modal-text');
-    const modalClose = document.getElementById('modal-close');
+    const copyRefLink = document.getElementById('copy-ref-link');
 
     // Переключение разделов
     function switchToSection(sectionId) {
@@ -567,28 +519,27 @@
     });
 
     // Переключение табов в бизнесе
-    function switchBusinessTab(tabId) {
-      tabBtns.forEach(btn => btn.classList.remove('active'));
-      tabContents.forEach(content => content.classList.remove('active'));
-      
-      document.querySelector(`.tab-btn[data-tab="${tabId}"]`).classList.add('active');
-      document.getElementById(`${tabId}-tab`).classList.add('active');
-      
-      currentBusinessTab = tabId;
-      loadBusinessTabData();
-    }
-
-    tabBtns.forEach(btn => {
-      btn.addEventListener('click', () => {
-        const tabId = btn.getAttribute('data-tab');
-        switchBusinessTab(tabId);
+    const tabs = document.querySelectorAll('.tab');
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        tabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
+        document.getElementById(`${tab.dataset.tab}-content`).style.display = 'block';
       });
+    });
+
+    // Копирование реферальной ссылки
+    copyRefLink.addEventListener('click', () => {
+      const refLink = `https://t.me/GoldEmpireGameBot?start=${telegramId}`;
+      navigator.clipboard.writeText(refLink);
+      showToast('Ссылка скопирована!');
     });
 
     // Загрузка данных для секции
     async function loadSectionData() {
       if (currentSection === 'business') {
-        switchBusinessTab(currentBusinessTab);
+        await loadUserCompanies();
       } else if (currentSection === 'market') {
         await loadMarket();
       } else if (currentSection === 'wallet') {
@@ -599,15 +550,6 @@
         await loadStockBuy();
       } else if (currentSection === 'stock-sell') {
         await loadStockSell();
-      }
-    }
-
-    // Загрузка данных для таба в бизнесе
-    async function loadBusinessTabData() {
-      if (currentBusinessTab === 'companies') {
-        await loadUserCompanies();
-      } else if (currentBusinessTab === 'referrals') {
-        await loadReferralsInfo();
       }
     }
 
@@ -670,8 +612,6 @@
       progressPercentEl.textContent = `${progressPercent}%`;
 
       totalClicksEl.textContent = totalClicks;
-      referralsCountEl.textContent = referralsCount;
-      earnedFromReferralsEl.textContent = `$ ${earnedFromReferrals.toFixed(2).replace('.', ',')}`;
     }
 
     // Toast уведомления
@@ -683,16 +623,6 @@
         toast.classList.remove('show');
       }, 3000);
     }
-
-    // Показать модальное окно
-    function showModal(message) {
-      modalText.textContent = message;
-      modal.classList.add('show');
-    }
-
-    modalClose.addEventListener('click', () => {
-      modal.classList.remove('show');
-    });
 
     // Обновление информации пользователя на сервере
     async function updateUserInfo() {
@@ -724,9 +654,7 @@
           level = user.level;
           progress = parseFloat(user.progress);
           totalClicks = user.total_clicks;
-          companiesCount = user.companies_count;
-          referralsCount = user.referrals_count || 0;
-          earnedFromReferrals = parseFloat(user.earned_from_referrals || 0);
+          companiesCount = user.companies_count || 0;
           clickValue = 2.50 * level;
 
           // Если данные placeholder, обновляем
@@ -754,37 +682,8 @@
         console.error('Init user error:', err);
       }
 
-      // Обработка реферального параметра
-      const startParam = tg.initDataUnsafe.start_param;
-      if (startParam && startParam.startsWith('ref_')) {
-        const referrerId = parseInt(startParam.split('_')[1]);
-        if (referrerId && referrerId !== telegramId) {
-          try {
-            const res = await fetch(`${apiBase}/set_referrer/${telegramId}`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ referrer_id: referrerId })
-            });
-            if (res.ok) {
-              const data = await res.json();
-              if (data.rewarded) {
-                showModal(`Вы присоединились по рефералке!`);
-              }
-            }
-          } catch (err) {
-            console.error('Set referrer error:', err);
-          }
-        }
-      }
-
       updateCreateCompanyArea();
       updateUI();
-      checkForReferralNotifications();
-    }
-
-    // Проверка уведомлений о рефералах (но поскольку уведомления через бот, здесь не нужно, но для модалки если нужно)
-    async function checkForReferralNotifications() {
-      // Если нужно хранить в БД, но для простоты пропустим, уведомления через бот
     }
 
     // Обновление области создания компании
@@ -850,33 +749,6 @@
         console.error('Load companies error:', err);
       }
     }
-
-    // Загрузка информации о рефералах
-    async function loadReferralsInfo() {
-      // Данные уже в initUser, но если нужно обновить
-      try {
-        const response = await fetch(`${apiBase}/user/${telegramId}`);
-        const user = await response.json();
-        referralsCount = user.referrals_count || 0;
-        earnedFromReferrals = parseFloat(user.earned_from_referrals || 0);
-        updateUI();
-      } catch (err) {
-        console.error('Load referrals error:', err);
-      }
-    }
-
-    // Скопировать реферальную ссылку
-    async function copyReferralLink() {
-      const link = `https://t.me/GoldEmpireGameBot?start=ref_${telegramId}`;
-      try {
-        await navigator.clipboard.writeText(link);
-        showToast('Ссылка скопирована!');
-      } catch (err) {
-        showToast('Ошибка копирования');
-      }
-    }
-
-    copyReferralLinkBtn.addEventListener('click', copyReferralLink);
 
     // Загрузка личного кабинета компании
     async function loadCompanyDashboard() {
