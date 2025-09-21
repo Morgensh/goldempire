@@ -43,15 +43,6 @@
       display: block;
     }
 
-    /* Подсекции */
-    .sub-section {
-      display: none;
-    }
-
-    .sub-section.active {
-      display: block;
-    }
-
     /* Карточки — просто белый фон, граница и отступы */
     .card {
       background: white;
@@ -228,7 +219,7 @@
 
   <!-- Основной контент -->
   <div class="main-content">
-    
+
     <!-- Главная (кликер) -->
     <div class="section active" id="home-section">
       <!-- Банковская карта -->
@@ -240,7 +231,7 @@
           <div>Уровень: <span id="card-level">1</span></div>
         </div>
       </div>
-      
+
       <div class="clicker-area">
         <div class="tap-circle" id="tap-circle">
           <i class="fas fa-hand-point-up" style="font-size: 40px;"></i>
@@ -252,20 +243,12 @@
     <!-- Бизнес -->
     <div class="section" id="business-section">
       <h2 class="section-title">Бизнес</h2>
-      <div class="btn" id="business-companies-btn">Компания</div>
-      <div class="btn" id="business-referrals-btn">Рефералы</div>
-      <div id="business-companies-content" class="sub-section active">
-        <div id="create-company-area" class="card">
-          <p id="create-company-cost">Первая компания бесплатно</p>
-          <input type="text" id="company-name-input" placeholder="Название компании (только английские буквы)">
-          <div class="btn" id="create-company-btn">Создать компанию</div>
-        </div>
-        <div id="user-companies-list"></div>
+      <div id="create-company-area" class="card">
+        <p id="create-company-cost">Первая компания бесплатно</p>
+        <input type="text" id="company-name-input" placeholder="Название компании (только английские буквы)">
+        <div class="btn" id="create-company-btn">Создать компанию</div>
       </div>
-      <div id="business-referrals-content" class="sub-section">
-        <p>Пригласи друга и получи 100 тысяч долларов</p>
-        <div class="btn" id="copy-ref-btn">Скопировать ссылку</div>
-      </div>
+      <div id="user-companies-list"></div>
     </div>
 
     <!-- Личный кабинет компании -->
@@ -291,15 +274,8 @@
 
     <!-- Рынок -->
     <div class="section" id="market-section">
-      <h2 class="section-title">Рынок</h2>
-      <div class="btn" id="market-stocks-btn">Рынок акций</div>
-      <div class="btn" id="market-servants-btn">Рынок слуг</div>
-      <div id="market-stocks-content" class="sub-section active">
-        <div id="market-list"></div>
-      </div>
-      <div id="market-servants-content" class="sub-section">
-        <div id="servants-market-list"></div>
-      </div>
+      <h2 class="section-title">Рынок акций</h2>
+      <div id="market-list"></div>
     </div>
 
     <!-- Покупка акций -->
@@ -330,41 +306,22 @@
       <div class="btn" id="back-to-wallet-btn">Назад в Кошелек</div>
     </div>
 
-    <!-- Покупка слуги -->
-    <div class="section" id="servant-buy-section">
-      <h2 class="section-title">Покупка слуги</h2>
-      <div class="card">
-        <div>Слуга: <span id="buy-servant-username"></span></div>
-        <div>Текущий хозяин: <span id="buy-servant-master"></span></div>
-        <div>Цена: <span id="buy-servant-price"></span></div>
-        <div class="btn" id="buy-servant-btn">Купить</div>
-      </div>
-      <div class="btn" id="back-to-servants-market-btn">Назад на Рынок слуг</div>
-    </div>
-
     <!-- Кошелек -->
     <div class="section" id="wallet-section">
       <h2 class="section-title">Кошелек</h2>
-      <div class="btn" id="wallet-holdings-btn">Акции</div>
-      <div class="btn" id="wallet-servants-btn">Слуги</div>
-      <div id="wallet-holdings-content" class="sub-section active">
-        <div class="card">
-          <div class="stat-row">
-            <span>Баланс</span>
-            <span id="wallet-balance">$ 0,00</span>
-          </div>
-          <div id="holdings-list"></div>
+      <div class="card">
+        <div class="stat-row">
+          <span>Баланс</span>
+          <span id="wallet-balance">$ 0,00</span>
         </div>
-      </div>
-      <div id="wallet-servants-content" class="sub-section">
-        <div id="servants-list"></div>
+        <div id="holdings-list"></div>
       </div>
     </div>
 
     <!-- Профиль -->
     <div class="section" id="profile-section">
       <h2 class="section-title">Профиль</h2>
-      
+
       <div class="profile-header">
         <div class="profile-avatar" id="profile-avatar">
           <img id="avatar-img" src="" alt="Avatar" style="display: none; width: 100%; height: 100%; border-radius: 50%;">
@@ -388,7 +345,7 @@
           <span id="progress-percent">0%</span>
         </div>
       </div>
-      
+
       <div class="card">
         <div class="progress-container">
           <div class="progress-fill" id="progress-fill"></div>
@@ -432,10 +389,6 @@
     tg.ready();
     tg.expand();
 
-    // Парсинг реферальной ссылки
-    const urlParams = new URLSearchParams(window.location.search);
-    const ref = urlParams.get('ref');
-
     // Глобальные переменные
     let userData = tg.initDataUnsafe.user || {};
     let telegramId = userData.id || 0;
@@ -447,9 +400,7 @@
     let companiesCount = 0;
     let apiBase = 'https://dinod.ru/api';
     let currentCompanyId = null;
-    let currentServantId = null;
     let currentSection = 'home';
-    let currentSubSection = {};
 
     // Список типов персонала
     const staffTypes = [
@@ -506,58 +457,20 @@
     const sellSharesBtn = document.getElementById('sell-shares-btn');
     const backToWalletBtn = document.getElementById('back-to-wallet-btn');
     const staffGrid = document.getElementById('staff-grid');
-    const businessCompaniesBtn = document.getElementById('business-companies-btn');
-    const businessReferralsBtn = document.getElementById('business-referrals-btn');
-    const businessCompaniesContent = document.getElementById('business-companies-content');
-    const businessReferralsContent = document.getElementById('business-referrals-content');
-    const copyRefBtn = document.getElementById('copy-ref-btn');
-    const marketStocksBtn = document.getElementById('market-stocks-btn');
-    const marketServantsBtn = document.getElementById('market-servants-btn');
-    const marketStocksContent = document.getElementById('market-stocks-content');
-    const marketServantsContent = document.getElementById('market-servants-content');
-    const servantsMarketList = document.getElementById('servants-market-list');
-    const walletHoldingsBtn = document.getElementById('wallet-holdings-btn');
-    const walletServantsBtn = document.getElementById('wallet-servants-btn');
-    const walletHoldingsContent = document.getElementById('wallet-holdings-content');
-    const walletServantsContent = document.getElementById('wallet-servants-content');
-    const servantsList = document.getElementById('servants-list');
-    const buyServantUsernameEl = document.getElementById('buy-servant-username');
-    const buyServantMasterEl = document.getElementById('buy-servant-master');
-    const buyServantPriceEl = document.getElementById('buy-servant-price');
-    const buyServantBtn = document.getElementById('buy-servant-btn');
-    const backToServantsMarketBtn = document.getElementById('back-to-servants-market-btn');
 
     // Переключение разделов
     function switchToSection(sectionId) {
       sections.forEach(section => section.classList.remove('active'));
       navItems.forEach(item => item.classList.remove('active'));
-      
+
       const targetSection = document.getElementById(`${sectionId}-section`);
       if (targetSection) targetSection.classList.add('active');
       const navItem = document.querySelector(`.nav-item[data-section="${sectionId}"]`);
       if (navItem) navItem.classList.add('active');
-      
+
       currentSection = sectionId;
-      currentSubSection[sectionId] = currentSubSection[sectionId] || getDefaultSubSection(sectionId);
-      switchToSubSection(sectionId, currentSubSection[sectionId]);
       loadSectionData();
       updateUI();
-    }
-
-    function getDefaultSubSection(sectionId) {
-      if (sectionId === 'business') return 'companies';
-      if (sectionId === 'market') return 'stocks';
-      if (sectionId === 'wallet') return 'holdings';
-      return null;
-    }
-
-    function switchToSubSection(sectionId, subId) {
-      const subSections = document.querySelectorAll(`#${sectionId}-section .sub-section`);
-      subSections.forEach(sub => sub.classList.remove('active'));
-      const targetSub = document.getElementById(`${sectionId}-${subId}-content`);
-      if (targetSub) targetSub.classList.add('active');
-      currentSubSection[sectionId] = subId;
-      loadSubSectionData(sectionId, subId);
     }
 
     navItems.forEach(item => {
@@ -567,46 +480,20 @@
       });
     });
 
-    // Обработчики переключения подсекций
-    businessCompaniesBtn.addEventListener('click', () => switchToSubSection('business', 'companies'));
-    businessReferralsBtn.addEventListener('click', () => switchToSubSection('business', 'referrals'));
-    marketStocksBtn.addEventListener('click', () => switchToSubSection('market', 'stocks'));
-    marketServantsBtn.addEventListener('click', () => switchToSubSection('market', 'servants'));
-    walletHoldingsBtn.addEventListener('click', () => switchToSubSection('wallet', 'holdings'));
-    walletServantsBtn.addEventListener('click', () => switchToSubSection('wallet', 'servants'));
-
     // Загрузка данных для секции
     async function loadSectionData() {
       if (currentSection === 'business') {
         await loadUserCompanies();
       } else if (currentSection === 'market') {
         await loadMarket();
-        await loadServantsMarket();
       } else if (currentSection === 'wallet') {
         await loadHoldings();
-        await loadServants();
       } else if (currentSection === 'company-dashboard') {
         await loadCompanyDashboard();
       } else if (currentSection === 'stock-buy') {
         await loadStockBuy();
       } else if (currentSection === 'stock-sell') {
         await loadStockSell();
-      } else if (currentSection === 'servant-buy') {
-        await loadServantBuy();
-      }
-    }
-
-    async function loadSubSectionData(sectionId, subId) {
-      if (sectionId === 'business' && subId === 'companies') {
-        await loadUserCompanies();
-      } else if (sectionId === 'market' && subId === 'stocks') {
-        await loadMarket();
-      } else if (sectionId === 'market' && subId === 'servants') {
-        await loadServantsMarket();
-      } else if (sectionId === 'wallet' && subId === 'holdings') {
-        await loadHoldings();
-      } else if (sectionId === 'wallet' && subId === 'servants') {
-        await loadServants();
       }
     }
 
@@ -661,7 +548,7 @@
       walletBalanceEl.textContent = formattedBalance;
       cardLevelEl.textContent = level;
       profileLevelEl.textContent = level;
-      
+
       const nextThreshold = level * 1000;
       const progressPercent = Math.min(100, Math.round((progress / nextThreshold) * 100));
       progressFillEl.style.width = `${progressPercent}%`;
@@ -705,7 +592,7 @@
 
       try {
         const response = await fetch(`${apiBase}/user/${telegramId}`);
-        let user = await response.json();
+        const user = await response.json();
         if (user) {
           balance = parseFloat(user.balance);
           level = user.level;
@@ -719,19 +606,11 @@
             await updateUserInfo();
             // Перезагружаем данные после обновления
             const updatedResponse = await fetch(`${apiBase}/user/${telegramId}`);
-            user = await updatedResponse.json();
-          }
-
-          // Установка реферера, если есть ref и нет master_id
-          if (ref && !user.master_id) {
-            const referrerId = ref.split('_')[1];
-            if (referrerId && referrerId !== telegramId.toString()) {
-              await fetch(`${apiBase}/user/${telegramId}/set_master`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ referrer_id: referrerId })
-              });
-            }
+            const updatedUser = await updatedResponse.json();
+            user.first_name = updatedUser.first_name;
+            user.last_name = updatedUser.last_name;
+            user.username = updatedUser.username;
+            user.avatar_url = updatedUser.avatar_url;
           }
 
           profileNameEl.textContent = `${user.first_name || ''} ${user.last_name || ''}`.trim() || 'Richman Player';
@@ -750,39 +629,6 @@
       updateCreateCompanyArea();
       updateUI();
     }
-
-    // Периодическое обновление баланса (для пассивного дохода)
-    async function updateBalance() {
-      try {
-        const response = await fetch(`${apiBase}/user/${telegramId}`);
-        const user = await response.json();
-        if (user) {
-          balance = parseFloat(user.balance);
-          updateUI();
-        }
-      } catch (err) {
-        console.error('Update balance error:', err);
-      }
-    }
-
-    setInterval(updateBalance, 5000);
-
-    // Проверка реферальных наград
-    async function checkRefRewards() {
-      try {
-        const response = await fetch(`${apiBase}/claim_ref_rewards/${telegramId}`);
-        const data = await response.json();
-        if (data.reward > 0) {
-          showToast(`По вашей ссылке перешло ${data.count} человек, вот ваш ${data.reward} долларов`);
-          balance = parseFloat(data.new_balance);
-          updateUI();
-        }
-      } catch (err) {
-        console.error('Check ref rewards error:', err);
-      }
-    }
-
-    setInterval(checkRefRewards, 5000);
 
     // Обновление области создания компании
     function updateCreateCompanyArea() {
@@ -847,14 +693,6 @@
         console.error('Load companies error:', err);
       }
     }
-
-    // Копирование реферальной ссылки
-    copyRefBtn.addEventListener('click', () => {
-      const refLink = `https://t.me/GoldEmpireGameBot?start=ref_${telegramId}`;
-      navigator.clipboard.writeText(refLink).then(() => {
-        showToast('Ссылка скопирована');
-      });
-    });
 
     // Загрузка личного кабинета компании
     async function loadCompanyDashboard() {
@@ -946,7 +784,7 @@
 
     backToBusinessBtn.addEventListener('click', () => switchToSection('business'));
 
-    // Загрузка рынка акций
+    // Загрузка рынка
     async function loadMarket() {
       try {
         const response = await fetch(`${apiBase}/companies`);
@@ -972,32 +810,7 @@
       }
     }
 
-    // Загрузка рынка слуг
-    async function loadServantsMarket() {
-      try {
-        const response = await fetch(`${apiBase}/servants_on_sale`);
-        const servants = await response.json();
-        servantsMarketList.innerHTML = '';
-        servants.forEach(servant => {
-          const card = document.createElement('div');
-          card.classList.add('card');
-          card.innerHTML = `
-            <div>Слуга: @${servant.username}</div>
-            <div>Хозяин: @${servant.master_username}</div>
-            <div>Цена: $${servant.sale_price}</div>
-          `;
-          card.addEventListener('click', () => {
-            currentServantId = servant.telegram_id;
-            switchToSection('servant-buy');
-          });
-          servantsMarketList.appendChild(card);
-        });
-      } catch (err) {
-        console.error('Load servants market error:', err);
-      }
-    }
-
-    // Загрузка страницы покупки акций
+    // Загрузка страницы покупки
     async function loadStockBuy() {
       if (!currentCompanyId) return;
 
@@ -1048,47 +861,6 @@
 
     backToMarketBtn.addEventListener('click', () => switchToSection('market'));
 
-    // Загрузка страницы покупки слуги
-    async function loadServantBuy() {
-      if (!currentServantId) return;
-
-      try {
-        const response = await fetch(`${apiBase}/user/${currentServantId}`);
-        const servant = await response.json();
-        buyServantUsernameEl.textContent = `@${servant.username}`;
-        buyServantMasterEl.textContent = `@${servant.master_username}`;
-        buyServantPriceEl.textContent = `$${servant.sale_price}`;
-      } catch (err) {
-        console.error('Load servant buy error:', err);
-      }
-    }
-
-    // Покупка слуги
-    async function buyServant() {
-      try {
-        const response = await fetch(`${apiBase}/buy_servant/${telegramId}/${currentServantId}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' }
-        });
-        if (!response.ok) {
-          const error = await response.json();
-          showToast(error.error || 'Ошибка покупки слуги');
-          return;
-        }
-        const updated = await response.json();
-        balance = parseFloat(updated.balance);
-        showToast('Слуга куплен успешно');
-        updateUI();
-        switchToSection('market');
-      } catch (err) {
-        showToast('Ошибка покупки слуги');
-      }
-    }
-
-    buyServantBtn.addEventListener('click', buyServant);
-
-    backToServantsMarketBtn.addEventListener('click', () => switchToSection('market'));
-
     // Загрузка холдингов
     async function loadHoldings() {
       try {
@@ -1122,80 +894,7 @@
       }
     }
 
-    // Загрузка слуг
-    async function loadServants() {
-      try {
-        const response = await fetch(`${apiBase}/servants/${telegramId}`);
-        const servants = await response.json();
-        servantsList.innerHTML = '';
-        servants.forEach(servant => {
-          const card = document.createElement('div');
-          card.classList.add('card');
-          card.innerHTML = `
-            <div>Слуга: @${servant.username}</div>
-            <input type="number" id="sale-price-${servant.telegram_id}" placeholder="Цена для продажи">
-            <div class="btn" data-action="sell" data-id="${servant.telegram_id}">Выставить на продажу</div>
-            <div class="btn" data-action="release" data-id="${servant.telegram_id}">Отпустить</div>
-          `;
-          card.querySelector('[data-action="sell"]').addEventListener('click', (e) => {
-            const priceInput = document.getElementById(`sale-price-${e.target.dataset.id}`);
-            const price = parseFloat(priceInput.value);
-            if (isNaN(price) || price <= 0) {
-              showToast('Введите положительную цену');
-              return;
-            }
-            setServantOnSale(servant.telegram_id, price);
-          });
-          card.querySelector('[data-action="release"]').addEventListener('click', (e) => {
-            releaseServant(servant.telegram_id);
-          });
-          servantsList.appendChild(card);
-        });
-      } catch (err) {
-        console.error('Load servants error:', err);
-      }
-    }
-
-    // Выставить слугу на продажу
-    async function setServantOnSale(servantId, price) {
-      try {
-        const response = await fetch(`${apiBase}/set_sale/${telegramId}/${servantId}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ price })
-        });
-        if (!response.ok) {
-          const error = await response.json();
-          showToast(error.error || 'Ошибка выставления на продажу');
-          return;
-        }
-        showToast('Слуга выставлен на продажу');
-        await loadServants();
-      } catch (err) {
-        showToast('Ошибка выставления на продажу');
-      }
-    }
-
-    // Отпустить слугу
-    async function releaseServant(servantId) {
-      try {
-        const response = await fetch(`${apiBase}/release_servant/${telegramId}/${servantId}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' }
-        });
-        if (!response.ok) {
-          const error = await response.json();
-          showToast(error.error || 'Ошибка отпускания слуги');
-          return;
-        }
-        showToast('Слуга отпущен');
-        await loadServants();
-      } catch (err) {
-        showToast('Ошибка отпускания слуги');
-      }
-    }
-
-    // Загрузка страницы продажи акций
+    // Загрузка страницы продажи
     async function loadStockSell() {
       if (!currentCompanyId) return;
 
@@ -1246,8 +945,8 @@
 
     // Инициализация
     initUser();
-    checkRefRewards();
   </script>
 
 </body>
 </html>
+
