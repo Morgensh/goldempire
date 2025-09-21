@@ -235,6 +235,11 @@
     .tab-content.active {
       display: block;
     }
+
+    /* Поисковые поля */
+    .search-input {
+      margin-bottom: 16px;
+    }
   </style>
 </head>
 <body>
@@ -257,7 +262,7 @@
         </div>
       </div>
       
-      <div class="clicker-area">
+      <div class="clicker-area" id="clicker-area">
         <div class="tap-circle" id="tap-circle">
           <i class="fas fa-hand-point-up" style="font-size: 40px;"></i>
         </div>
@@ -282,8 +287,10 @@
       </div>
       <div id="referrals-content" class="tab-content">
         <div class="card">
-          <p>Пригласи друга и получи 100 тысяч долларов за каждого, кто начнёт игру по твоей ссылке!</p>
+          <p>Пригласи друга и получи 100 тысяч долларов за каждого, кто начнёт игру по твоей ссылке! Каждый приглашённый будет вашим слугой.</p>
+          <p>Ваша реферальная ссылка: <span id="ref-link-text"></span></p>
           <div class="btn" id="copy-ref-link">Скопировать ссылку</div>
+          <p>Подпишись чтобы не пропустить главные новости: <a href="https://t.me/gechnl">https://t.me/gechnl</a></p>
         </div>
       </div>
     </div>
@@ -317,9 +324,11 @@
         <div class="tab" data-tab="servants">Слуги</div>
       </div>
       <div id="stocks-market-content" class="tab-content active">
+        <input type="text" id="search-stocks" class="search-input" placeholder="Поиск компании...">
         <div id="market-list"></div>
       </div>
       <div id="servants-market-content" class="tab-content">
+        <input type="text" id="search-servants" class="search-input" placeholder="Поиск слуги по юзернейму...">
         <div id="servant-market-list"></div>
       </div>
     </div>
@@ -475,6 +484,8 @@
     let currentCompanyId = null;
     let currentServantId = null;
     let currentSection = 'home';
+    let marketCompanies = []; // Для хранения полного списка компаний
+    let marketServants = []; // Для хранения полного списка слуг
 
     // Список типов персонала
     const staffTypes = [
@@ -490,6 +501,7 @@
     const navItems = document.querySelectorAll('.nav-item');
     const sections = document.querySelectorAll('.section');
     const tapCircle = document.getElementById('tap-circle');
+    const clickerArea = document.getElementById('clicker-area');
     const cardBalanceEl = document.getElementById('card-balance');
     const cardLevelEl = document.getElementById('card-level');
     const progressFillEl = document.getElementById('progress-fill');
@@ -532,6 +544,7 @@
     const backToWalletBtn = document.getElementById('back-to-wallet-btn');
     const staffGrid = document.getElementById('staff-grid');
     const copyRefLink = document.getElementById('copy-ref-link');
+    const refLinkText = document.getElementById('ref-link-text');
     const servantStatusEl = document.getElementById('servant-status');
     const freeSelfBtnContainer = document.getElementById('free-self-btn-container');
     const secIncomeEl = document.getElementById('sec-income');
@@ -542,6 +555,8 @@
     const buyServantPriceEl = document.getElementById('buy-servant-price');
     const buyServantBtn = document.getElementById('buy-servant-btn');
     const backToMarketServantBtn = document.getElementById('back-to-market-servant-btn');
+    const searchStocks = document.getElementById('search-stocks');
+    const searchServants = document.getElementById('search-servants');
 
     // Переключение разделов
     function switchToSection(sectionId) {
@@ -591,6 +606,8 @@
     async function loadSectionData() {
       if (currentSection === 'business') {
         await loadUserCompanies();
+        const refLink = `https://t.me/GoldEmpireGameBot?start=${telegramId}`;
+        refLinkText.textContent = refLink;
       } else if (currentSection === 'market') {
         const activeTab = document.querySelector('#market-section .tab.active').dataset.tab;
         if (activeTab === 'stocks') {
@@ -618,8 +635,8 @@
       }
     }
 
-    // Обработка клика
-    async function handleClick() {
+    // Обработка клика (локально, без сервера)
+    function handleClick() {
       if (!telegramId) return;
 
       totalClicks++;
@@ -629,25 +646,6 @@
       if (progress >= nextThreshold) {
         level++;
         progress = 0;
-      }
-
-      try {
-        const response = await fetch(`${apiBase}/click/${telegramId}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ balance, total_clicks: totalClicks })
-        });
-        const updatedUser = await response.json();
-        if (updatedUser) {
-          balance = parseFloat(updatedUser.balance);
-          level = updatedUser.level;
-          progress = parseFloat(updatedUser.progress);
-          totalClicks = updatedUser.total_clicks;
-          companiesCount = updatedUser.companies_count;
-          clickValue = 2.50 * level;
-        }
-      } catch (err) {
-        console.error('Click error:', err);
       }
 
       updateUI();
@@ -660,7 +658,8 @@
       ], { duration: 200 });
     }
 
-    tapCircle.addEventListener('click', handleClick);
+    // Расширяем зону клика на всю область ниже карты
+    clickerArea.addEventListener('click', handleClick);
 
     // Обновление UI
     function updateUI() {
@@ -704,6 +703,19 @@
         });
       } catch (err) {
         console.error('Update user info error:', err);
+      }
+    }
+
+    // Синхронизация данных с сервером каждые 30 секунд
+    async function syncUserData() {
+      try {
+        await fetch(`${apiBase}/sync/${telegramId}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ balance, total_clicks: totalClicks, level, progress })
+        });
+      } catch (err) {
+        console.error('Sync error:', err);
       }
     }
 
@@ -764,6 +776,9 @@
 
       updateCreateCompanyArea();
       updateUI();
+
+      // Запускаем синхронизацию каждые 30 секунд
+      setInterval(syncUserData, 30000);
     }
 
     // Загрузка информации о статусе слуги в профиле
@@ -951,51 +966,75 @@
     async function loadMarket() {
       try {
         const response = await fetch(`${apiBase}/companies`);
-        const companies = await response.json();
-        marketList.innerHTML = '';
-        companies.forEach(company => {
-          const card = document.createElement('div');
-          card.classList.add('card');
-          card.innerHTML = `
-            <div>Компания: ${company.name}</div>
-            <div>Владелец: @${company.owner_username}</div>
-            <div>Клиентов: ${company.clients_count}</div>
-            <div>Цена: $${company.price}</div>
-          `;
-          card.addEventListener('click', () => {
-            currentCompanyId = company.id;
-            switchToSection('stock-buy');
-          });
-          marketList.appendChild(card);
-        });
+        marketCompanies = await response.json();
+        renderMarketList(marketCompanies);
       } catch (err) {
         console.error('Load market error:', err);
       }
     }
 
+    // Рендер списка акций с фильтром
+    function renderMarketList(companies) {
+      marketList.innerHTML = '';
+      companies.forEach(company => {
+        const card = document.createElement('div');
+        card.classList.add('card');
+        card.innerHTML = `
+          <div>Компания: ${company.name}</div>
+          <div>Владелец: @${company.owner_username}</div>
+          <div>Клиентов: ${company.clients_count}</div>
+          <div>Цена: $${company.price}</div>
+        `;
+        card.addEventListener('click', () => {
+          currentCompanyId = company.id;
+          switchToSection('stock-buy');
+        });
+        marketList.appendChild(card);
+      });
+    }
+
+    // Поиск по акциям
+    searchStocks.addEventListener('input', (e) => {
+      const query = e.target.value.toLowerCase();
+      const filtered = marketCompanies.filter(c => c.name.toLowerCase().includes(query));
+      renderMarketList(filtered);
+    });
+
     // Загрузка рынка слуг
     async function loadServantMarket() {
       try {
         const response = await fetch(`${apiBase}/servant_market`);
-        const servants = await response.json();
-        servantMarketList.innerHTML = '';
-        servants.forEach(servant => {
-          const card = document.createElement('div');
-          card.classList.add('card');
-          card.innerHTML = `
-            <div>Слуга: @${servant.username}</div>
-            <div>Цена: $${servant.price}</div>
-          `;
-          card.addEventListener('click', () => {
-            currentServantId = servant.servant_id;
-            switchToSection('servant-buy');
-          });
-          servantMarketList.appendChild(card);
-        });
+        marketServants = await response.json();
+        renderServantMarketList(marketServants);
       } catch (err) {
         console.error('Load servant market error:', err);
       }
     }
+
+    // Рендер списка слуг с фильтром
+    function renderServantMarketList(servants) {
+      servantMarketList.innerHTML = '';
+      servants.forEach(servant => {
+        const card = document.createElement('div');
+        card.classList.add('card');
+        card.innerHTML = `
+          <div>Слуга: @${servant.username}</div>
+          <div>Цена: $${servant.price}</div>
+        `;
+        card.addEventListener('click', () => {
+          currentServantId = servant.servant_id;
+          switchToSection('servant-buy');
+        });
+        servantMarketList.appendChild(card);
+      });
+    }
+
+    // Поиск по слугам
+    searchServants.addEventListener('input', (e) => {
+      const query = e.target.value.toLowerCase();
+      const filtered = marketServants.filter(s => s.username.toLowerCase().includes(query));
+      renderServantMarketList(filtered);
+    });
 
     // Загрузка страницы покупки акций
     async function loadStockBuy() {
