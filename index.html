@@ -210,6 +210,31 @@
       border-radius: 50%;
       margin-bottom: 8px;
     }
+
+    /* Стили для табов в бизнесе */
+    .tabs {
+      display: flex;
+      justify-content: space-around;
+      margin-bottom: 16px;
+    }
+
+    .tab {
+      padding: 12px;
+      cursor: pointer;
+    }
+
+    .tab.active {
+      font-weight: bold;
+      border-bottom: 2px solid black;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
   </style>
 </head>
 <body>
@@ -243,12 +268,24 @@
     <!-- Бизнес -->
     <div class="section" id="business-section">
       <h2 class="section-title">Бизнес</h2>
-      <div id="create-company-area" class="card">
-        <p id="create-company-cost">Первая компания бесплатно</p>
-        <input type="text" id="company-name-input" placeholder="Название компании (только английские буквы)">
-        <div class="btn" id="create-company-btn">Создать компанию</div>
+      <div class="tabs">
+        <div class="tab active" data-tab="company">Компания</div>
+        <div class="tab" data-tab="referrals">Рефералы</div>
       </div>
-      <div id="user-companies-list"></div>
+      <div id="company-content" class="tab-content active">
+        <div id="create-company-area" class="card">
+          <p id="create-company-cost">Первая компания бесплатно</p>
+          <input type="text" id="company-name-input" placeholder="Название компании (только английские буквы)">
+          <div class="btn" id="create-company-btn">Создать компанию</div>
+        </div>
+        <div id="user-companies-list"></div>
+      </div>
+      <div id="referrals-content" class="tab-content">
+        <div class="card">
+          <p>Пригласи друга и получи 100 тысяч долларов за каждого, кто начнёт игру по твоей ссылке!</p>
+          <div class="btn" id="copy-ref-link">Скопировать ссылку</div>
+        </div>
+      </div>
     </div>
 
     <!-- Личный кабинет компании -->
@@ -457,6 +494,7 @@
     const sellSharesBtn = document.getElementById('sell-shares-btn');
     const backToWalletBtn = document.getElementById('back-to-wallet-btn');
     const staffGrid = document.getElementById('staff-grid');
+    const copyRefLink = document.getElementById('copy-ref-link');
 
     // Переключение разделов
     function switchToSection(sectionId) {
@@ -478,6 +516,24 @@
         const sectionId = item.getAttribute('data-section');
         switchToSection(sectionId);
       });
+    });
+
+    // Переключение табов в бизнесе
+    const tabs = document.querySelectorAll('.tab');
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        tabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
+        document.getElementById(`${tab.dataset.tab}-content`).style.display = 'block';
+      });
+    });
+
+    // Копирование реферальной ссылки
+    copyRefLink.addEventListener('click', () => {
+      const refLink = `https://t.me/GoldEmpireGameBot?start=${telegramId}`;
+      navigator.clipboard.writeText(refLink);
+      showToast('Ссылка скопирована!');
     });
 
     // Загрузка данных для секции
