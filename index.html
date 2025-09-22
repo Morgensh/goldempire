@@ -240,6 +240,25 @@
     .search-input {
       margin-bottom: 16px;
     }
+
+    .btn-green {
+      background: green;
+      color: white;
+    }
+
+    .top-players-content {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .top-list {
+      margin-bottom: 20px;
+    }
+
+    .top-item {
+      padding: 10px;
+      border-bottom: 1px solid #ccc;
+    }
   </style>
 </head>
 <body>
@@ -291,12 +310,11 @@
           <p>Ваша реферальная ссылка: <span id="ref-link-text"></span></p>
           <div class="btn" id="copy-ref-link">Скопировать ссылку</div>
           <p>Подпишись чтобы не пропустить главные новости: <a href="https://t.me/gechnl">https://t.me/gechnl</a></p>
-        </div>
-        <!-- Добавленный раздел для награды за подписку -->
-        <div class="card">
           <p>Подпишитесь на канал и получите 25 000 долларов!</p>
-          <a href="https://t.me/gechnl" target="_blank" class="btn">Подписаться на канал</a>
-          <div class="btn" id="claim-sub-reward-btn" style="background: #ccc;">Я подписался</div>
+          <a href="https://t.me/gechnl" class="btn">Подписаться на канал</a>
+          <div class="btn" id="check-sub">Я подписался</div>
+          <div class="btn" id="claim-bonus" disabled>Получить 25 000</div>
+          <div id="bonus-status"></div>
         </div>
       </div>
     </div>
@@ -328,7 +346,7 @@
       <div class="tabs">
         <div class="tab active" data-tab="stocks">Акции</div>
         <div class="tab" data-tab="servants">Слуги</div>
-        <div class="tab" data-tab="top-players">Топ игроки</div>
+        <div class="tab" data-tab="top">Топ игроки</div>
       </div>
       <div id="stocks-market-content" class="tab-content active">
         <input type="text" id="search-stocks" class="search-input" placeholder="Поиск компании...">
@@ -339,7 +357,10 @@
         <div id="servant-market-list"></div>
       </div>
       <div id="top-players-content" class="tab-content">
-        <div id="top-players-list"></div>
+        <h3>Топ по уровню</h3>
+        <div id="top-level-list" class="top-list"></div>
+        <h3>Топ по балансу</h3>
+        <div id="top-balance-list" class="top-list"></div>
       </div>
     </div>
 
@@ -441,10 +462,8 @@
         </div>
         <div style="text-align: center; margin-top: 8px;" id="progress-text">$0 / $1 000</div>
       </div>
-      <!-- Добавленная кнопка для анонимности -->
       <div class="card">
-        <p>Хотите быть полностью анонимным? Чтобы никто не видел ваш юзернейм нигде в игре?</p>
-        <div class="btn" id="toggle-anonymous-btn">Да, стать анонимным</div>
+        <div class="btn" id="toggle-anonymous-btn">Хотите быть полностью анонимным? Чтобы никто не видел ваш юзернейм нигде в игре?</div>
       </div>
     </div>
 
@@ -501,7 +520,10 @@
     let currentSection = 'home';
     let marketCompanies = []; // Для хранения полного списка компаний
     let marketServants = []; // Для хранения полного списка слуг
-    let anonymous = false; // Для анонимности
+    let anonymous = false;
+    let claimedChannelBonus = false;
+    let touchStartY = 0;
+    let touchEndY = 0;
 
     // Список типов персонала
     const staffTypes = [
@@ -573,11 +595,14 @@
     const backToMarketServantBtn = document.getElementById('back-to-market-servant-btn');
     const searchStocks = document.getElementById('search-stocks');
     const searchServants = document.getElementById('search-servants');
-    // Новые элементы
     const toggleAnonymousBtn = document.getElementById('toggle-anonymous-btn');
-    const claimSubRewardBtn = document.getElementById('claim-sub-reward-btn');
-    const topPlayersList = document.getElementById('top-players-list');
-    const mainContent = document.querySelector('.main-content');
+    const checkSubBtn = document.getElementById('check-sub');
+    const claimBonusBtn = document.getElementById('claim-bonus');
+    const bonusStatusEl = document.getElementById('bonus-status');
+    const topLevelList = document.getElementById('top-level-list');
+    const topBalanceList = document.getElementById('top-balance-list');
+    const marketSection = document.getElementById('market-section');
+    const marketNavItem = document.querySelector('.nav-item[data-section="market"]');
 
     // Переключение разделов
     function switchToSection(sectionId) {
@@ -629,13 +654,14 @@
         await loadUserCompanies();
         const refLink = `https://t.me/GoldEmpireGameBot?start=${telegramId}`;
         refLinkText.textContent = refLink;
+        await loadBonusStatus();
       } else if (currentSection === 'market') {
         const activeTab = document.querySelector('#market-section .tab.active').dataset.tab;
         if (activeTab === 'stocks') {
           await loadMarket();
         } else if (activeTab === 'servants') {
           await loadServantMarket();
-        } else if (activeTab === 'top-players') {
+        } else if (activeTab === 'top') {
           await loadTopPlayers();
         }
       } else if (currentSection === 'wallet') {
@@ -655,8 +681,96 @@
         await loadStockSell();
       } else if (currentSection === 'profile') {
         await loadProfileServantInfo();
+        await loadAnonymousStatus();
       }
     }
+
+    async function loadBonusStatus() {
+      if (claimedChannelBonus) {
+        bonusStatusEl.textContent = 'Награда уже получена';
+        checkSubBtn.style.display = 'none';
+        claimBonusBtn.style.display = 'none';
+      } else {
+        bonusStatusEl.textContent = '';
+        checkSubBtn.style.display = 'block';
+        claimBonusBtn.style.display = 'block';
+        claimBonusBtn.disabled = true;
+        claimBonusBtn.classList.remove('btn-green');
+      }
+    }
+
+    checkSubBtn.addEventListener('click', async () => {
+      try {
+        const response = await fetch(`${apiBase}/check_channel_sub/${telegramId}`);
+        const data = await response.json();
+        if (data.subscribed) {
+          claimBonusBtn.disabled = false;
+          claimBonusBtn.classList.add('btn-green');
+          showToast('Подписка подтверждена!');
+        } else {
+          showToast('Вы не подписаны на канал');
+        }
+      } catch (err) {
+        showToast('Ошибка проверки подписки');
+      }
+    });
+
+    claimBonusBtn.addEventListener('click', async () => {
+      try {
+        const response = await fetch(`${apiBase}/claim_channel_bonus/${telegramId}`, { method: 'POST' });
+        if (response.ok) {
+          const updated = await response.json();
+          balance = parseFloat(updated.balance);
+          claimedChannelBonus = true;
+          updateUI();
+          loadBonusStatus();
+          showToast('Награда получена!');
+        } else {
+          showToast('Ошибка получения награды');
+        }
+      } catch (err) {
+        showToast('Ошибка получения награды');
+      }
+    });
+
+    async function loadTopPlayers() {
+      try {
+        const levelRes = await fetch(`${apiBase}/top_players?type=level`);
+        const balanceRes = await fetch(`${apiBase}/top_players?type=balance`);
+        const topLevel = await levelRes.json();
+        const topBalance = await balanceRes.json();
+        renderTopList(topLevelList, topLevel);
+        renderTopList(topBalanceList, topBalance);
+      } catch (err) {
+        console.error('Load top players error:', err);
+      }
+    }
+
+    function renderTopList(listEl, players) {
+      listEl.innerHTML = '';
+      players.forEach((player, index) => {
+        const item = document.createElement('div');
+        item.classList.add('top-item');
+        item.innerHTML = `${index + 1}. ${player.username} - Уровень: ${player.level}, Баланс: $${player.balance.toFixed(2)}`;
+        listEl.appendChild(item);
+      });
+    }
+
+    async function loadAnonymousStatus() {
+      toggleAnonymousBtn.textContent = anonymous ? 'Вы анонимны. Отключить анонимность?' : 'Хотите быть полностью анонимным? Чтобы никто не видел ваш юзернейм нигде в игре?';
+    }
+
+    toggleAnonymousBtn.addEventListener('click', async () => {
+      try {
+        const newStatus = !anonymous;
+        await fetch(`${apiBase}/set_anonymous/${telegramId}/${newStatus ? 'true' : 'false'}`, { method: 'POST' });
+        anonymous = newStatus;
+        loadAnonymousStatus();
+        showToast(newStatus ? 'Анонимность включена' : 'Анонимность отключена');
+      } catch (err) {
+        showToast('Ошибка изменения анонимности');
+      }
+    });
 
     // Обработка клика (локально, без сервера)
     function handleClick() {
@@ -758,7 +872,8 @@
           masterId = user.master_id;
           referralsCount = user.referrals_count;
           servantsCount = user.servants_count;
-          anonymous = user.anonymous || false;
+          anonymous = user.anonymous;
+          claimedChannelBonus = user.claimed_channel_bonus;
           clickValue = 2.50 * level;
 
           // Применить налог если слуга
@@ -987,11 +1102,12 @@
     backToBusinessBtn.addEventListener('click', () => switchToSection('business'));
 
     // Загрузка рынка акций
-    async function loadMarket() {
+    async function loadMarket(refresh = false) {
       try {
         const response = await fetch(`${apiBase}/companies`);
         marketCompanies = await response.json();
         renderMarketList(marketCompanies);
+        if (refresh) showToast('Данные обновлены');
       } catch (err) {
         console.error('Load market error:', err);
       }
@@ -1025,11 +1141,12 @@
     });
 
     // Загрузка рынка слуг
-    async function loadServantMarket() {
+    async function loadServantMarket(refresh = false) {
       try {
         const response = await fetch(`${apiBase}/servant_market`);
         marketServants = await response.json();
         renderServantMarketList(marketServants);
+        if (refresh) showToast('Данные обновлены');
       } catch (err) {
         console.error('Load servant market error:', err);
       }
@@ -1278,84 +1395,43 @@
 
     backToWalletBtn.addEventListener('click', () => switchToSection('wallet'));
 
-    // Добавленный код для анонимности
-    toggleAnonymousBtn.addEventListener('click', async () => {
-      try {
-        const response = await fetch(`${apiBase}/toggle_anonymous/${telegramId}`, { method: 'POST' });
-        if (response.ok) {
-          anonymous = true;
-          showToast('Вы теперь анонимны!');
-          toggleAnonymousBtn.style.display = 'none'; // Кнопка исчезает после активации
-        } else {
-          showToast('Ошибка активации анонимности');
+    // Pull-to-refresh и double click для market
+    marketSection.addEventListener('touchstart', (e) => {
+      touchStartY = e.touches[0].clientY;
+    });
+
+    marketSection.addEventListener('touchmove', (e) => {
+      touchEndY = e.touches[0].clientY;
+    });
+
+    marketSection.addEventListener('touchend', () => {
+      if (touchEndY - touchStartY > 100 && window.scrollY === 0) {
+        const activeTab = document.querySelector('#market-section .tab.active').dataset.tab;
+        if (activeTab === 'stocks') {
+          loadMarket(true);
+        } else if (activeTab === 'servants') {
+          loadServantMarket(true);
+        } else if (activeTab === 'top') {
+          loadTopPlayers();
+          showToast('Данные обновлены');
         }
-      } catch (err) {
-        showToast('Ошибка активации анонимности');
       }
     });
 
-    // Добавленный код для награды за подписку
-    claimSubRewardBtn.addEventListener('click', async () => {
-      try {
-        const response = await fetch(`${apiBase}/claim_subscription_reward/${telegramId}`, { method: 'POST' });
-        const data = await response.json();
-        if (response.ok) {
-          balance = parseFloat(data.balance);
-          showToast('Награда получена: 25 000 долларов!');
-          claimSubRewardBtn.style.background = 'green';
-          claimSubRewardBtn.textContent = 'Награда получена';
-          claimSubRewardBtn.disabled = true;
-          updateUI();
-        } else {
-          showToast(data.error || 'Вы не подписаны или уже получили награду');
+    let clickCount = 0;
+    marketNavItem.addEventListener('click', () => {
+      clickCount++;
+      setTimeout(() => { clickCount = 0; }, 300);
+      if (clickCount === 2) {
+        const activeTab = document.querySelector('#market-section .tab.active').dataset.tab;
+        if (activeTab === 'stocks') {
+          loadMarket(true);
+        } else if (activeTab === 'servants') {
+          loadServantMarket(true);
+        } else if (activeTab === 'top') {
+          loadTopPlayers();
+          showToast('Данные обновлены');
         }
-      } catch (err) {
-        showToast('Ошибка проверки подписки');
-      }
-    });
-
-    // Добавленный код для загрузки топ игроков
-    async function loadTopPlayers() {
-      try {
-        const response = await fetch(`${apiBase}/top_players`);
-        const players = await response.json();
-        topPlayersList.innerHTML = '<table style="width:100%; border-collapse: collapse;"><tr><th>Место</th><th>Игрок</th><th>Уровень</th><th>Баланс</th></tr>';
-        players.forEach((player, index) => {
-          topPlayersList.innerHTML += `<tr><td>${index + 1}</td><td>@${player.username}</td><td>${player.level}</td><td>$${player.balance.toFixed(2)}</td></tr>`;
-        });
-        topPlayersList.innerHTML += '</table>';
-      } catch (err) {
-        console.error('Load top players error:', err);
-      }
-    }
-
-    // Добавленный код для pull-to-refresh и double click в рынке
-    let touchStartY = 0;
-    let touchEndY = 0;
-    let lastRefresh = 0;
-
-    mainContent.addEventListener('touchstart', (e) => {
-      if (currentSection === 'market') touchStartY = e.touches[0].clientY;
-    });
-
-    mainContent.addEventListener('touchmove', (e) => {
-      if (currentSection === 'market') touchEndY = e.touches[0].clientY;
-    });
-
-    mainContent.addEventListener('touchend', () => {
-      if (currentSection === 'market' && touchEndY - touchStartY > 100 && Date.now() - lastRefresh > 1000) {
-        lastRefresh = Date.now();
-        loadSectionData();
-        showToast('Рынок обновлён');
-      }
-    });
-
-    const marketNav = document.querySelector('.nav-item[data-section="market"]');
-    marketNav.addEventListener('dblclick', () => {
-      if (currentSection === 'market' && Date.now() - lastRefresh > 1000) {
-        lastRefresh = Date.now();
-        loadSectionData();
-        showToast('Рынок обновлён');
       }
     });
 
