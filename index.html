@@ -752,8 +752,8 @@
           item.classList.add('highlighted');
         }
         item.innerHTML = `
-          <div>${player.username} <span style="float: right;">$${player.balance.toFixed(2)}</span></div>
-          <div>${player.level}</div>
+          <div>${index + 1}. ${player.username} <span style="float: right;">$${player.balance.toFixed(2)}</span></div>
+          <div>Уровень ${player.level}</div>
         `;
         listEl.appendChild(item);
       });
