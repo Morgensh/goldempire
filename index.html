@@ -260,8 +260,8 @@
       border-bottom: 1px solid #ccc;
     }
 
-    .top-item.highlight {
-      background-color: #ffff00;
+    .top-item.highlighted {
+      background-color: #ffff99;
     }
   </style>
 </head>
@@ -360,10 +360,8 @@
         <div id="servant-market-list"></div>
       </div>
       <div id="top-market-content" class="tab-content">
-        <h3>Топ по балансу</h3>
-        <div id="top-balance-list" class="top-list"></div>
-        <h3>Топ по уровню</h3>
-        <div id="top-level-list" class="top-list"></div>
+        <h3>Топ игроки</h3>
+        <div id="top-players-list" class="top-list"></div>
       </div>
     </div>
 
@@ -602,8 +600,7 @@
     const checkSubBtn = document.getElementById('check-sub');
     const claimBonusBtn = document.getElementById('claim-bonus');
     const bonusStatusEl = document.getElementById('bonus-status');
-    const topLevelList = document.getElementById('top-level-list');
-    const topBalanceList = document.getElementById('top-balance-list');
+    const topPlayersList = document.getElementById('top-players-list');
     const marketSection = document.getElementById('market-section');
     const marketNavItem = document.querySelector('.nav-item[data-section="market"]');
 
@@ -738,12 +735,9 @@
 
     async function loadTopPlayers() {
       try {
-        const levelRes = await fetch(`${apiBase}/top_players?type=level`);
         const balanceRes = await fetch(`${apiBase}/top_players?type=balance`);
-        const topLevel = await levelRes.json();
-        const topBalance = await balanceRes.json();
-        renderTopList(topLevelList, topLevel);
-        renderTopList(topBalanceList, topBalance);
+        const topPlayers = await balanceRes.json();
+        renderTopList(topPlayersList, topPlayers);
       } catch (err) {
         console.error('Load top players error:', err);
       }
@@ -754,10 +748,13 @@
       players.forEach((player, index) => {
         const item = document.createElement('div');
         item.classList.add('top-item');
-        if (player.username === userData.username) {
-          item.classList.add('highlight');
+        if (player.telegram_id === telegramId) {
+          item.classList.add('highlighted');
         }
-        item.innerHTML = `${index + 1}. ${player.username} - Уровень: ${player.level}, Баланс: $${player.balance.toFixed(2)}`;
+        item.innerHTML = `
+          <div>${player.username} <span style="float: right;">$${player.balance.toFixed(2)}</span></div>
+          <div>${player.level}</div>
+        `;
         listEl.appendChild(item);
       });
     }
@@ -1447,4 +1444,3 @@
 
 </body>
 </html>
-
