@@ -360,16 +360,10 @@
         <div id="servant-market-list"></div>
       </div>
       <div id="top-market-content" class="tab-content">
-        <div class="tabs">
-          <div class="tab active" data-tab="balance">Топ по балансу</div>
-          <div class="tab" data-tab="level">Топ по уровню</div>
-        </div>
-        <div id="top-balance-content" class="tab-content active">
-          <div id="top-balance-list" class="top-list"></div>
-        </div>
-        <div id="top-level-content" class="tab-content">
-          <div id="top-level-list" class="top-list"></div>
-        </div>
+        <h3>Топ по балансу</h3>
+        <div id="top-balance-list" class="top-list"></div>
+        <h3>Топ по уровню</h3>
+        <div id="top-level-list" class="top-list"></div>
       </div>
     </div>
 
@@ -650,19 +644,6 @@
       });
     });
 
-    // Отдельный обработчик для табов в топе
-    const topTabs = document.querySelectorAll('#top-market-content .tab');
-    topTabs.forEach(tab => {
-      tab.addEventListener('click', () => {
-        topTabs.forEach(t => t.classList.remove('active'));
-        tab.classList.add('active');
-        const topTabContents = document.querySelectorAll('#top-market-content .tab-content');
-        topTabContents.forEach(c => c.classList.remove('active'));
-        document.getElementById(`top-${tab.dataset.tab}-content`).classList.add('active');
-        loadTopPlayers(tab.dataset.tab);
-      });
-    });
-
     // Копирование реферальной ссылки
     copyRefLink.addEventListener('click', () => {
       const refLink = `https://t.me/GoldEmpireGameBot?start=${telegramId}`;
@@ -684,8 +665,7 @@
         } else if (activeTab === 'servants') {
           await loadServantMarket();
         } else if (activeTab === 'top') {
-          const activeSubTab = document.querySelector('#top-market-content .tab.active').dataset.tab;
-          await loadTopPlayers(activeSubTab);
+          await loadTopPlayers();
         }
       } else if (currentSection === 'wallet') {
         const activeTab = document.querySelector('#wallet-section .tab.active').dataset.tab;
@@ -756,12 +736,14 @@
       }
     });
 
-    async function loadTopPlayers(type) {
+    async function loadTopPlayers() {
       try {
-        const res = await fetch(`${apiBase}/top_players?type=${type}`);
-        const players = await res.json();
-        const listEl = type === 'level' ? topLevelList : topBalanceList;
-        renderTopList(listEl, players);
+        const levelRes = await fetch(`${apiBase}/top_players?type=level`);
+        const balanceRes = await fetch(`${apiBase}/top_players?type=balance`);
+        const topLevel = await levelRes.json();
+        const topBalance = await balanceRes.json();
+        renderTopList(topLevelList, topLevel);
+        renderTopList(topBalanceList, topBalance);
       } catch (err) {
         console.error('Load top players error:', err);
       }
@@ -1436,8 +1418,7 @@
         } else if (activeTab === 'servants') {
           loadServantMarket(true);
         } else if (activeTab === 'top') {
-          const activeSubTab = document.querySelector('#top-market-content .tab.active').dataset.tab;
-          loadTopPlayers(activeSubTab);
+          loadTopPlayers();
           showToast('Данные обновлены');
         }
       }
@@ -1454,8 +1435,7 @@
         } else if (activeTab === 'servants') {
           loadServantMarket(true);
         } else if (activeTab === 'top') {
-          const activeSubTab = document.querySelector('#top-market-content .tab.active').dataset.tab;
-          loadTopPlayers(activeSubTab);
+          loadTopPlayers();
           showToast('Данные обновлены');
         }
       }
