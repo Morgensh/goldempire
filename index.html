@@ -263,6 +263,12 @@
     .top-item.highlighted {
       background-color: #ffff99;
     }
+
+    .staff-produced {
+      font-size: 18px;
+      margin-bottom: 10px;
+      text-align: center;
+    }
   </style>
 </head>
 <body>
@@ -337,6 +343,7 @@
       <!-- Раздел Персонал -->
       <div class="staff-section card">
         <h3>Персонал</h3>
+        <div class="staff-produced">Произведено акций персоналом: <span id="produced-shares">0</span> <div class="btn" id="collect-shares-btn">Собрать</div></div>
         <div class="staff-grid" id="staff-grid"></div>
       </div>
 
@@ -507,7 +514,7 @@
     let userData = tg.initDataUnsafe.user || {};
     let telegramId = userData.id || 0;
     let balance = 0;
-    let clickValue = 2.50;
+    let clickValue = 2.5;
     let level = 1;
     let progress = 0;
     let totalClicks = 0;
@@ -525,6 +532,10 @@
     let claimedChannelBonus = false;
     let touchStartY = 0;
     let touchEndY = 0;
+    let producedShares = 0;
+    let productionRatePerSecond = 0;
+    let lastCollectTimestamp = null;
+    let productionInterval = null;
 
     // Список типов персонала
     const staffTypes = [
@@ -603,6 +614,8 @@
     const topPlayersList = document.getElementById('top-players-list');
     const marketSection = document.getElementById('market-section');
     const marketNavItem = document.querySelector('.nav-item[data-section="market"]');
+    const producedSharesEl = document.getElementById('produced-shares');
+    const collectSharesBtn = document.getElementById('collect-shares-btn');
 
     // Переключение разделов
     function switchToSection(sectionId) {
@@ -617,6 +630,9 @@
       currentSection = sectionId;
       loadSectionData();
       updateUI();
+      if (sectionId !== 'company-dashboard') {
+        clearInterval(productionInterval);
+      }
     }
 
     navItems.forEach(item => {
@@ -781,11 +797,12 @@
 
       totalClicks++;
       balance += clickValue;
-      progress += clickValue * 10;
+      progress += clickValue;
       const nextThreshold = level * 1000;
       if (progress >= nextThreshold) {
         level++;
-        progress = 0;
+        progress -= nextThreshold;
+        clickValue = 2.5 * level;
       }
 
       updateUI();
@@ -877,7 +894,7 @@
           servantsCount = user.servants_count;
           anonymous = user.anonymous;
           claimedChannelBonus = user.claimed_channel_bonus;
-          clickValue = 2.50 * level;
+          clickValue = 2.5 * level;
 
           // Применить налог если слуга
           if (masterId) {
@@ -1026,13 +1043,20 @@
         companyIssuedEl.textContent = company.issued_shares;
         companyAvailableIssueEl.textContent = company.available_to_issue;
 
+        // Инициализация производства акций
+        lastCollectTimestamp = new Date(company.last_collect).getTime();
+        productionRatePerSecond = company.production_rate_per_second || 0;
+        updateProducedShares();
+        clearInterval(productionInterval);
+        productionInterval = setInterval(updateProducedShares, 1000);
+
         // Загрузка персонала
         staffGrid.innerHTML = '';
         staffTypes.forEach(staff => {
           const staffCard = document.createElement('div');
           staffCard.classList.add('staff-card');
           const currentLevel = company[`staff_${staff.type}_level`] || 1;
-          const cost = 100 * currentLevel; // Формула цены
+          const cost = 500 * currentLevel;
 
           staffCard.innerHTML = `
             <img src="${staff.img}" alt="${staff.name}" class="staff-img">
@@ -1050,6 +1074,36 @@
       }
     }
 
+    // Обновление отображаемого количества произведенных акций
+    function updateProducedShares() {
+      const now = Date.now();
+      const elapsedSeconds = Math.floor((now - lastCollectTimestamp) / 1000);
+      producedShares = Math.floor(elapsedSeconds * productionRatePerSecond);
+      producedSharesEl.textContent = producedShares;
+    }
+
+    // Сбор акций от персонала
+    async function collectShares() {
+      try {
+        const response = await fetch(`${apiBase}/company/${currentCompanyId}/collect`, { method: 'POST' });
+        if (!response.ok) {
+          const error = await response.json();
+          showToast(error.error || 'Ошибка сбора акций');
+          return;
+        }
+        const updated = await response.json();
+        companyIssuedEl.textContent = updated.issued_shares;
+        lastCollectTimestamp = Date.now();
+        producedShares = 0;
+        updateProducedShares();
+        showToast('Акции собраны успешно');
+      } catch (err) {
+        showToast('Ошибка сбора акций');
+      }
+    }
+
+    collectSharesBtn.addEventListener('click', collectShares);
+
     // Улучшение персонала
     async function upgradeStaff(type) {
       try {
@@ -1065,6 +1119,7 @@
         }
         const updated = await response.json();
         balance = parseFloat(updated.balance);
+        productionRatePerSecond = updated.production_rate_per_second || productionRatePerSecond;
         showToast('Персонал улучшен успешно');
         updateUI();
         await loadCompanyDashboard();
