@@ -729,20 +729,39 @@
     });
 
     // Переключение табов (общий handler)
-    const allTabs = document.querySelectorAll('.tab');
-    allTabs.forEach(tab => {
-      tab.addEventListener('click', () => {
+    // Переключение табов (общий handler) - ИСПРАВЛЕННАЯ ВЕРСИЯ
+const allTabs = document.querySelectorAll('.tab');
+allTabs.forEach(tab => {
+    tab.addEventListener('click', () => {
         const tabsContainer = tab.parentElement;
+        const parentSection = tabsContainer.parentElement;
+
+        // Убираем активность у всех табов в этой группе
         tabsContainer.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        // Делаем текущий таб активным
         tab.classList.add('active');
-        const tabContents = tabsContainer.parentElement.querySelectorAll('.tab-content');
-        tabContents.forEach(c => c.classList.remove('active'));
-        const contentId = `${tab.dataset.tab}-${tabsContainer.parentElement.id.split('-')[0]}-content` || `${tab.dataset.tab}-content`;
+
+        // Скрываем все содержимое табов в этой секции
+        const tabContents = parentSection.querySelectorAll('.tab-content');
+        tabContents.forEach(content => content.classList.remove('active'));
+
+        // Определяем ID целевого контента
+        let contentId;
+        if (parentSection.id === 'business-section') {
+            contentId = `${tab.dataset.tab}-content`;
+        } else {
+            contentId = `${tab.dataset.tab}-${parentSection.id.split('-')[0]}-content` || `${tab.dataset.tab}-content`;
+        }
+
+        // Показываем нужное содержимое
         const targetContent = document.getElementById(contentId);
-        if (targetContent) targetContent.classList.add('active');
+        if (targetContent) {
+            targetContent.classList.add('active');
+        }
+
         loadSectionData();
-      });
     });
+});
 
     // Копирование реферальной ссылки
     copyRefLink.addEventListener('click', () => {
@@ -1795,6 +1814,27 @@
 
     // Инициализация
     initUser();
+// ДОБАВЬ ЭТОТ КОД ПОСЛЕ initUser();
+setTimeout(() => {
+    // Исправляем обработчики табов для бизнес-секции
+    const businessTabs = document.querySelectorAll('#business-section .tab');
+    businessTabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            // Убираем активность у всех табов
+            businessTabs.forEach(t => t.classList.remove('active'));
+            // Делаем текущий таб активным
+            tab.classList.add('active');
+
+            // Скрываем все содержимое табов
+            const tabContents = document.querySelectorAll('#business-section .tab-content');
+            tabContents.forEach(content => content.classList.remove('active'));
+
+            // Показываем нужное содержимое
+            const targetContent = document.getElementById(`${tab.dataset.tab}-content`);
+            if (targetContent) targetContent.classList.add('active');
+        });
+    });
+}, 1000);
   </script>
 
 </body>
