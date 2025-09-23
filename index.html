@@ -274,10 +274,27 @@
 <body>
 
   <!-- Верхняя панель -->
-  <div class="header">Richman</div>
+<div class="header">
+  Richman
+  <i id="shop-btn" class="fas fa-store" style="float:right; cursor:pointer;"></i>
+</div>
+
 
   <!-- Основной контент -->
   <div class="main-content">
+
+      <!-- Магазин -->
+<div class="section" id="shop-section">
+  <h2 class="section-title">Магазин</h2>
+  <div class="card">
+    <div class="btn" onclick="buyPackage(1)">100 000$ — 10$</div>
+    <div class="btn" onclick="buyPackage(2)">500 000$ — 25$</div>
+    <div class="btn" onclick="buyPackage(3)">1 000 000$ — 50$</div>
+    <div class="btn" onclick="buyPackage(4)">10 000 000$ — 200$</div>
+  </div>
+  <div class="btn" onclick="switchToSection('home')">Назад</div>
+</div>
+
 
     <!-- Главная (кликер) -->
     <div class="section active" id="home-section">
@@ -1493,9 +1510,33 @@
       }
     });
 
+// Магазин
+const shopBtn = document.getElementById('shop-btn');
+shopBtn.addEventListener('click', () => switchToSection('shop'));
+
+async function buyPackage(packageId) {
+  try {
+    const res = await fetch(`${apiBase}/create_invoice/${telegramId}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ package_id: packageId })
+    });
+    const data = await res.json();
+    if (data.pay_url) {
+      window.Telegram.WebApp.openTelegramLink(data.pay_url);
+    } else {
+      showToast("Ошибка при создании платежа");
+    }
+  } catch (err) {
+    console.error(err);
+    showToast("Ошибка сети");
+  }
+}
+
     // Инициализация
     initUser();
   </script>
 
 </body>
 </html>
+
