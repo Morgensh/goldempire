@@ -7,7 +7,6 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
-    /* Только базовые сбросы и белый фон */
     * {
       margin: 0;
       padding: 0;
@@ -19,22 +18,19 @@
       background: white;
       color: black;
       min-height: 100vh;
-      padding-bottom: 72px; /* место под навигацию */
+      padding-bottom: 72px;
     }
 
-    /* Простой заголовок */
     .header {
       padding: 20px;
       font-size: 24px;
       font-weight: bold;
     }
 
-    /* Основной контент */
     .main-content {
       padding: 0 20px;
     }
 
-    /* Секции — только блок/скрыто */
     .section {
       display: none;
     }
@@ -43,7 +39,6 @@
       display: block;
     }
 
-    /* Карточки — просто белый фон, граница и отступы */
     .card {
       background: white;
       border: 1px solid #ccc;
@@ -51,7 +46,6 @@
       margin-bottom: 16px;
     }
 
-    /* Банковская карта — просто прямоугольник */
     .bank-card {
       background: white;
       border: 1px solid #ccc;
@@ -59,7 +53,6 @@
       margin-bottom: 24px;
     }
 
-    /* Кликер — просто круглая кнопка */
     .tap-circle {
       width: 120px;
       height: 120px;
@@ -78,7 +71,6 @@
       margin: 10px 0;
     }
 
-    /* Кнопки — просто прямоугольники */
     .btn {
       padding: 12px;
       background: white;
@@ -88,7 +80,6 @@
       text-align: center;
     }
 
-    /* Нижняя навигация — просто ряд иконок */
     .bottom-nav {
       display: flex;
       justify-content: space-around;
@@ -115,7 +106,6 @@
       font-weight: bold;
     }
 
-    /* Toast — просто белый блок с текстом */
     #toast {
       position: fixed;
       bottom: 100px;
@@ -134,14 +124,12 @@
       opacity: 1;
     }
 
-    /* Заголовки секций */
     .section-title {
       font-size: 22px;
       font-weight: bold;
       margin: 20px 0 10px;
     }
 
-    /* Профиль — просто структура */
     .profile-header {
       text-align: center;
       margin-bottom: 20px;
@@ -182,7 +170,6 @@
       width: 0%;
     }
 
-    /* Дополнительно для форм */
     input {
       padding: 8px;
       border: 1px solid #ccc;
@@ -190,7 +177,6 @@
       width: 100%;
     }
 
-    /* Стили для персонала */
     .staff-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
@@ -211,7 +197,6 @@
       margin-bottom: 8px;
     }
 
-    /* Стили для табов в бизнесе */
     .tabs {
       display: flex;
       justify-content: space-around;
@@ -236,7 +221,6 @@
       display: block;
     }
 
-    /* Поисковые поля */
     .search-input {
       margin-bottom: 16px;
     }
@@ -269,20 +253,39 @@
       margin-bottom: 10px;
       text-align: center;
     }
+
+    .announcement-card {
+      background: #f9f9f9;
+      border: 1px solid #ccc;
+      padding: 16px;
+      margin-bottom: 16px;
+      border-radius: 4px;
+    }
+
+    .announcement-title {
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
+
+    .announcement-date {
+      font-size: 12px;
+      color: #666;
+      margin-bottom: 8px;
+    }
+
+    .announcement-content {
+      font-size: 14px;
+    }
   </style>
 </head>
 <body>
-
-  <!-- Верхняя панель -->
   <div class="header">
     Richman
     <i id="shop-btn" class="fas fa-store" style="float:right; cursor:pointer;"></i>
   </div>
 
-  <!-- Основной контент -->
   <div class="main-content">
-
-    <!-- Магазин -->
     <div class="section" id="shop-section">
       <h2 class="section-title">Магазин</h2>
       <div class="card">
@@ -294,9 +297,7 @@
       <div class="btn" onclick="switchToSection('home')">Назад</div>
     </div>
 
-    <!-- Главная (кликер) -->
     <div class="section active" id="home-section">
-      <!-- Банковская карта -->
       <div class="bank-card">
         <div>RICHMAN</div>
         <div>•••• •••• •••• 1234</div>
@@ -305,7 +306,6 @@
           <div>Уровень: <span id="card-level">1</span></div>
         </div>
       </div>
-
       <div class="clicker-area" id="clicker-area">
         <div class="tap-circle" id="tap-circle">
           <i class="fas fa-hand-point-up" style="font-size: 40px;"></i>
@@ -314,7 +314,6 @@
       </div>
     </div>
 
-    <!-- Бизнес -->
     <div class="section" id="business-section">
       <h2 class="section-title">Бизнес</h2>
       <div class="tabs">
@@ -343,7 +342,6 @@
       </div>
     </div>
 
-    <!-- Личный кабинет компании -->
     <div class="section" id="company-dashboard-section">
       <h2 class="section-title">Личный кабинет компании</h2>
       <div class="card">
@@ -354,25 +352,21 @@
         <input type="number" id="issue-amount-input" placeholder="Количество акций для выпуска">
         <div class="btn" id="issue-shares-btn">Выпустить акции</div>
       </div>
-
-      <!-- Раздел Персонал -->
       <div class="staff-section card">
         <h3>Персонал</h3>
         <div class="staff-produced">Произведено акций персоналом: <span id="produced-shares">0</span> <div class="btn" id="collect-shares-btn">Собрать</div></div>
         <div class="staff-grid" id="staff-grid"></div>
       </div>
-
       <div class="btn" id="back-to-business-btn">Назад в Бизнес</div>
     </div>
 
-    <!-- Рынок -->
     <div class="section" id="market-section">
       <h2 class="section-title">Рынок</h2>
       <div class="tabs">
         <div class="tab active" data-tab="stocks">Акции</div>
         <div class="tab" data-tab="servants">Слуги</div>
         <div class="tab" data-tab="top">Топ игроки</div>
-        <div class="tab" data-tab="ads">Объявления</div>
+        <div class="tab" data-tab="announcements">Объявления</div>
       </div>
       <div id="stocks-market-content" class="tab-content active">
         <input type="text" id="search-stocks" class="search-input" placeholder="Поиск компании...">
@@ -386,31 +380,12 @@
         <h3>Топ игроки</h3>
         <div id="top-players-list" class="top-list"></div>
       </div>
-      <!-- Ads content -->
-      <div id="ads-market-content" class="tab-content">
-        <div class="card">
-          <div class="btn" id="open-create-ad-btn">Опубликовать объявление</div>
-        </div>
-        <div id="ads-list"></div>
+      <div id="announcements-market-content" class="tab-content">
+        <h3>Объявления</h3>
+        <div id="announcements-list"></div>
       </div>
     </div>
 
-    <!-- Публикация объявления -->
-    <div class="section" id="publish-ad-section">
-      <h2 class="section-title">Публикация объявления</h2>
-      <div class="card">
-        <p>Чтобы бот мог проверять подписки — добавьте его в админы вашего канала и дайте права на управление сообщениями.</p>
-        <input type="text" id="ad-channel-input" placeholder="Юзернейм канала (например @mychannel)">
-        <input type="number" id="ad-reward-input" placeholder="Награда за подписку (число)">
-        <input type="number" id="ad-budget-input" placeholder="Бюджет объявления (число)">
-        <label><input type="checkbox" id="ad-bot-added"> Я добавил бота в админы своего канала</label><br>
-        <label><input type="checkbox" id="ad-bot-posted"> Попросить бота опубликовать пост в канале</label>
-        <div class="btn" id="create-ad-btn">Опубликовать</div>
-        <div class="btn" onclick="switchToSection('market')">Отмена</div>
-      </div>
-    </div>
-
-    <!-- Покупка акций -->
     <div class="section" id="stock-buy-section">
       <h2 class="section-title">Покупка акций</h2>
       <div class="card">
@@ -425,7 +400,6 @@
       <div class="btn" id="back-to-market-btn">Назад на Рынок</div>
     </div>
 
-    <!-- Покупка слуги -->
     <div class="section" id="servant-buy-section">
       <h2 class="section-title">Покупка слуги</h2>
       <div class="card">
@@ -436,7 +410,6 @@
       <div class="btn" id="back-to-market-servant-btn">Назад на Рынок</div>
     </div>
 
-    <!-- Продажа акций -->
     <div class="section" id="stock-sell-section">
       <h2 class="section-title">Продажа акций</h2>
       <div class="card">
@@ -449,7 +422,6 @@
       <div class="btn" id="back-to-wallet-btn">Назад в Кошелек</div>
     </div>
 
-    <!-- Кошелек -->
     <div class="section" id="wallet-section">
       <h2 class="section-title">Кошелек</h2>
       <div class="card">
@@ -472,10 +444,8 @@
       </div>
     </div>
 
-    <!-- Профиль -->
     <div class="section" id="profile-section">
       <h2 class="section-title">Профиль</h2>
-
       <div class="profile-header">
         <div class="profile-avatar" id="profile-avatar">
           <img id="avatar-img" src="" alt="Avatar" style="display: none; width: 100%; height: 100%; border-radius: 50%;">
@@ -486,7 +456,6 @@
         <div id="servant-status"></div>
         <div id="free-self-btn-container"></div>
       </div>
-
       <div class="card">
         <div class="stat-row">
           <span>ID игрока</span>
@@ -501,7 +470,6 @@
           <span id="progress-percent">0%</span>
         </div>
       </div>
-
       <div class="card">
         <div class="progress-container">
           <div class="progress-fill" id="progress-fill"></div>
@@ -512,10 +480,8 @@
         <div class="btn" id="toggle-anonymous-btn">Хотите быть полностью анонимным? Чтобы никто не видел ваш юзернейм нигде в игре?</div>
       </div>
     </div>
-
   </div>
 
-  <!-- Нижняя навигация -->
   <div class="bottom-nav">
     <div class="nav-item active" data-section="home">
       <i class="fas fa-home"></i>
@@ -539,16 +505,13 @@
     </div>
   </div>
 
-  <!-- Toast уведомление -->
   <div id="toast"></div>
 
   <script>
-    // Telegram WebApp init
     const tg = window.Telegram.WebApp;
     tg.ready();
     tg.expand();
 
-    // Глобальные переменные
     let userData = tg.initDataUnsafe.user || {};
     let telegramId = userData.id || 0;
     let balance = 0;
@@ -564,9 +527,9 @@
     let currentCompanyId = null;
     let currentServantId = null;
     let currentSection = 'home';
-    let marketCompanies = []; // Для хранения полного списка компаний
-    let marketServants = []; // Для хранения полного списка слуг
-    let marketAds = []; // Для хранения списка объявлений
+    let marketCompanies = [];
+    let marketServants = [];
+    let announcements = [];
     let anonymous = false;
     let claimedChannelBonus = false;
     let touchStartY = 0;
@@ -576,7 +539,6 @@
     let lastCollectTimestamp = null;
     let productionInterval = null;
 
-    // Список типов персонала
     const staffTypes = [
       { type: 'director', name: 'Директор', img: 'a1.png' },
       { type: 'accountant', name: 'Бухгалтер', img: 'a2.png' },
@@ -586,7 +548,6 @@
       { type: 'lawyer', name: 'Юрист', img: 'a6.png' }
     ];
 
-    // DOM элементы
     const navItems = document.querySelectorAll('.nav-item');
     const sections = document.querySelectorAll('.section');
     const tapCircle = document.getElementById('tap-circle');
@@ -651,14 +612,12 @@
     const claimBonusBtn = document.getElementById('claim-bonus');
     const bonusStatusEl = document.getElementById('bonus-status');
     const topPlayersList = document.getElementById('top-players-list');
+    const announcementsList = document.getElementById('announcements-list');
     const marketSection = document.getElementById('market-section');
     const marketNavItem = document.querySelector('.nav-item[data-section="market"]');
     const producedSharesEl = document.getElementById('produced-shares');
     const collectSharesBtn = document.getElementById('collect-shares-btn');
-    const openCreateAdBtn = document.getElementById('open-create-ad-btn');
-    const createAdBtn = document.getElementById('create-ad-btn');
 
-    // Переключение разделов
     function switchToSection(sectionId) {
       sections.forEach(section => section.classList.remove('active'));
       navItems.forEach(item => item.classList.remove('active'));
@@ -683,7 +642,6 @@
       });
     });
 
-    // Переключение табов (общий handler)
     const allTabs = document.querySelectorAll('.tab');
     allTabs.forEach(tab => {
       tab.addEventListener('click', () => {
@@ -698,14 +656,12 @@
       });
     });
 
-    // Копирование реферальной ссылки
     copyRefLink.addEventListener('click', () => {
       const refLink = `https://t.me/GoldEmpireGameBot?start=${telegramId}`;
       navigator.clipboard.writeText(refLink);
       showToast('Ссылка скопирована!');
     });
 
-    // Загрузка данных для секции
     async function loadSectionData() {
       if (currentSection === 'business') {
         await loadUserCompanies();
@@ -720,8 +676,8 @@
           await loadServantMarket();
         } else if (activeTab === 'top') {
           await loadTopPlayers();
-        } else if (activeTab === 'ads') {
-          await loadAds();
+        } else if (activeTab === 'announcements') {
+          await loadAnnouncements();
         }
       } else if (currentSection === 'wallet') {
         const activeTab = document.querySelector('#wallet-section .tab.active').dataset.tab;
@@ -742,6 +698,32 @@
         await loadProfileServantInfo();
         await loadAnonymousStatus();
       }
+    }
+
+    async function loadAnnouncements(refresh = false) {
+      try {
+        const response = await fetch(`${apiBase}/announcements`);
+        announcements = await response.json();
+        renderAnnouncementsList(announcements);
+        if (refresh) showToast('Объявления обновлены');
+      } catch (err) {
+        console.error('Load announcements error:', err);
+        showToast('Ошибка загрузки объявлений');
+      }
+    }
+
+    function renderAnnouncementsList(announcements) {
+      announcementsList.innerHTML = '';
+      announcements.forEach(announcement => {
+        const card = document.createElement('div');
+        card.classList.add('announcement-card');
+        card.innerHTML = `
+          <div class="announcement-title">${announcement.title}</div>
+          <div class="announcement-date">${new Date(announcement.created_at).toLocaleString('ru-RU')}</div>
+          <div class="announcement-content">${announcement.content}</div>
+        `;
+        announcementsList.appendChild(card);
+      });
     }
 
     async function loadBonusStatus() {
@@ -834,7 +816,6 @@
       }
     });
 
-    // Обработка клика (локально, без сервера)
     function handleClick() {
       if (!telegramId) return;
 
@@ -850,7 +831,6 @@
 
       updateUI();
 
-      // Анимация
       tapCircle.animate([
         { transform: 'scale(1)' },
         { transform: 'scale(0.95)' },
@@ -858,10 +838,8 @@
       ], { duration: 200 });
     }
 
-    // Расширяем зону клика на всю область ниже карты
     clickerArea.addEventListener('click', handleClick);
 
-    // Обновление UI
     function updateUI() {
       const formattedBalance = '$ ' + balance.toFixed(2).replace('.', ',');
       cardBalanceEl.textContent = formattedBalance;
@@ -878,7 +856,6 @@
       totalClicksEl.textContent = totalClicks;
     }
 
-    // Toast уведомления
     function showToast(message) {
       const toast = document.getElementById('toast');
       toast.textContent = message;
@@ -888,7 +865,6 @@
       }, 3000);
     }
 
-    // Обновление информации пользователя на сервере
     async function updateUserInfo() {
       try {
         await fetch(`${apiBase}/user/${telegramId}/update`, {
@@ -906,7 +882,6 @@
       }
     }
 
-    // Синхронизация данных с сервером каждые 30 секунд
     async function syncUserData() {
       try {
         await fetch(`${apiBase}/sync/${telegramId}`, {
@@ -919,7 +894,6 @@
       }
     }
 
-    // Инициализация пользователя
     async function initUser() {
       if (!telegramId) return;
 
@@ -939,22 +913,18 @@
           claimedChannelBonus = user.claimed_channel_bonus;
           clickValue = 2.5 * level;
 
-          // Применить налог если слуга
           if (masterId) {
             response = await fetch(`${apiBase}/apply_tax/${telegramId}`, { method: 'POST' });
             user = await response.json();
             balance = parseFloat(user.balance);
           }
 
-          // Заявить доход если есть слуги
           response = await fetch(`${apiBase}/claim_income/${telegramId}`, { method: 'POST' });
           user = await response.json();
           balance = parseFloat(user.balance);
 
-          // Если данные placeholder, обновляем
           if (user.first_name === 'Unknown' || !user.username) {
             await updateUserInfo();
-            // Перезагружаем данные после обновления
             const updatedResponse = await fetch(`${apiBase}/user/${telegramId}`);
             const updatedUser = await updatedResponse.json();
             user.first_name = updatedUser.first_name;
@@ -979,11 +949,9 @@
       updateCreateCompanyArea();
       updateUI();
 
-      // Запускаем синхронизацию каждые 30 секунд
       setInterval(syncUserData, 30000);
     }
 
-    // Загрузка информации о статусе слуги в профиле
     async function loadProfileServantInfo() {
       servantStatusEl.innerHTML = '';
       freeSelfBtnContainer.innerHTML = '';
@@ -1010,7 +978,6 @@
       }
     }
 
-    // Обновление области создания компании
     function updateCreateCompanyArea() {
       const createArea = document.getElementById('create-company-area');
       if (companiesCount >= 2) {
@@ -1021,7 +988,6 @@
       }
     }
 
-    // Создание компании
     async function createCompany() {
       const name = companyNameInput.value.trim();
       if (!name.match(/^[a-zA-Z]+$/)) {
@@ -1053,7 +1019,6 @@
 
     createCompanyBtn.addEventListener('click', createCompany);
 
-    // Загрузка компаний пользователя
     async function loadUserCompanies() {
       try {
         const response = await fetch(`${apiBase}/companies/user/${telegramId}`);
@@ -1074,7 +1039,6 @@
       }
     }
 
-    // Загрузка личного кабинета компании
     async function loadCompanyDashboard() {
       if (!currentCompanyId) return;
 
@@ -1086,14 +1050,12 @@
         companyIssuedEl.textContent = company.issued_shares;
         companyAvailableIssueEl.textContent = company.available_to_issue;
 
-        // Инициализация производства акций
         lastCollectTimestamp = new Date(company.last_collect).getTime();
         productionRatePerSecond = company.production_rate_per_second || 0;
         updateProducedShares();
         clearInterval(productionInterval);
         productionInterval = setInterval(updateProducedShares, 1000);
 
-        // Загрузка персонала
         staffGrid.innerHTML = '';
         staffTypes.forEach(staff => {
           const staffCard = document.createElement('div');
@@ -1109,7 +1071,6 @@
           `;
           staffGrid.appendChild(staffCard);
 
-          // Добавляем обработчик для кнопки
           document.getElementById(`upgrade-${staff.type}-btn`).addEventListener('click', () => upgradeStaff(staff.type));
         });
       } catch (err) {
@@ -1117,7 +1078,6 @@
       }
     }
 
-    // Обновление отображаемого количества произведенных акций
     function updateProducedShares() {
       const now = Date.now();
       const elapsedSeconds = Math.floor((now - lastCollectTimestamp) / 1000);
@@ -1125,7 +1085,6 @@
       producedSharesEl.textContent = producedShares;
     }
 
-    // Сбор акций от персонала
     async function collectShares() {
       try {
         const response = await fetch(`${apiBase}/company/${currentCompanyId}/collect`, { method: 'POST' });
@@ -1147,7 +1106,6 @@
 
     collectSharesBtn.addEventListener('click', collectShares);
 
-    // Улучшение персонала
     async function upgradeStaff(type) {
       try {
         const response = await fetch(`${apiBase}/company/${currentCompanyId}/upgrade_staff/${telegramId}`, {
@@ -1171,7 +1129,6 @@
       }
     }
 
-    // Выпуск акций
     async function issueShares() {
       const amount = parseInt(issueAmountInput.value);
       if (isNaN(amount) || amount <= 0) {
@@ -1202,7 +1159,6 @@
 
     backToBusinessBtn.addEventListener('click', () => switchToSection('business'));
 
-    // Загрузка рынка акций
     async function loadMarket(refresh = false) {
       try {
         const response = await fetch(`${apiBase}/companies`);
@@ -1214,7 +1170,6 @@
       }
     }
 
-    // Рендер списка акций с фильтром
     function renderMarketList(companies) {
       marketList.innerHTML = '';
       companies.forEach(company => {
@@ -1234,14 +1189,12 @@
       });
     }
 
-    // Поиск по акциям
     searchStocks.addEventListener('input', (e) => {
       const query = e.target.value.toLowerCase();
       const filtered = marketCompanies.filter(c => c.name.toLowerCase().includes(query));
       renderMarketList(filtered);
     });
 
-    // Загрузка рынка слуг
     async function loadServantMarket(refresh = false) {
       try {
         const response = await fetch(`${apiBase}/servant_market`);
@@ -1253,7 +1206,6 @@
       }
     }
 
-    // Рендер списка слуг с фильтром
     function renderServantMarketList(servants) {
       servantMarketList.innerHTML = '';
       servants.forEach(servant => {
@@ -1271,159 +1223,12 @@
       });
     }
 
-    // Поиск по слугам
     searchServants.addEventListener('input', (e) => {
       const query = e.target.value.toLowerCase();
       const filtered = marketServants.filter(s => s.username.toLowerCase().includes(query));
       renderServantMarketList(filtered);
     });
 
-    // === Ads (клиент) ===
-    openCreateAdBtn?.addEventListener('click', () => {
-      switchToSection('publish-ad');
-    });
-
-    async function createAd() {
-      const channel = document.getElementById('ad-channel-input').value.trim();
-      const reward = parseFloat(document.getElementById('ad-reward-input').value);
-      const budget = parseFloat(document.getElementById('ad-budget-input').value);
-      const bot_added = document.getElementById('ad-bot-added').checked;
-      const bot_posted = document.getElementById('ad-bot-posted').checked;
-
-      if (!channel || !channel.startsWith('@') || isNaN(reward) || isNaN(budget) || reward <= 0 || budget <= 0) {
-        showToast('Заполните корректно все поля');
-        return;
-      }
-
-      try {
-        const res = await fetch(`${apiBase}/ads/create`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            owner_id: telegramId,
-            channel_username: channel,
-            reward_per_sub: reward,
-            budget,
-            bot_added,
-            bot_posted
-          })
-        });
-        if (!res.ok) {
-          const e = await res.json();
-          showToast(e.error || 'Ошибка создания объявления');
-          return;
-        }
-        showToast('Объявление создано');
-        switchToSection('market');
-        await loadAds();
-      } catch (err) {
-        console.error(err);
-        showToast('Ошибка сети');
-      }
-    }
-
-    createAdBtn?.addEventListener('click', createAd);
-
-    async function loadAds() {
-      try {
-        const response = await fetch(`${apiBase}/ads`);
-        marketAds = await response.json();
-        renderAdsList(marketAds);
-      } catch (err) {
-        console.error('Load ads error:', err);
-      }
-    }
-
-    function renderAdsList(ads) {
-      const adsList = document.getElementById('ads-list');
-      adsList.innerHTML = '';
-      ads.forEach(ad => {
-        const card = document.createElement('div');
-        card.classList.add('card');
-        card.innerHTML = `
-          <div style="display:flex; align-items:center; gap:10px;">
-            <div style="width:48px;height:48px;border-radius:50%;background:#eee;overflow:hidden;">
-              ${ad.owner_avatar ? `<img src="${ad.owner_avatar}" style="width:100%;height:100%;object-fit:cover;">` : ''}
-            </div>
-            <div style="flex:1;">
-              <div><strong>${ad.owner_username}</strong> → ${ad.channel_username}</div>
-              <div>Награда: $${parseFloat(ad.reward_per_sub)}  •  Бюджет: $${parseFloat(ad.budget_left)}</div>
-            </div>
-          </div>
-          <div style="margin-top:10px;">
-            <a class="btn" href="https://t.me/${ad.channel_username.replace('@','')}" target="_blank">Перейти в канал</a>
-            <button class="btn" data-action="check" data-id="${ad.id}">Я подписался</button>
-            <button class="btn" data-action="claim" data-id="${ad.id}" disabled>Получить награду</button>
-          </div>
-        `;
-        // события
-        card.querySelector('[data-action="check"]').addEventListener('click', async (e) => {
-          const adId = e.currentTarget.dataset.id;
-          await checkAdSubscription(adId, card);
-        });
-        card.querySelector('[data-action="claim"]').addEventListener('click', async (e) => {
-          const adId = e.currentTarget.dataset.id;
-          await claimAdReward(adId, card);
-        });
-
-        adsList.appendChild(card);
-      });
-    }
-
-    async function checkAdSubscription(adId, cardEl) {
-      try {
-        const res = await fetch(`${apiBase}/ads/${adId}/check/${telegramId}`);
-        const data = await res.json();
-        if (!data.allowed_check) {
-          showToast('Проверка недоступна — владелец не публиковал пост через бота.');
-          return;
-        }
-        if (data.subscribed) {
-          showToast('Подписка подтверждена! Нажмите "Получить награду".');
-          const claimBtn = cardEl.querySelector('[data-action="claim"]');
-          claimBtn.disabled = false;
-          claimBtn.classList.add('btn-green');
-        } else {
-          showToast('Вы не подписаны на канал.');
-        }
-      } catch (err) {
-        console.error(err);
-        showToast('Ошибка проверки подписки');
-      }
-    }
-
-    async function claimAdReward(adId, cardEl) {
-      try {
-        const res = await fetch(`${apiBase}/ads/${adId}/claim/${telegramId}`, { method: 'POST' });
-        if (!res.ok) {
-          const e = await res.json();
-          showToast(e.error || 'Ошибка получения награды');
-          if (e.error === 'Budget exhausted') {
-            // обновим список
-            await loadAds();
-          }
-          return;
-        }
-        const data = await res.json();
-        showToast('Награда выдана!');
-        // обновим отображение бюджета
-        await loadAds();
-        // опционально: отключим кнопку в текущей карточке
-        const claimBtn = cardEl.querySelector('[data-action="claim"]');
-        if (claimBtn) {
-          claimBtn.disabled = true;
-          claimBtn.classList.remove('btn-green');
-        }
-        // обновить баланс в UI
-        balance = parseFloat(data.balance);
-        updateUI();
-      } catch (err) {
-        console.error(err);
-        showToast('Ошибка получения награды');
-      }
-    }
-
-    // Загрузка страницы покупки акций
     async function loadStockBuy() {
       if (!currentCompanyId) return;
 
@@ -1440,7 +1245,6 @@
       }
     }
 
-    // Загрузка страницы покупки слуги
     async function loadServantBuy() {
       if (!currentServantId) return;
 
@@ -1454,7 +1258,6 @@
       }
     }
 
-    // Покупка акций
     async function buyShares() {
       const amount = parseInt(buyAmountInput.value);
       if (isNaN(amount) || amount <= 0) {
@@ -1486,7 +1289,6 @@
 
     buySharesBtn.addEventListener('click', buyShares);
 
-    // Покупка слуги
     async function buyServant() {
       try {
         const response = await fetch(`${apiBase}/buy_servant/${telegramId}/${currentServantId}`, {
@@ -1513,7 +1315,6 @@
     backToMarketBtn.addEventListener('click', () => switchToSection('market'));
     backToMarketServantBtn.addEventListener('click', () => switchToSection('market'));
 
-    // Загрузка холдингов
     async function loadHoldings() {
       try {
         const response = await fetch(`${apiBase}/holdings/${telegramId}`);
@@ -1546,7 +1347,6 @@
       }
     }
 
-    // Загрузка слуг
     async function loadServants() {
       try {
         const response = await fetch(`${apiBase}/servants/${telegramId}`);
@@ -1592,7 +1392,6 @@
       }
     }
 
-    // Загрузка страницы продажи акций
     async function loadStockSell() {
       if (!currentCompanyId) return;
 
@@ -1607,7 +1406,6 @@
       }
     }
 
-    // Продажа акций
     async function sellShares() {
       const amount = parseInt(sellAmountInput.value);
       if (isNaN(amount) || amount <= 0) {
@@ -1641,7 +1439,6 @@
 
     backToWalletBtn.addEventListener('click', () => switchToSection('wallet'));
 
-    // Pull-to-refresh и double click для market
     marketSection.addEventListener('touchstart', (e) => {
       touchStartY = e.touches[0].clientY;
     });
@@ -1660,9 +1457,8 @@
         } else if (activeTab === 'top') {
           loadTopPlayers();
           showToast('Данные обновлены');
-        } else if (activeTab === 'ads') {
-          loadAds();
-          showToast('Данные обновлены');
+        } else if (activeTab === 'announcements') {
+          loadAnnouncements(true);
         }
       }
     });
@@ -1680,14 +1476,12 @@
         } else if (activeTab === 'top') {
           loadTopPlayers();
           showToast('Данные обновлены');
-        } else if (activeTab === 'ads') {
-          loadAds();
-          showToast('Данные обновлены');
+        } else if (activeTab === 'announcements') {
+          loadAnnouncements(true);
         }
       }
     });
 
-    // Магазин
     const shopBtn = document.getElementById('shop-btn');
     shopBtn.addEventListener('click', () => switchToSection('shop'));
 
@@ -1710,7 +1504,6 @@
       }
     }
 
-    // Инициализация
     initUser();
   </script>
 </body>
