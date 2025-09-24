@@ -1439,20 +1439,26 @@ allTabs.forEach(tab => {
     createAdBtn.addEventListener('click', createAd);
 
     // Верификация бота
-    async function verifyBotAdded(adId) {
-      try {
-        const response = await fetch(`${apiBase}/ads/${adId}/verify_added/${telegramId}`, { method: 'POST' });
-        const data = await response.json();
-        if (data.success) {
-          showToast('Бот верифицирован!');
-          // Активировать publish кнопку (в реальности по DOM или state)
-        } else {
-          showToast('Ошибка верификации');
-        }
-      } catch (err) {
-        showToast('Ошибка верификации');
+async function verifyBotAdded(adId) {
+  try {
+    const response = await fetch(`${apiBase}/ads/${adId}/verify/${telegramId}`, { method: 'POST' });
+    const data = await response.json();
+    if (data.success) {
+      showToast('Бот верифицирован!');
+      // Активировать publish кнопку (например, снять disabled)
+      const publishBtn = document.querySelector('#ad-status .btn:nth-child(3)');
+      if (publishBtn) {
+        publishBtn.disabled = false;
+        publishBtn.classList.add('btn-green');
       }
+    } else {
+      showToast('Ошибка верификации');
     }
+  } catch (err) {
+    showToast('Ошибка верификации');
+  }
+}
+
 
     // Публикация поста
     async function publishAd(adId) {
@@ -1839,3 +1845,5 @@ setTimeout(() => {
 
 </body>
 </html>
+
+
