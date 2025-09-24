@@ -493,12 +493,10 @@
           <div id="holdings-list"></div>
         </div>
         <div id="servants-content" class="tab-content">
-  <div>Ежесекундный доход: <span id="sec-income">0</span> $ / сек</div>
-  <div>Накопленный доход: <span id="pending-income">0</span> $</div>
-  <div class="btn" id="collect-income-btn">Забрать</div>
-  <div>Налоги в день: <span id="daily-tax">0</span></div>
-  <div id="servants-list"></div>
-</div>
+          <div>Ежесекундный доход: <span id="sec-income">0</span></div>
+          <div>Налоги в день: <span id="daily-tax">0</span></div>
+          <div id="servants-list"></div>
+        </div>
       </div>
     </div>
 
@@ -606,10 +604,6 @@
     let productionRatePerSecond = 0;
     let lastCollectTimestamp = null;
     let productionInterval = null;
-    let pendingIncome = 0;
-let incomeInterval = null;
-let lastIncomeTimestamp = null;
-let incomeRatePerSecond = 0;
 
     // Список типов персонала
     const staffTypes = [
@@ -1206,23 +1200,23 @@ allTabs.forEach(tab => {
 
     // Сбор акций от персонала
     async function collectShares() {
-  try {
-    const response = await fetch(`${apiBase}/company/${currentCompanyId}/collect`, { method: 'POST' });
-    if (!response.ok) {
-      const error = await response.json();
-      showToast(error.error || 'Ошибка сбора акций');
-      return;
+      try {
+        const response = await fetch(`${apiBase}/company/${currentCompanyId}/collect`, { method: 'POST' });
+        if (!response.ok) {
+          const error = await response.json();
+          showToast(error.error || 'Ошибка сбора акций');
+          return;
+        }
+        const updated = await response.json();
+        companyIssuedEl.textContent = updated.issued_shares;
+        lastCollectTimestamp = Date.now();
+        producedShares = 0;
+        updateProducedShares();
+        showToast('Акции собраны успешно');
+      } catch (err) {
+        showToast('Ошибка сбора акций');
+      }
     }
-    const updated = await response.json();
-    companyIssuedEl.textContent = updated.issued_shares;
-    lastCollectTimestamp = Date.now();
-    producedShares = 0;
-    updateProducedShares();
-    showToast('Акции собраны успешно');
-  } catch (err) {
-    showToast('Ошибка сбора акций');
-  }
-}
 
     collectSharesBtn.addEventListener('click', collectShares);
 
@@ -1663,84 +1657,50 @@ async function verifyBotAdded(adId) {
     }
 
     // Загрузка слуг
-    // Загрузка слуг
-async function loadServants() {
-  try {
-    const response = await fetch(`${apiBase}/servants/${telegramId}`);
-    const servants = await response.json();
-    let totalSec = servants.length * 1;
-    let totalTax = 0;
-    servantsList.innerHTML = '';
-    servants.forEach(serv => {
-      totalTax += 0.05 * serv.balance;
-      const card = document.createElement('div');
-      card.classList.add('card');
-      card.innerHTML = `
-        <div>Слуга: @${serv.username}</div>
-        <div>Ежесекундный доход: $1</div>
-        <div class="btn" data-action="free">Освободить</div>
-        <div class="btn" data-action="sell">Продать</div>
-      `;
-      card.querySelector('[data-action="free"]').addEventListener('click', async () => {
-        if (confirm('Освободить слугу?')) {
-          await fetch(`${apiBase}/free_servant/${telegramId}/${serv.telegram_id}`, { method: 'POST' });
-          showToast('Слуга освобожден');
-          loadServants();
-        }
-      });
-      card.querySelector('[data-action="sell"]').addEventListener('click', async () => {
-        const price = prompt('Сумма продажи');
-        if (price && !isNaN(price)) {
-          await fetch(`${apiBase}/sell_servant/${telegramId}/${serv.telegram_id}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ price: parseFloat(price) })
+    async function loadServants() {
+      try {
+        const response = await fetch(`${apiBase}/servants/${telegramId}`);
+        const servants = await response.json();
+        let totalSec = servants.length * 1;
+        let totalTax = 0;
+        servantsList.innerHTML = '';
+        servants.forEach(serv => {
+          totalTax += 0.05 * serv.balance;
+          const card = document.createElement('div');
+          card.classList.add('card');
+          card.innerHTML = `
+            <div>Слуга: @${serv.username}</div>
+            <div>Ежесекундный доход: $1</div>
+            <div class="btn" data-action="free">Освободить</div>
+            <div class="btn" data-action="sell">Продать</div>
+          `;
+          card.querySelector('[data-action="free"]').addEventListener('click', async () => {
+            if (confirm('Освободить слугу?')) {
+              await fetch(`${apiBase}/free_servant/${telegramId}/${serv.telegram_id}`, { method: 'POST' });
+              showToast('Слуга освобожден');
+              loadServants();
+            }
           });
-          showToast('Слуга выставлен на продажу');
-          loadServants();
-        }
-      });
-      servantsList.appendChild(card);
-    });
-    secIncomeEl.textContent = totalSec;
-    dailyTaxEl.textContent = totalTax.toFixed(2);
-
-    // Инит анимации дохода
-    incomeRatePerSecond = totalSec;
-    pendingIncome = 0; // На старте 0, сервер даст реальный при collect
-    lastIncomeTimestamp = Date.now(); // Но реальный last_claim с сервера, здесь approx
-    updatePendingIncome();
-    clearInterval(incomeInterval);
-    incomeInterval = setInterval(updatePendingIncome, 1000);
-
-    // Кнопка забрать
-    const collectIncomeBtn = document.getElementById('collect-income-btn');
-    collectIncomeBtn.addEventListener('click', async () => {
-      const response = await fetch(`${apiBase}/claim_income/${telegramId}`, { method: 'POST' });
-      if (response.ok) {
-        const { balance } = await response.json();
-        balance = balance; // Обнови глобальный balance
-        updateUI();
-        pendingIncome = 0;
-        lastIncomeTimestamp = Date.now();
-        showToast('Доход забран');
-      } else {
-        showToast('Ошибка сбора');
+          card.querySelector('[data-action="sell"]').addEventListener('click', async () => {
+            const price = prompt('Сумма продажи');
+            if (price && !isNaN(price)) {
+              await fetch(`${apiBase}/sell_servant/${telegramId}/${serv.telegram_id}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ price: parseFloat(price) })
+              });
+              showToast('Слуга выставлен на продажу');
+              loadServants();
+            }
+          });
+          servantsList.appendChild(card);
+        });
+        secIncomeEl.textContent = totalSec;
+        dailyTaxEl.textContent = totalTax.toFixed(2);
+      } catch (err) {
+        console.error('Load servants error:', err);
       }
-    });
-  } catch (err) {
-    console.error('Load servants error:', err);
-  }
-}
-
-// Функция обновления pending (анимация)
-function updatePendingIncome() {
-  const now = Date.now();
-  const elapsedSeconds = Math.floor((now - lastIncomeTimestamp) / 1000);
-  pendingIncome = elapsedSeconds * incomeRatePerSecond;
-  document.getElementById('pending-income').textContent = pendingIncome.toFixed(0);
-}
-
+    }
 
     // Загрузка страницы продажи акций
     async function loadStockSell() {
@@ -1885,6 +1845,3 @@ setTimeout(() => {
 
 </body>
 </html>
-
-
-
