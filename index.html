@@ -902,38 +902,19 @@
       }
     }
 
-   // Синхронизация данных с сервером
-async function syncUserData() {
-  try {
-    const response = await fetch(`${apiBase}/sync/${telegramId}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ total_clicks: totalClicks })
-    });
-
-    if (!response.ok) {
-      throw new Error('Sync failed');
+    // Синхронизация данных с сервером
+    async function syncUserData() {
+      try {
+        await fetch(`${apiBase}/sync/${telegramId}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ balance, total_clicks: totalClicks, level, progress })
+        });
+        saveUserToLocal();
+      } catch (err) {
+        console.error('Sync error:', err);
+      }
     }
-
-    const updatedData = await response.json();
-
-    // ОБНОВЛЯЕМ ДАННЫЕ С СЕРВЕРА (это истина)
-    balance = parseFloat(updatedData.balance);
-    level = updatedData.level;
-    progress = parseFloat(updatedData.progress);
-    totalClicks = updatedData.total_clicks; // На случай, если сервер скорректировал
-
-    // Обновляем клик-стоимость по новому уровню
-    clickValue = 2.5 * level;
-
-    saveUserToLocal();
-    updateUI(); // Чтобы сразу отобразить изменения
-
-  } catch (err) {
-    console.error('Sync error:', err);
-    // Можно добалить fallback: показать toast "Нет соединения, данные локальные"
-  }
-}
 
     // Сохранение в localStorage
     function saveUserToLocal() {
@@ -1676,4 +1657,3 @@ async function buyPackage(packageId) {
 
 </body>
 </html>
-
