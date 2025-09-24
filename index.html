@@ -777,51 +777,51 @@ allTabs.forEach(tab => {
     });
 
     // Загрузка данных для секции
-    async function loadSectionData() {
-      if (currentSection === 'business') {
-        const activeTab = document.querySelector('#business-section .tab.active').dataset.tab;
-        if (activeTab === 'company') {
-          await loadUserCompanies();
-        } else if (activeTab === 'referrals') {
-          const refLink = `https://t.me/GoldEmpireGameBot?start=${telegramId}`;
-          refLinkText.textContent = refLink;
-          await loadBonusStatus();
-        } else if (activeTab === 'ads') {
-          // Для создания ad ничего не загружаем, форма статическая
-        }
-      } else if (currentSection === 'market') {
-        const activeTab = document.querySelector('#market-section .tab.active').dataset.tab;
-        if (activeTab === 'stocks') {
-          await loadMarket();
-        } else if (activeTab === 'servants') {
-          await loadServantMarket();
-        } else if (activeTab === 'ads') {
-          await loadAdsMarket();
-        } else if (activeTab === 'top') {
-          await loadTopPlayers();
-        }
-      } else if (currentSection === 'wallet') {
-        const activeTab = document.querySelector('#wallet-section .tab.active').dataset.tab;
-        if (activeTab === 'stocks') {
-          await loadHoldings();
-        } else {
-          await loadServants();
-        }
-      } else if (currentSection === 'company-dashboard') {
-        await loadCompanyDashboard();
-      } else if (currentSection === 'stock-buy') {
-        await loadStockBuy();
-      } else if (currentSection === 'servant-buy') {
-        await loadServantBuy();
-      } else if (currentSection === 'ad-details') {
-        await loadAdDetails();
-      } else if (currentSection === 'stock-sell') {
-        await loadStockSell();
-      } else if (currentSection === 'profile') {
-        await loadProfileServantInfo();
-        await loadAnonymousStatus();
-      }
+async function loadSectionData() {
+  if (currentSection === 'business') {
+    const activeTab = document.querySelector('#business-section .tab.active').dataset.tab;
+    if (activeTab === 'company') {
+      await loadUserCompanies();
+    } else if (activeTab === 'referrals') {
+      const refLink = `https://t.me/GoldEmpireGameBot?start=${telegramId}`;
+      refLinkText.textContent = refLink;
+      await loadBonusStatus();
+    } else if (activeTab === 'ads') {
+      // Для создания ad ничего не загружаем, форма статическая
     }
+  } else if (currentSection === 'market') {
+    const activeTab = document.querySelector('#market-section .tab.active').dataset.tab;
+    if (activeTab === 'stocks') {
+      await loadMarket();
+    } else if (activeTab === 'servants') {
+      await loadServantMarket();
+    } else if (activeTab === 'ads') {
+      await loadAdsMarket();
+    } else if (activeTab === 'top') {
+      await loadTopPlayers();
+    }
+  } else if (currentSection === 'wallet') {
+    const activeTab = document.querySelector('#wallet-section .tab.active').dataset.tab;
+    if (activeTab === 'stocks') {
+      await loadHoldings();
+    } else if (activeTab === 'servants') {
+      await loadServants();
+    }
+  } else if (currentSection === 'company-dashboard') {
+    await loadCompanyDashboard();
+  } else if (currentSection === 'stock-buy') {
+    await loadStockBuy();
+  } else if (currentSection === 'servant-buy') {
+    await loadServantBuy();
+  } else if (currentSection === 'ad-details') {
+    await loadAdDetails();
+  } else if (currentSection === 'stock-sell') {
+    await loadStockSell();
+  } else if (currentSection === 'profile') {
+    await loadProfileServantInfo();
+    await loadAnonymousStatus();
+  }
+}
 
     async function loadBonusStatus() {
       if (claimedChannelBonus) {
@@ -1885,6 +1885,7 @@ setTimeout(() => {
 
 </body>
 </html>
+
 
 
 
