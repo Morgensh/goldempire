@@ -269,6 +269,12 @@
       margin-bottom: 10px;
       text-align: center;
     }
+
+    /* Additional for ads */
+    .checkbox-label {
+      display: block;
+      margin: 10px 0;
+    }
   </style>
 </head>
 <body>
@@ -329,6 +335,7 @@
           <input type="text" id="company-name-input" placeholder="Название компании (только английские буквы)">
           <div class="btn" id="create-company-btn">Создать компанию</div>
         </div>
+        <div class="btn" id="publish-ad-btn">Опубликовать объявление</div>
         <div id="user-companies-list"></div>
       </div>
       <div id="referrals-content" class="tab-content">
@@ -374,6 +381,7 @@
         <div class="tab active" data-tab="stocks">Акции</div>
         <div class="tab" data-tab="servants">Слуги</div>
         <div class="tab" data-tab="top">Топ игроки</div>
+        <div class="tab" data-tab="ads">Объявления</div>
       </div>
       <div id="stocks-market-content" class="tab-content active">
         <input type="text" id="search-stocks" class="search-input" placeholder="Поиск компании...">
@@ -386,6 +394,9 @@
       <div id="top-market-content" class="tab-content">
         <h3>Топ игроки</h3>
         <div id="top-players-list" class="top-list"></div>
+      </div>
+      <div id="ads-market-content" class="tab-content">
+        <div id="ads-list"></div>
       </div>
     </div>
 
@@ -494,6 +505,37 @@
       </div>
     </div>
 
+    <!-- Создание объявления -->
+    <div class="section" id="ad-create-section">
+      <h2 class="section-title">Создание объявления</h2>
+      <div class="card">
+        <p>Вам нужно добавить бота в админы своего канала, дав ему права на управление сообщениями и добавление подписчиков. Бот будет проверять подписку игроков для выдачи награды. Когда добавите бота, он опубликует пост с призывом играть в бота. Если пост не опубликуется, бот не будет проверять подписку.</p>
+        <input type="text" id="channel-input" placeholder="Юзернейм канала (без @)">
+        <input type="number" id="reward-input" placeholder="Сумма награды">
+        <input type="number" id="budget-input" placeholder="Бюджет (снимается безвозвратно)">
+        <div class="btn" id="create-ad-btn">Опубликовать объявление</div>
+      </div>
+      <div id="ad-stage2" style="display: none;">
+        <h3>Этап 2</h3>
+        <label class="checkbox-label"><input type="checkbox" id="added-bot-check"> Я добавил бота в канал</label>
+        <label class="checkbox-label"><input type="checkbox" id="publish-post-check"> Бот может опубликовать свой пост</label>
+      </div>
+      <div class="btn" id="back-to-business-ad-btn">Назад в Бизнес</div>
+    </div>
+
+    <!-- Просмотр объявления -->
+    <div class="section" id="ad-claim-section">
+      <h2 class="section-title">Объявление</h2>
+      <div class="card">
+        <div>Канал: <a id="ad-channel-link" href="#" target="_blank">Подписаться</a></div>
+        <div>Награда за подписку: <span id="ad-reward">0</span></div>
+        <div>Бюджет: <span id="ad-budget">0</span></div>
+        <div class="btn" id="check-sub-ad">Я подписался</div>
+        <div class="btn" id="claim-ad" disabled>Получить награду</div>
+      </div>
+      <div class="btn" id="back-to-ads-btn">Назад на Рынок</div>
+    </div>
+
   </div>
 
   <!-- Нижняя навигация -->
@@ -544,9 +586,11 @@
     let apiBase = 'https://dinod.ru/api';
     let currentCompanyId = null;
     let currentServantId = null;
+    let currentAdId = null;
     let currentSection = 'home';
     let marketCompanies = []; // Для хранения полного списка компаний
     let marketServants = []; // Для хранения полного списка слуг
+    let marketAds = []; // Для хранения полного списка объявлений
     let anonymous = false;
     let claimedChannelBonus = false;
     let touchStartY = 0;
@@ -641,6 +685,22 @@
     const collectSharesBtn = document.getElementById('collect-shares-btn');
     const pendingIncomeEl = document.getElementById('pending-income');
     const claimIncomeBtn = document.getElementById('claim-income-btn');
+    const publishAdBtn = document.getElementById('publish-ad-btn');
+    const channelInput = document.getElementById('channel-input');
+    const rewardInput = document.getElementById('reward-input');
+    const budgetInput = document.getElementById('budget-input');
+    const createAdBtn = document.getElementById('create-ad-btn');
+    const adStage2 = document.getElementById('ad-stage2');
+    const addedBotCheck = document.getElementById('added-bot-check');
+    const publishPostCheck = document.getElementById('publish-post-check');
+    const backToBusinessAdBtn = document.getElementById('back-to-business-ad-btn');
+    const adsList = document.getElementById('ads-list');
+    const adChannelLink = document.getElementById('ad-channel-link');
+    const adReward = document.getElementById('ad-reward');
+    const adBudget = document.getElementById('ad-budget');
+    const checkSubAd = document.getElementById('check-sub-ad');
+    const claimAd = document.getElementById('claim-ad');
+    const backToAdsBtn = document.getElementById('back-to-ads-btn');
 
     // Переключение разделов
     function switchToSection(sectionId) {
@@ -669,6 +729,10 @@
           updatePendingIncome();
           incomeInterval = setInterval(updatePendingIncome, 1000);
         }
+      }
+      if (sectionId === 'ad-create') {
+        adStage2.style.display = 'none';
+        createAdBtn.disabled = false;
       }
     }
 
@@ -716,6 +780,8 @@
           await loadServantMarket();
         } else if (activeTab === 'top') {
           await loadTopPlayers();
+        } else if (activeTab === 'ads') {
+          await loadAds();
         }
       } else if (currentSection === 'wallet') {
         const activeTab = document.querySelector('#wallet-section .tab.active').dataset.tab;
@@ -735,6 +801,8 @@
       } else if (currentSection === 'profile') {
         await loadProfileServantInfo();
         await loadAnonymousStatus();
+      } else if (currentSection === 'ad-claim') {
+        await loadAdClaim();
       }
     }
 
@@ -902,19 +970,38 @@
       }
     }
 
-    // Синхронизация данных с сервером
-    async function syncUserData() {
-      try {
-        await fetch(`${apiBase}/sync/${telegramId}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ balance, total_clicks: totalClicks, level, progress })
-        });
-        saveUserToLocal();
-      } catch (err) {
-        console.error('Sync error:', err);
-      }
+   // Синхронизация данных с сервером
+async function syncUserData() {
+  try {
+    const response = await fetch(`${apiBase}/sync/${telegramId}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ balance, total_clicks: totalClicks, level, progress })
+    });
+
+    if (!response.ok) {
+      throw new Error('Sync failed');
     }
+
+    const updatedData = await response.json();
+
+    // ОБНОВЛЯЕМ ДАННЫЕ С СЕРВЕРА (это истина)
+    balance = parseFloat(updatedData.balance);
+    level = updatedData.level;
+    progress = parseFloat(updatedData.progress);
+    totalClicks = updatedData.total_clicks; // На случай, если сервер скорректировал
+
+    // Обновляем клик-стоимость по новому уровню
+    clickValue = 2.5 * level;
+
+    saveUserToLocal();
+    updateUI(); // Чтобы сразу отобразить изменения
+
+  } catch (err) {
+    console.error('Sync error:', err);
+    // Можно добалить fallback: показать toast "Нет соединения, данные локальные"
+  }
+}
 
     // Сохранение в localStorage
     function saveUserToLocal() {
@@ -1331,6 +1418,37 @@
       renderServantMarketList(filtered);
     });
 
+    // Загрузка списка объявлений
+    async function loadAds(refresh = false) {
+      try {
+        const response = await fetch(`${apiBase}/ads`);
+        marketAds = await response.json();
+        renderAdsList(marketAds);
+        if (refresh) showToast('Данные обновлены');
+      } catch (err) {
+        console.error('Load ads error:', err);
+      }
+    }
+
+    // Рендер списка объявлений
+    function renderAdsList(ads) {
+      adsList.innerHTML = '';
+      ads.forEach(ad => {
+        const card = document.createElement('div');
+        card.classList.add('card');
+        card.innerHTML = `
+          <div>Создатель: @${ad.creator_username}</div>
+          <div>Награда за подписку: $${ad.reward}</div>
+          <div>Бюджет: $${ad.budget}</div>
+        `;
+        card.addEventListener('click', () => {
+          currentAdId = ad.id;
+          switchToSection('ad-claim');
+        });
+        adsList.appendChild(card);
+      });
+    }
+
     // Загрузка страницы покупки акций
     async function loadStockBuy() {
       if (!currentCompanyId) return;
@@ -1359,6 +1477,24 @@
         buyServantPriceEl.textContent = `$${servant.price}`;
       } catch (err) {
         console.error('Load servant buy error:', err);
+      }
+    }
+
+    // Загрузка страницы заявки награды за объявление
+    async function loadAdClaim() {
+      if (!currentAdId) return;
+
+      try {
+        const response = await fetch(`${apiBase}/ad/${currentAdId}`);
+        const ad = await response.json();
+        adChannelLink.href = `https://t.me/${ad.channel_username}`;
+        adChannelLink.textContent = `Подписаться на @${ad.channel_username}`;
+        adReward.textContent = ad.reward;
+        adBudget.textContent = ad.budget;
+        claimAd.disabled = true;
+        claimAd.classList.remove('btn-green');
+      } catch (err) {
+        console.error('Load ad claim error:', err);
       }
     }
 
@@ -1422,6 +1558,117 @@
 
     backToMarketBtn.addEventListener('click', () => switchToSection('market'));
     backToMarketServantBtn.addEventListener('click', () => switchToSection('market'));
+    backToAdsBtn.addEventListener('click', () => switchToSection('market'));
+
+    // Проверка подписки на объявление
+    checkSubAd.addEventListener('click', async () => {
+      try {
+        const response = await fetch(`${apiBase}/ad/check_sub/${currentAdId}/${telegramId}`);
+        const data = await response.json();
+        if (data.subscribed) {
+          claimAd.disabled = false;
+          claimAd.classList.add('btn-green');
+          showToast('Подписка подтверждена!');
+        } else {
+          showToast('Вы не подписаны на канал');
+        }
+      } catch (err) {
+        showToast('Ошибка проверки подписки');
+      }
+    });
+
+    // Заявка награды за объявление
+    claimAd.addEventListener('click', async () => {
+      try {
+        const response = await fetch(`${apiBase}/ad/claim/${currentAdId}/${telegramId}`, { method: 'POST' });
+        if (response.ok) {
+          const updated = await response.json();
+          balance = parseFloat(updated.balance);
+          updateUI();
+          saveUserToLocal();
+          showToast('Награда получена!');
+          switchToSection('market');
+        } else {
+          const error = await response.json();
+          showToast(error.error || 'Ошибка получения награды');
+        }
+      } catch (err) {
+        showToast('Ошибка получения награды');
+      }
+    });
+
+    // Создание объявления
+    createAdBtn.addEventListener('click', async () => {
+      const channel_username = channelInput.value.trim();
+      const reward = parseFloat(rewardInput.value);
+      const budget = parseFloat(budgetInput.value);
+      if (!channel_username || isNaN(reward) || isNaN(budget) || reward <= 0 || budget < reward) {
+        showToast('Неверные данные. Бюджет должен быть >= награды.');
+        return;
+      }
+      try {
+        const response = await fetch(`${apiBase}/ad/create/${telegramId}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ channel_username, reward, budget })
+        });
+        if (!response.ok) {
+          const error = await response.json();
+          showToast(error.error || 'Ошибка создания объявления');
+          return;
+        }
+        const ad = await response.json();
+        currentAdId = ad.id;
+        balance = parseFloat(ad.balance || balance); // if server returns updated balance
+        updateUI();
+        adStage2.style.display = 'block';
+        createAdBtn.disabled = true;
+        showToast('Объявление создано, перейдите к этапу 2');
+      } catch (err) {
+        showToast('Ошибка создания объявления');
+      }
+    });
+
+    // Проверка добавления бота
+    addedBotCheck.addEventListener('change', async () => {
+      if (addedBotCheck.checked) {
+        try {
+          const response = await fetch(`${apiBase}/ad/verify_admin/${currentAdId}/${telegramId}`);
+          if (!response.ok) {
+            const error = await response.json();
+            showToast(error.error || 'Бот не добавлен или нет прав');
+            addedBotCheck.checked = false;
+          }
+        } catch (err) {
+          showToast('Ошибка проверки');
+          addedBotCheck.checked = false;
+        }
+      }
+    });
+
+    // Публикация поста
+    publishPostCheck.addEventListener('change', async () => {
+      if (publishPostCheck.checked) {
+        try {
+          const response = await fetch(`${apiBase}/ad/publish/${currentAdId}/${telegramId}`, { method: 'POST' });
+          if (!response.ok) {
+            const error = await response.json();
+            showToast(error.error || 'Ошибка публикации поста');
+            publishPostCheck.checked = false;
+          } else {
+            showToast('Пост опубликован, объявление активно');
+            switchToSection('business');
+          }
+        } catch (err) {
+          showToast('Ошибка публикации');
+          publishPostCheck.checked = false;
+        }
+      }
+    });
+
+    backToBusinessAdBtn.addEventListener('click', () => switchToSection('business'));
+
+    publishAdBtn.addEventListener('click', () => switchToSection('ad-create'));
 
     // Загрузка холдингов
     async function loadHoldings() {
@@ -1604,6 +1851,8 @@
         } else if (activeTab === 'top') {
           loadTopPlayers();
           showToast('Данные обновлены');
+        } else if (activeTab === 'ads') {
+          loadAds(true);
         }
       }
     });
@@ -1621,6 +1870,8 @@
         } else if (activeTab === 'top') {
           loadTopPlayers();
           showToast('Данные обновлены');
+        } else if (activeTab === 'ads') {
+          loadAds(true);
         }
       }
     });
