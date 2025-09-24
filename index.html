@@ -445,6 +445,8 @@
         </div>
         <div id="servants-content" class="tab-content">
           <div>Ежесекундный доход: <span id="sec-income">0</span></div>
+          <div>Накопленный доход: $<span id="pending-income">0</span></div>
+          <div class="btn" id="claim-income-btn">Забрать</div>
           <div>Налоги в день: <span id="daily-tax">0</span></div>
           <div id="servants-list"></div>
         </div>
@@ -553,6 +555,10 @@
     let productionRatePerSecond = 0;
     let lastCollectTimestamp = null;
     let productionInterval = null;
+    let lastClaimTime = 0;
+    let pendingIncome = 0;
+    let incomeInterval = null;
+    const LOCAL_STORAGE_KEY = `user_data_${telegramId}`;
 
     // Список типов персонала
     const staffTypes = [
@@ -633,6 +639,8 @@
     const marketNavItem = document.querySelector('.nav-item[data-section="market"]');
     const producedSharesEl = document.getElementById('produced-shares');
     const collectSharesBtn = document.getElementById('collect-shares-btn');
+    const pendingIncomeEl = document.getElementById('pending-income');
+    const claimIncomeBtn = document.getElementById('claim-income-btn');
 
     // Переключение разделов
     function switchToSection(sectionId) {
@@ -649,6 +657,18 @@
       updateUI();
       if (sectionId !== 'company-dashboard') {
         clearInterval(productionInterval);
+      } else {
+        updateProducedShares();
+        productionInterval = setInterval(updateProducedShares, 1000);
+      }
+      if (sectionId !== 'wallet') {
+        clearInterval(incomeInterval);
+      } else {
+        const activeTab = document.querySelector('#wallet-section .tab.active').dataset.tab;
+        if (activeTab === 'servants') {
+          updatePendingIncome();
+          incomeInterval = setInterval(updatePendingIncome, 1000);
+        }
       }
     }
 
@@ -757,6 +777,7 @@
           claimedChannelBonus = true;
           updateUI();
           loadBonusStatus();
+          saveUserToLocal();
           showToast('Награда получена!');
         } else {
           showToast('Ошибка получения награды');
@@ -802,6 +823,7 @@
         await fetch(`${apiBase}/set_anonymous/${telegramId}/${newStatus ? 'true' : 'false'}`, { method: 'POST' });
         anonymous = newStatus;
         loadAnonymousStatus();
+        saveUserToLocal();
         showToast(newStatus ? 'Анонимность включена' : 'Анонимность отключена');
       } catch (err) {
         showToast('Ошибка изменения анонимности');
@@ -880,7 +902,7 @@
       }
     }
 
-    // Синхронизация данных с сервером каждые 30 секунд
+    // Синхронизация данных с сервером
     async function syncUserData() {
       try {
         await fetch(`${apiBase}/sync/${telegramId}`, {
@@ -888,14 +910,62 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ balance, total_clicks: totalClicks, level, progress })
         });
+        saveUserToLocal();
       } catch (err) {
         console.error('Sync error:', err);
       }
     }
 
+    // Сохранение в localStorage
+    function saveUserToLocal() {
+      const user = {
+        balance,
+        level,
+        progress,
+        total_clicks: totalClicks,
+        companies_count: companiesCount,
+        master_id: masterId,
+        referrals_count: referralsCount,
+        servants_count: servantsCount,
+        anonymous,
+        claimed_channel_bonus: claimedChannelBonus,
+        last_claim: new Date(lastClaimTime).toISOString()
+      };
+      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify({ timestamp: Date.now(), user }));
+    }
+
+    // Загрузка из localStorage
+    function loadFromLocal() {
+      const stored = localStorage.getItem(LOCAL_STORAGE_KEY);
+      if (stored) {
+        const { timestamp, user } = JSON.parse(stored);
+        if (Date.now() - timestamp < 60000) { // 1 минута
+          balance = parseFloat(user.balance);
+          level = user.level;
+          progress = parseFloat(user.progress);
+          totalClicks = user.total_clicks;
+          companiesCount = user.companies_count || 0;
+          masterId = user.master_id;
+          referralsCount = user.referrals_count;
+          servantsCount = user.servants_count;
+          anonymous = user.anonymous;
+          claimedChannelBonus = user.claimed_channel_bonus;
+          lastClaimTime = new Date(user.last_claim).getTime();
+          clickValue = 2.5 * level;
+          updateUI();
+          updateCreateCompanyArea();
+          return true;
+        }
+      }
+      return false;
+    }
+
     // Инициализация пользователя
     async function initUser() {
       if (!telegramId) return;
+
+      // Попробовать загрузить из localStorage
+      const loadedFromLocal = loadFromLocal();
 
       try {
         let response = await fetch(`${apiBase}/user/${telegramId}`);
@@ -911,6 +981,7 @@
           servantsCount = user.servants_count;
           anonymous = user.anonymous;
           claimedChannelBonus = user.claimed_channel_bonus;
+          lastClaimTime = new Date(user.last_claim).getTime();
           clickValue = 2.5 * level;
 
           // Применить налог если слуга
@@ -924,6 +995,7 @@
           response = await fetch(`${apiBase}/claim_income/${telegramId}`, { method: 'POST' });
           user = await response.json();
           balance = parseFloat(user.balance);
+          lastClaimTime = Date.now(); // После claim
 
           // Если данные placeholder, обновляем
           if (user.first_name === 'Unknown' || !user.username) {
@@ -945,9 +1017,15 @@
             avatarImgEl.src = user.avatar_url;
             avatarImgEl.style.display = 'block';
           }
+
+          saveUserToLocal();
         }
       } catch (err) {
         console.error('Init user error:', err);
+        if (!loadedFromLocal) {
+          // Если не загрузили из local, показать ошибку
+          showToast('Ошибка загрузки данных');
+        }
       }
 
       updateCreateCompanyArea();
@@ -974,6 +1052,7 @@
               await fetch(`${apiBase}/free_self/${telegramId}`, { method: 'POST' });
               showToast('Вы освобождены!');
               masterId = null;
+              saveUserToLocal();
               loadProfileServantInfo();
             });
             freeSelfBtnContainer.appendChild(btn);
@@ -1016,6 +1095,7 @@
         }
         const newCompany = await response.json();
         companiesCount++;
+        saveUserToLocal();
         updateCreateCompanyArea();
         companyNameInput.value = '';
         showToast('Компания создана успешно');
@@ -1064,8 +1144,6 @@
         lastCollectTimestamp = new Date(company.last_collect).getTime();
         productionRatePerSecond = company.production_rate_per_second || 0;
         updateProducedShares();
-        clearInterval(productionInterval);
-        productionInterval = setInterval(updateProducedShares, 1000);
 
         // Загрузка персонала
         staffGrid.innerHTML = '';
@@ -1137,6 +1215,7 @@
         const updated = await response.json();
         balance = parseFloat(updated.balance);
         productionRatePerSecond = updated.production_rate_per_second || productionRatePerSecond;
+        saveUserToLocal();
         showToast('Персонал улучшен успешно');
         updateUI();
         await loadCompanyDashboard();
@@ -1304,6 +1383,7 @@
         }
         const updated = await response.json();
         balance = parseFloat(updated.balance);
+        saveUserToLocal();
         buyAmountInput.value = '';
         showToast('Акции куплены успешно');
         updateUI();
@@ -1329,6 +1409,7 @@
         const updated = await response.json();
         balance = parseFloat(updated.balance);
         servantsCount = updated.servants_count;
+        saveUserToLocal();
         showToast('Слуга куплен успешно');
         updateUI();
         switchToSection('market');
@@ -1419,7 +1500,40 @@
       } catch (err) {
         console.error('Load servants error:', err);
       }
+      updatePendingIncome();
     }
+
+    // Обновление накопленного дохода
+    function updatePendingIncome() {
+      const now = Date.now();
+      const elapsed = (now - lastClaimTime) / 1000;
+      pendingIncome = servantsCount * elapsed;
+      if (pendingIncomeEl) pendingIncomeEl.textContent = pendingIncome.toFixed(2);
+    }
+
+    // Заявка дохода
+    async function claimIncome() {
+      try {
+        const response = await fetch(`${apiBase}/claim_income/${telegramId}`, { method: 'POST' });
+        if (!response.ok) {
+          const error = await response.json();
+          showToast(error.error || 'Ошибка заявки дохода');
+          return;
+        }
+        const updated = await response.json();
+        balance = parseFloat(updated.balance);
+        lastClaimTime = Date.now();
+        pendingIncome = 0;
+        saveUserToLocal();
+        updateUI();
+        updatePendingIncome();
+        showToast('Доход заявлен успешно');
+      } catch (err) {
+        showToast('Ошибка заявки дохода');
+      }
+    }
+
+    claimIncomeBtn.addEventListener('click', claimIncome);
 
     // Загрузка страницы продажи акций
     async function loadStockSell() {
@@ -1457,6 +1571,7 @@
         }
         const updated = await response.json();
         balance = parseFloat(updated.balance);
+        saveUserToLocal();
         sellAmountInput.value = '';
         showToast('Акции проданы успешно');
         updateUI();
@@ -1532,6 +1647,9 @@ async function buyPackage(packageId) {
     showToast("Ошибка сети");
   }
 }
+
+    // Синхронизация при выходе
+    window.addEventListener('beforeunload', syncUserData);
 
     // Инициализация
     initUser();
