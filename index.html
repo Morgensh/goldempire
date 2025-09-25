@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Business Empire Richman</title>
+  <title>Gold Empire</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
@@ -91,6 +91,7 @@
     .btn.disabled {
       opacity: 0.5;
       cursor: not-allowed;
+      pointer-events: none; /* Prevent clicks */
     }
 
     /* Нижняя навигация — просто ряд иконок */
@@ -279,33 +280,31 @@
 <body>
 
   <!-- Верхняя панель -->
-<div class="header">
-  Richman
-  <i id="shop-btn" class="fas fa-store" style="float:right; cursor:pointer;"></i>
-</div>
-
+  <div class="header">
+    Gold Empire
+    <i id="shop-btn" class="fas fa-store" style="float:right; cursor:pointer;"></i>
+  </div>
 
   <!-- Основной контент -->
   <div class="main-content">
 
-      <!-- Магазин -->
-<div class="section" id="shop-section">
-  <h2 class="section-title">Магазин</h2>
-  <div class="card">
-    <div class="btn" onclick="buyPackage(1)">100 000$ — 10$</div>
-    <div class="btn" onclick="buyPackage(2)">500 000$ — 25$</div>
-    <div class="btn" onclick="buyPackage(3)">1 000 000$ — 50$</div>
-    <div class="btn" onclick="buyPackage(4)">10 000 000$ — 200$</div>
-  </div>
-  <div class="btn" onclick="switchToSection('home')">Назад</div>
-</div>
-
+    <!-- Магазин -->
+    <div class="section" id="shop-section">
+      <h2 class="section-title">Магазин</h2>
+      <div class="card">
+        <div class="btn" onclick="buyPackage(1)">100 000$ — 10$</div>
+        <div class="btn" onclick="buyPackage(2)">500 000$ — 25$</div>
+        <div class="btn" onclick="buyPackage(3)">1 000 000$ — 50$</div>
+        <div class="btn" onclick="buyPackage(4)">10 000 000$ — 200$</div>
+      </div>
+      <div class="btn" onclick="switchToSection('home')">Назад</div>
+    </div>
 
     <!-- Главная (кликер) -->
     <div class="section active" id="home-section">
       <!-- Банковская карта -->
       <div class="bank-card">
-        <div>RICHMAN</div>
+        <div>GOLD EMPIRE</div>
         <div>•••• •••• •••• 1234</div>
         <div>
           <div>Баланс: <span id="card-balance">$ 0,00</span></div>
@@ -344,7 +343,7 @@
           <p>Подпишитесь на канал и получите 25 000 долларов!</p>
           <a href="https://t.me/gechnl" class="btn">Подписаться на канал</a>
           <div class="btn" id="check-sub">Я подписался</div>
-          <div class="btn" id="claim-bonus" disabled>Получить 25 000</div>
+          <div class="btn disabled" id="claim-bonus">Получить 25 000</div>
           <div id="bonus-status"></div>
         </div>
       </div>
@@ -406,6 +405,7 @@
     <div class="section" id="create-ad-section">
       <h2 class="section-title">Создать объявление</h2>
       <p>Добавьте бота в админы вашего канала, дав ему права на управление сообщениями и добавление подписчиков. Бот будет проверять подписки и опубликует пост с призывом играть.</p>
+      <p>Создание объявления возможно лишь когда наш бот отправит свой пост в ваш канал, без этого объявление невозможно выложить.</p>
       <div class="card" id="ad-form">
         <input id="channel-input" placeholder="Юзернейм канала без @">
         <input id="reward-input" type="number" placeholder="Награда за подписку">
@@ -504,7 +504,7 @@
         <div class="profile-avatar" id="profile-avatar">
           <img id="avatar-img" src="" alt="Avatar" style="display: none; width: 100%; height: 100%; border-radius: 50%;">
         </div>
-        <div class="profile-name" id="profile-name">Richman Player</div>
+        <div class="profile-name" id="profile-name">Gold Empire Player</div>
         <div class="profile-username" id="profile-username">@username</div>
         <div class="profile-level">Уровень <span id="profile-level">1</span></div>
         <div id="servant-status"></div>
@@ -715,9 +715,13 @@
       updateUI();
       if (sectionId !== 'company-dashboard') {
         clearInterval(productionInterval);
+        producedShares = 0; // Reset production when leaving dashboard
       } else {
         updateProducedShares();
-        productionInterval = setInterval(updateProducedShares, 1000);
+        productionInterval = setInterval(() => {
+          producedShares += productionRatePerSecond;
+          producedSharesEl.textContent = Math.floor(producedShares);
+        }, 1000); // Accumulate only while in section
       }
       if (sectionId !== 'wallet') {
         clearInterval(incomeInterval);
@@ -815,7 +819,7 @@
         bonusStatusEl.textContent = '';
         checkSubBtn.style.display = 'block';
         claimBonusBtn.style.display = 'block';
-        claimBonusBtn.disabled = true;
+        claimBonusBtn.classList.add('disabled');
         claimBonusBtn.classList.remove('btn-green');
       }
     }
@@ -825,7 +829,7 @@
         const response = await fetch(`${apiBase}/check_channel_sub/${telegramId}`);
         const data = await response.json();
         if (data.subscribed) {
-          claimBonusBtn.disabled = false;
+          claimBonusBtn.classList.remove('disabled');
           claimBonusBtn.classList.add('btn-green');
           showToast('Подписка подтверждена!');
         } else {
@@ -836,30 +840,31 @@
       }
     });
 
-    claimBonusBtn.addEventListener('click', async () => {
-  try {
-    const response = await fetch(`${apiBase}/claim_channel_bonus/${telegramId}`, { method: 'POST' });
-    const data = await response.json();
+    claimBonusBtn.addEventListener('click', async (e) => {
+      if (e.target.classList.contains('disabled')) return;
+      try {
+        const response = await fetch(`${apiBase}/claim_channel_bonus/${telegramId}`, { method: 'POST' });
+        const data = await response.json();
 
-    if (response.ok && data.balance) {
-      balance = parseFloat(data.balance);
-      claimedChannelBonus = true;
-      updateUI();
-      loadBonusStatus();
-      saveUserToLocal();
-      showToast('Награда получена!');
-    } else if (data.error === 'already_claimed') {
-      claimedChannelBonus = true;
-      loadBonusStatus();
-      showToast('Награда уже получена');
-    } else {
-      showToast('Ошибка: ' + (data.error || 'неизвестно'));
-    }
-  } catch (err) {
-    showToast('Ошибка соединения');
-  }
-});
-
+        if (response.ok && data.balance) {
+          balance = parseFloat(data.balance);
+          claimedChannelBonus = true;
+          updateUI();
+          loadBonusStatus();
+          saveUserToLocal();
+          showToast('Награда получена!');
+          await syncUserData(); // Immediate sync after claim
+        } else if (data.error === 'already_claimed') {
+          claimedChannelBonus = true;
+          loadBonusStatus();
+          showToast('Награда уже получена');
+        } else {
+          showToast('Ошибка: ' + (data.error || 'неизвестно'));
+        }
+      } catch (err) {
+        showToast('Ошибка соединения');
+      }
+    });
 
     async function loadTopPlayers() {
       try {
@@ -976,48 +981,47 @@
       }
     }
 
-   // Синхронизация данных с сервером
-// Упрощенная синхронизация данных
-async function syncUserData() {
-  try {
-    const response = await fetch(`${apiBase}/sync/${telegramId}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        total_clicks: totalClicks,
-        balance: balance,
-        level: level,
-        progress: progress
-      })
-    });
+    // Синхронизация данных с сервером
+    async function syncUserData() {
+      try {
+        const response = await fetch(`${apiBase}/sync/${telegramId}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            total_clicks: totalClicks,
+            balance: balance,
+            level: level,
+            progress: progress
+          })
+        });
 
-    if (response.ok) {
-      const updatedData = await response.json();
+        if (response.ok) {
+          const updatedData = await response.json();
 
-      // ОБНОВЛЯЕМ ДАННЫЕ С СЕРВЕРА
-      balance = parseFloat(updatedData.balance);
-      level = updatedData.level;
-      progress = parseFloat(updatedData.progress);
-      totalClicks = updatedData.total_clicks;
+          // ОБНОВЛЯЕМ ДАННЫЕ С СЕРВЕРА
+          balance = parseFloat(updatedData.balance);
+          level = updatedData.level;
+          progress = parseFloat(updatedData.progress);
+          totalClicks = updatedData.total_clicks;
 
-      // Обновляем клик-стоимость по новому уровню
-      clickValue = 2.5 * level;
+          // Обновляем клик-стоимость по новому уровню
+          clickValue = 2.5 * level;
 
-      saveUserToLocal();
-      updateUI();
+          saveUserToLocal();
+          updateUI();
 
-    } else if (response.status === 403) {
-      // User banned
-      showToast('Аккаунт заблокирован');
-    } else {
-      console.warn('Sync failed, using local data');
-      // Продолжаем работать с локальными данными
+        } else if (response.status === 403) {
+          // User banned
+          showToast('Аккаунт заблокирован');
+        } else {
+          console.warn('Sync failed, using local data');
+          // Продолжаем работать с локальными данными
+        }
+      } catch (err) {
+        console.warn('Sync error, using local data:', err);
+        // Продолжаем работать с локальными данными
+      }
     }
-  } catch (err) {
-    console.warn('Sync error, using local data:', err);
-    // Продолжаем работать с локальными данными
-  }
-}
 
     // Сохранение в localStorage
     function saveUserToLocal() {
@@ -1112,7 +1116,7 @@ async function syncUserData() {
             user.avatar_url = updatedUser.avatar_url;
           }
 
-          profileNameEl.textContent = `${user.first_name || ''} ${user.last_name || ''}`.trim() || 'Richman Player';
+          profileNameEl.textContent = `${user.first_name || ''} ${user.last_name || ''}`.trim() || 'Gold Empire Player';
           profileUsernameEl.textContent = user.username ? `@${user.username}` : '@username';
           playerIdEl.textContent = `#${telegramId}`;
 
@@ -1243,9 +1247,9 @@ async function syncUserData() {
         companyIssuedEl.textContent = company.issued_shares;
         companyAvailableIssueEl.textContent = company.available_to_issue;
 
-        // Инициализация производства акций
-        lastCollectTimestamp = new Date(company.last_collect).getTime();
+        // Инициализация производства акций (only online)
         productionRatePerSecond = company.production_rate_per_second || 0;
+        producedShares = 0; // Start from 0 each time entering dashboard
         updateProducedShares();
 
         // Загрузка персонала
@@ -1274,16 +1278,13 @@ async function syncUserData() {
 
     // Обновление отображаемого количества произведенных акций
     function updateProducedShares() {
-      const now = Date.now();
-      const elapsedSeconds = Math.floor((now - lastCollectTimestamp) / 1000);
-      producedShares = Math.floor(elapsedSeconds * productionRatePerSecond);
-      producedSharesEl.textContent = producedShares;
+      producedSharesEl.textContent = Math.floor(producedShares);
     }
 
     // Сбор акций от персонала
     async function collectShares() {
       try {
-        const response = await fetch(`${apiBase}/company/${currentCompanyId}/collect`, { method: 'POST' });
+        const response = await fetch(`${apiBase}/company/${currentCompanyId}/collect`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ amount: Math.floor(producedShares) }) });
         if (!response.ok) {
           const error = await response.json();
           showToast(error.error || 'Ошибка сбора акций');
@@ -1291,7 +1292,6 @@ async function syncUserData() {
         }
         const updated = await response.json();
         companyIssuedEl.textContent = updated.issued_shares;
-        lastCollectTimestamp = Date.now();
         producedShares = 0;
         updateProducedShares();
         showToast('Акции собраны успешно');
@@ -1523,7 +1523,7 @@ async function syncUserData() {
         const res = await fetch(`${apiBase}/ad/${currentAdId}/is_bot_admin/${telegramId}`);
         const data = await res.json();
         if (data.is_admin) {
-          publishBotPost.disabled = false;
+          publishBotPost.classList.remove('disabled');
           showToast('Бот добавлен');
         } else {
           showToast('Бот не добавлен или без прав');
@@ -1533,11 +1533,12 @@ async function syncUserData() {
       }
     });
 
-    publishBotPost.addEventListener('click', async () => {
+    publishBotPost.addEventListener('click', async (e) => {
+      if (e.target.classList.contains('disabled')) return;
       try {
         const res = await fetch(`${apiBase}/ad/${currentAdId}/publish_post/${telegramId}`, {method: 'POST'});
         if (res.ok) {
-          publishAd.disabled = false;
+          publishAd.classList.remove('disabled');
           showToast('Пост опубликован');
         } else {
           showToast('Ошибка публикации поста');
@@ -1547,7 +1548,8 @@ async function syncUserData() {
       }
     });
 
-    publishAd.addEventListener('click', async () => {
+    publishAd.addEventListener('click', async (e) => {
+      if (e.target.classList.contains('disabled')) return;
       try {
         const res = await fetch(`${apiBase}/ad/${currentAdId}/publish/${telegramId}`, {method: 'POST'});
         if (res.ok) {
@@ -1566,7 +1568,7 @@ async function syncUserData() {
     async function loadClaimAd() {
       claimChannel.textContent = '@' + currentChannel;
       subscribeLink.href = 'https://t.me/' + currentChannel;
-      claimReward.disabled = true;
+      claimReward.classList.add('disabled');
       claimReward.classList.remove('btn-green');
     }
 
@@ -1575,7 +1577,7 @@ async function syncUserData() {
         const res = await fetch(`${apiBase}/ad/${currentAdId}/check_subscribed/${telegramId}`);
         const data = await res.json();
         if (data.subscribed) {
-          claimReward.disabled = false;
+          claimReward.classList.remove('disabled');
           claimReward.classList.add('btn-green');
           showToast('Подписка подтверждена');
         } else {
@@ -1586,25 +1588,27 @@ async function syncUserData() {
       }
     });
 
-    claimReward.addEventListener('click', async () => {
-  try {
-    const res = await fetch(`${apiBase}/ad/${currentAdId}/claim/${telegramId}`, {method: 'POST'});
-    const data = await res.json();
+    claimReward.addEventListener('click', async (e) => {
+      if (e.target.classList.contains('disabled')) return;
+      try {
+        const res = await fetch(`${apiBase}/ad/${currentAdId}/claim/${telegramId}`, {method: 'POST'});
+        const data = await res.json();
 
-    if (res.ok) {
-      balance = data.balance;
-      updateUI();
-      saveUserToLocal();
-      showToast(data.message || 'Награда получена успешно!');
-      switchToSection('market');
-    } else {
-      showToast(data.error || 'Ошибка получения награды');
-    }
-  } catch (e) {
-    console.error('Claim error:', e);
-    showToast('Ошибка сети. Попробуйте позже.');
-  }
-});
+        if (res.ok) {
+          balance = data.balance;
+          updateUI();
+          saveUserToLocal();
+          showToast(data.message || 'Награда получена успешно!');
+          switchToSection('market');
+          await syncUserData(); // Immediate sync after claim
+        } else {
+          showToast(data.error || 'Ошибка получения награды');
+        }
+      } catch (e) {
+        console.error('Claim error:', e);
+        showToast('Ошибка сети. Попробуйте позже.');
+      }
+    });
 
     backToAdsFromClaimBtn.addEventListener('click', () => switchToSection('market'));
 
@@ -1738,8 +1742,11 @@ async function syncUserData() {
       try {
         const response = await fetch(`${apiBase}/servants/${telegramId}`);
         const servants = await response.json();
-        let totalSec = servants.length * 1;
+        let totalSec = 0;
         let totalTax = 0;
+        if (servants.length > 0) {
+          totalSec = servants.length * 1;
+        }
         servantsList.innerHTML = '';
         servants.forEach(serv => {
           totalTax += 0.05 * serv.balance;
@@ -1782,9 +1789,13 @@ async function syncUserData() {
 
     // Обновление накопленного дохода
     function updatePendingIncome() {
-      const now = Date.now();
-      const elapsed = (now - lastClaimTime) / 1000;
-      pendingIncome = servantsCount * elapsed;
+      if (servantsCount === 0) {
+        pendingIncome = 0;
+      } else {
+        const now = Date.now();
+        const elapsed = (now - lastClaimTime) / 1000;
+        pendingIncome = servantsCount * elapsed;
+      }
       pendingIncomeEl.textContent = pendingIncome.toFixed(2);
     }
 
@@ -1860,28 +1871,28 @@ async function syncUserData() {
       }
     });
 
-// Магазин
-const shopBtn = document.getElementById('shop-btn');
-shopBtn.addEventListener('click', () => switchToSection('shop'));
+    // Магазин
+    const shopBtn = document.getElementById('shop-btn');
+    shopBtn.addEventListener('click', () => switchToSection('shop'));
 
-async function buyPackage(packageId) {
-  try {
-    const res = await fetch(`${apiBase}/create_invoice/${telegramId}`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ package_id: packageId })
-    });
-    const data = await res.json();
-    if (data.pay_url) {
-      window.Telegram.WebApp.openTelegramLink(data.pay_url);
-    } else {
-      showToast("Ошибка при создании платежа");
+    async function buyPackage(packageId) {
+      try {
+        const res = await fetch(`${apiBase}/create_invoice/${telegramId}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ package_id: packageId })
+        });
+        const data = await res.json();
+        if (data.pay_url) {
+          window.Telegram.WebApp.openTelegramLink(data.pay_url);
+        } else {
+          showToast("Ошибка при создании платежа");
+        }
+      } catch (err) {
+        console.error(err);
+        showToast("Ошибка сети");
+      }
     }
-  } catch (err) {
-    console.error(err);
-    showToast("Ошибка сети");
-  }
-}
 
     // Синхронизация при выходе
     window.addEventListener('beforeunload', syncUserData);
@@ -1892,5 +1903,3 @@ async function buyPackage(packageId) {
 
 </body>
 </html>
-
-
