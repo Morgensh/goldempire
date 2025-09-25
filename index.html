@@ -1299,23 +1299,32 @@ async function syncUserData() {
 
     // Сбор акций от персонала
     async function collectShares() {
-      try {
-        const response = await fetch(`${apiBase}/company/${currentCompanyId}/collect`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ amount: Math.floor(producedShares) }) });
-        if (!response.ok) {
-          const error = await response.json();
-          showToast(error.error || 'Ошибка сбора акций');
-          return;
-        }
-        const updated = await response.json();
-        companyIssuedEl.textContent = updated.issued_shares;
-        producedShares = 0;
-        updateProducedShares();
-        showToast('Акции собраны успешно');
-      } catch (err) {
-        showToast('Ошибка сбора акций');
-      }
+  try {
+    const response = await fetch(`${apiBase}/company/${currentCompanyId}/collect`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ amount: Math.floor(producedShares) })
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      showToast(error.error || 'Ошибка сбора акций');
+      return;
     }
 
+    const updated = await response.json();
+    companyIssuedEl.textContent = updated.issued_shares;
+
+    // ФИКС: Обновляем время последнего сбора
+    lastCollectTimestamp = Date.now(); // ← ДОБАВЬ ЭТУ СТРОЧКУ
+    producedShares = 0;
+
+    updateProducedShares();
+    showToast('Акции собраны успешно');
+  } catch (err) {
+    showToast('Ошибка сбора акций');
+  }
+}
     collectSharesBtn.addEventListener('click', collectShares);
 
     // Улучшение персонала
