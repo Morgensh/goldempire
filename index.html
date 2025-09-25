@@ -275,6 +275,10 @@
       margin-bottom: 10px;
       text-align: center;
     }
+
+    .hidden {
+      display: none;
+    }
   </style>
 </head>
 <body>
@@ -393,8 +397,8 @@
         <div id="top-players-list" class="top-list"></div>
       </div>
       <div id="ads-market-content" class="tab-content">
-        <h3>Мои объявления</h3>
-        <div id="my-ads-list"></div>
+        <div class="btn" id="show-my-ads-btn">Мои объявления</div>
+        <div id="my-ads-list" class="hidden"></div>
         <div class="btn" id="create-ad-btn">Создать объявление</div>
         <h3>Активные объявления</h3>
         <div id="ads-list"></div>
@@ -699,6 +703,7 @@
     const checkSubscribed = document.getElementById('check-subscribed');
     const claimReward = document.getElementById('claim-reward');
     const backToAdsFromClaimBtn = document.getElementById('back-to-ads-from-claim-btn');
+    const showMyAdsBtn = document.getElementById('show-my-ads-btn');
 
     // Переключение разделов
     function switchToSection(sectionId) {
@@ -715,20 +720,14 @@
       updateUI();
       if (sectionId !== 'company-dashboard') {
         clearInterval(productionInterval);
-        producedShares = 0; // Reset production when leaving dashboard
       } else {
-        updateProducedShares();
-        productionInterval = setInterval(() => {
-          producedShares += productionRatePerSecond;
-          producedSharesEl.textContent = Math.floor(producedShares);
-        }, 1000); // Accumulate only while in section
+        productionInterval = setInterval(updateProducedShares, 1000);
       }
       if (sectionId !== 'wallet') {
         clearInterval(incomeInterval);
       } else {
         const activeTab = document.querySelector('#wallet-section .tab.active').dataset.tab;
-        if (activeTab === 'servants') {
-          updatePendingIncome();
+        if (activeTab === 'servants' && servantsCount > 0) {
           incomeInterval = setInterval(updatePendingIncome, 1000);
         }
       }
@@ -738,6 +737,9 @@
       }
       if (sectionId === 'claim-ad') {
         loadClaimAd();
+      }
+      if (sectionId === 'market') {
+        myAdsList.classList.add('hidden');
       }
     }
 
@@ -760,6 +762,12 @@
         const targetContent = document.getElementById(`${tab.dataset.tab}-${tabsContainer.parentElement.id.split('-')[0]}-content`) || document.getElementById(`${tab.dataset.tab}-content`);
         if (targetContent) targetContent.classList.add('active');
         loadSectionData();
+        if (tab.parentElement.parentElement.id === 'wallet-section' && tab.dataset.tab === 'servants' && servantsCount > 0) {
+          clearInterval(incomeInterval);
+          incomeInterval = setInterval(updatePendingIncome, 1000);
+        } else {
+          clearInterval(incomeInterval);
+        }
       });
     });
 
@@ -786,7 +794,6 @@
         } else if (activeTab === 'top') {
           await loadTopPlayers();
         } else if (activeTab === 'ads') {
-          await loadMyAds();
           await loadAds();
         }
       } else if (currentSection === 'wallet') {
@@ -1247,9 +1254,9 @@
         companyIssuedEl.textContent = company.issued_shares;
         companyAvailableIssueEl.textContent = company.available_to_issue;
 
-        // Инициализация производства акций (only online)
+        // Инициализация производства акций
         productionRatePerSecond = company.production_rate_per_second || 0;
-        producedShares = 0; // Start from 0 each time entering dashboard
+        lastCollectTimestamp = new Date(company.last_collect).getTime();
         updateProducedShares();
 
         // Загрузка персонала
@@ -1278,7 +1285,14 @@
 
     // Обновление отображаемого количества произведенных акций
     function updateProducedShares() {
-      producedSharesEl.textContent = Math.floor(producedShares);
+      if (productionRatePerSecond > 0) {
+        const elapsed = (Date.now() - lastCollectTimestamp) / 1000;
+        producedShares = Math.floor(elapsed * productionRatePerSecond);
+        producedSharesEl.textContent = producedShares;
+      } else {
+        producedShares = 0;
+        producedSharesEl.textContent = 0;
+      }
     }
 
     // Сбор акций от персонала
@@ -1458,6 +1472,11 @@
       }
     }
 
+    showMyAdsBtn.addEventListener('click', () => {
+      myAdsList.classList.toggle('hidden');
+      loadMyAds();
+    });
+
     // Загрузка активных объявлений
     async function loadAds() {
       try {
@@ -1589,46 +1608,46 @@
     });
 
     claimReward.addEventListener('click', async (e) => {
-  if (e.target.classList.contains('disabled')) return;
+      if (e.target.classList.contains('disabled')) return;
 
-  claimReward.classList.add('disabled');
-  const originalText = claimReward.textContent;
-  claimReward.textContent = 'Обработка...';
+      claimReward.classList.add('disabled');
+      const originalText = claimReward.textContent;
+      claimReward.textContent = 'Обработка...';
 
-  try {
-    const res = await fetch(`${apiBase}/ad/${currentAdId}/claim/${telegramId}`, {
-      method: 'POST'
+      try {
+        const res = await fetch(`${apiBase}/ad/${currentAdId}/claim/${telegramId}`, {
+          method: 'POST'
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+
+          // ФИКС: Правильное извлечение баланса
+          balance = parseFloat(data.balance); // Убедись что это число
+          updateUI();
+          saveUserToLocal();
+          showToast(data.message || 'Награда получена успешно!');
+
+          // Немедленная синхронизация
+          await syncUserData();
+          switchToSection('market');
+        } else {
+          const errorData = await res.json().catch(() => ({ error: 'unknown' }));
+          showToast(errorData.error || 'Ошибка получения награды');
+
+          // Перезагружаем статус кнопки
+          await loadClaimAd();
+        }
+      } catch (err) {
+        console.error('Claim error:', err);
+        showToast('Ошибка сети. Попробуйте позже.');
+
+        // Всегда восстанавливаем кнопку при ошибке
+        await loadClaimAd();
+      } finally {
+        claimReward.textContent = originalText;
+      }
     });
-
-    if (res.ok) {
-      const data = await res.json();
-
-      // ФИКС: Правильное извлечение баланса
-      balance = parseFloat(data.balance); // Убедись что это число
-      updateUI();
-      saveUserToLocal();
-      showToast(data.message || 'Награда получена успешно!');
-
-      // Немедленная синхронизация
-      await syncUserData();
-      switchToSection('market');
-    } else {
-      const errorData = await res.json().catch(() => ({ error: 'unknown' }));
-      showToast(errorData.error || 'Ошибка получения награды');
-
-      // Перезагружаем статус кнопки
-      await loadClaimAd();
-    }
-  } catch (err) {
-    console.error('Claim error:', err);
-    showToast('Ошибка сети. Попробуйте позже.');
-
-    // Всегда восстанавливаем кнопку при ошибке
-    await loadClaimAd();
-  } finally {
-    claimReward.textContent = originalText;
-  }
-});
 
     backToAdsFromClaimBtn.addEventListener('click', () => switchToSection('market'));
 
@@ -1863,7 +1882,6 @@
           loadTopPlayers();
           showToast('Данные обновлены');
         } else if (activeTab === 'ads') {
-          loadMyAds();
           loadAds();
           showToast('Данные обновлены');
         }
@@ -1884,7 +1902,6 @@
           loadTopPlayers();
           showToast('Данные обновлены');
         } else if (activeTab === 'ads') {
-          loadMyAds();
           loadAds();
           showToast('Данные обновлены');
         }
@@ -1923,5 +1940,3 @@
 
 </body>
 </html>
-
-
