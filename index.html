@@ -1589,26 +1589,50 @@
     });
 
     claimReward.addEventListener('click', async (e) => {
-      if (e.target.classList.contains('disabled')) return;
-      try {
-        const res = await fetch(`${apiBase}/ad/${currentAdId}/claim/${telegramId}`, {method: 'POST'});
-        const data = await res.json();
+  if (e.target.classList.contains('disabled')) return;
 
-        if (res.ok) {
-          balance = data.balance;
-          updateUI();
-          saveUserToLocal();
-          showToast(data.message || 'Награда получена успешно!');
-          switchToSection('market');
-          await syncUserData(); // Immediate sync after claim
-        } else {
-          showToast(data.error || 'Ошибка получения награды');
-        }
-      } catch (e) {
-        console.error('Claim error:', e);
-        showToast('Ошибка сети. Попробуйте позже.');
-      }
+  // disable UI immediately
+  claimReward.classList.add('disabled');
+  const originalText = claimReward.textContent;
+  claimReward.textContent = 'Обработка...';
+
+  // add client-side timeout to avoid hanging forever
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 8000); // 8s timeout
+
+  try {
+    const res = await fetch(`${apiBase}/ad/${currentAdId}/claim/${telegramId}`, {
+      method: 'POST',
+      signal: controller.signal
     });
+    clearTimeout(timeoutId);
+
+    if (res.ok) {
+      const data = await res.json();
+      balance = data.balance;
+      updateUI();
+      saveUserToLocal();
+      showToast(data.message || 'Награда получена успешно!');
+      // fire-and-forget sync: don't await, so UI remains responsive
+      syncUserData().catch(()=>{ /* optional logging */ });
+      switchToSection('market');
+    } else {
+      const data = await res.json().catch(()=>({ error: 'unknown' }));
+      showToast(data.error || 'Ошибка получения награды');
+    }
+  } catch (err) {
+    if (err.name === 'AbortError') {
+      showToast('Сервер не отвечает — попробуйте ещё раз');
+    } else {
+      console.error('Claim error (client):', err);
+      showToast('Ошибка сети. Попробуйте позже.');
+    }
+  } finally {
+    claimReward.textContent = originalText;
+    // re-check or reload claim button state
+    await loadClaimAd(); // если нужно — заново выставит disabled
+  }
+});
 
     backToAdsFromClaimBtn.addEventListener('click', () => switchToSection('market'));
 
@@ -1903,3 +1927,4 @@
 
 </body>
 </html>
+
