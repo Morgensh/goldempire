@@ -837,23 +837,29 @@
     });
 
     claimBonusBtn.addEventListener('click', async () => {
-      try {
-        const response = await fetch(`${apiBase}/claim_channel_bonus/${telegramId}`, { method: 'POST' });
-        if (response.ok) {
-          const updated = await response.json();
-          balance = parseFloat(updated.balance);
-          claimedChannelBonus = true;
-          updateUI();
-          loadBonusStatus();
-          saveUserToLocal();
-          showToast('Награда получена!');
-        } else {
-          showToast('Ошибка получения награды');
-        }
-      } catch (err) {
-        showToast('Ошибка получения награды');
-      }
-    });
+  try {
+    const response = await fetch(`${apiBase}/claim_channel_bonus/${telegramId}`, { method: 'POST' });
+    const data = await response.json();
+
+    if (response.ok && data.balance) {
+      balance = parseFloat(data.balance);
+      claimedChannelBonus = true;
+      updateUI();
+      loadBonusStatus();
+      saveUserToLocal();
+      showToast('Награда получена!');
+    } else if (data.error === 'already_claimed') {
+      claimedChannelBonus = true;
+      loadBonusStatus();
+      showToast('Награда уже получена');
+    } else {
+      showToast('Ошибка: ' + (data.error || 'неизвестно'));
+    }
+  } catch (err) {
+    showToast('Ошибка соединения');
+  }
+});
+
 
     async function loadTopPlayers() {
       try {
@@ -1584,7 +1590,7 @@ async function syncUserData() {
   try {
     const res = await fetch(`${apiBase}/ad/${currentAdId}/claim/${telegramId}`, {method: 'POST'});
     const data = await res.json();
-    
+
     if (res.ok) {
       balance = data.balance;
       updateUI();
@@ -1886,4 +1892,5 @@ async function buyPackage(packageId) {
 
 </body>
 </html>
+
 
