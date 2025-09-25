@@ -1591,46 +1591,42 @@
     claimReward.addEventListener('click', async (e) => {
   if (e.target.classList.contains('disabled')) return;
 
-  // disable UI immediately
   claimReward.classList.add('disabled');
   const originalText = claimReward.textContent;
   claimReward.textContent = 'Обработка...';
 
-  // add client-side timeout to avoid hanging forever
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 8000); // 8s timeout
-
   try {
     const res = await fetch(`${apiBase}/ad/${currentAdId}/claim/${telegramId}`, {
-      method: 'POST',
-      signal: controller.signal
+      method: 'POST'
     });
-    clearTimeout(timeoutId);
 
     if (res.ok) {
       const data = await res.json();
-      balance = data.balance;
+
+      // ФИКС: Правильное извлечение баланса
+      balance = parseFloat(data.balance); // Убедись что это число
       updateUI();
       saveUserToLocal();
       showToast(data.message || 'Награда получена успешно!');
-      // fire-and-forget sync: don't await, so UI remains responsive
-      syncUserData().catch(()=>{ /* optional logging */ });
+
+      // Немедленная синхронизация
+      await syncUserData();
       switchToSection('market');
     } else {
-      const data = await res.json().catch(()=>({ error: 'unknown' }));
-      showToast(data.error || 'Ошибка получения награды');
+      const errorData = await res.json().catch(() => ({ error: 'unknown' }));
+      showToast(errorData.error || 'Ошибка получения награды');
+
+      // Перезагружаем статус кнопки
+      await loadClaimAd();
     }
   } catch (err) {
-    if (err.name === 'AbortError') {
-      showToast('Сервер не отвечает — попробуйте ещё раз');
-    } else {
-      console.error('Claim error (client):', err);
-      showToast('Ошибка сети. Попробуйте позже.');
-    }
+    console.error('Claim error:', err);
+    showToast('Ошибка сети. Попробуйте позже.');
+
+    // Всегда восстанавливаем кнопку при ошибке
+    await loadClaimAd();
   } finally {
     claimReward.textContent = originalText;
-    // re-check or reload claim button state
-    await loadClaimAd(); // если нужно — заново выставит disabled
   }
 });
 
@@ -1927,4 +1923,5 @@
 
 </body>
 </html>
+
 
