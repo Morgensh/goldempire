@@ -971,35 +971,45 @@
     }
 
    // Синхронизация данных с сервером
+// Упрощенная синхронизация данных
 async function syncUserData() {
   try {
     const response = await fetch(`${apiBase}/sync/${telegramId}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ total_clicks: totalClicks })
+      body: JSON.stringify({
+        total_clicks: totalClicks,
+        balance: balance,
+        level: level,
+        progress: progress
+      })
     });
 
-    if (!response.ok) {
-      throw new Error('Sync failed');
+    if (response.ok) {
+      const updatedData = await response.json();
+
+      // ОБНОВЛЯЕМ ДАННЫЕ С СЕРВЕРА
+      balance = parseFloat(updatedData.balance);
+      level = updatedData.level;
+      progress = parseFloat(updatedData.progress);
+      totalClicks = updatedData.total_clicks;
+
+      // Обновляем клик-стоимость по новому уровню
+      clickValue = 2.5 * level;
+
+      saveUserToLocal();
+      updateUI();
+
+    } else if (response.status === 403) {
+      // User banned
+      showToast('Аккаунт заблокирован');
+    } else {
+      console.warn('Sync failed, using local data');
+      // Продолжаем работать с локальными данными
     }
-
-    const updatedData = await response.json();
-
-    // ОБНОВЛЯЕМ ДАННЫЕ С СЕРВЕРА (это истина)
-    balance = parseFloat(updatedData.balance);
-    level = updatedData.level;
-    progress = parseFloat(updatedData.progress);
-    totalClicks = updatedData.total_clicks; // На случай, если сервер скорректировал
-
-    // Обновляем клик-стоимость по новому уровню
-    clickValue = 2.5 * level;
-
-    saveUserToLocal();
-    updateUI(); // Чтобы сразу отобразить изменения
-
   } catch (err) {
-    console.error('Sync error:', err);
-    // Можно добалить fallback: показать toast "Нет соединения, данные локальные"
+    console.warn('Sync error, using local data:', err);
+    // Продолжаем работать с локальными данными
   }
 }
 
@@ -1571,23 +1581,24 @@ async function syncUserData() {
     });
 
     claimReward.addEventListener('click', async () => {
-      try {
-        const res = await fetch(`${apiBase}/ad/${currentAdId}/claim/${telegramId}`, {method: 'POST'});
-        if (res.ok) {
-          const updated = await res.json();
-          balance = updated.balance;
-          updateUI();
-          saveUserToLocal();
-          showToast('Награда получена');
-          switchToSection('market');
-        } else {
-          const err = await res.json();
-          showToast(err.error);
-        }
-      } catch (e) {
-        showToast('Ошибка');
-      }
-    });
+  try {
+    const res = await fetch(`${apiBase}/ad/${currentAdId}/claim/${telegramId}`, {method: 'POST'});
+    const data = await res.json();
+    
+    if (res.ok) {
+      balance = data.balance;
+      updateUI();
+      saveUserToLocal();
+      showToast(data.message || 'Награда получена успешно!');
+      switchToSection('market');
+    } else {
+      showToast(data.error || 'Ошибка получения награды');
+    }
+  } catch (e) {
+    console.error('Claim error:', e);
+    showToast('Ошибка сети. Попробуйте позже.');
+  }
+});
 
     backToAdsFromClaimBtn.addEventListener('click', () => switchToSection('market'));
 
@@ -1875,3 +1886,4 @@ async function buyPackage(packageId) {
 
 </body>
 </html>
+
