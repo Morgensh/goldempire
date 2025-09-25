@@ -605,6 +605,7 @@
     let lastCollectTimestamp = null;
     let productionInterval = null;
     let lastClaimTime = 0;
+    let lastSaveTime = 0
     let pendingIncome = 0;
     let incomeInterval = null;
     const LOCAL_STORAGE_KEY = `user_data_${telegramId}`;
@@ -704,6 +705,21 @@
     const claimReward = document.getElementById('claim-reward');
     const backToAdsFromClaimBtn = document.getElementById('back-to-ads-from-claim-btn');
     const showMyAdsBtn = document.getElementById('show-my-ads-btn');
+
+    setInterval(() => {
+  if (Date.now() - lastSaveTime > 3000) {
+    saveUserToLocal();
+    lastSaveTime = Date.now();
+  }
+}, 1000);
+
+// Сохранять при скрытии приложения
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) {
+    saveUserToLocal();
+    syncUserData();
+  }
+});
 
     // Переключение разделов
     function switchToSection(sectionId) {
@@ -989,46 +1005,32 @@
     }
 
     // Синхронизация данных с сервером
-    async function syncUserData() {
-      try {
-        const response = await fetch(`${apiBase}/sync/${telegramId}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            total_clicks: totalClicks,
-            balance: balance,
-            level: level,
-            progress: progress
-          })
-        });
+async function syncUserData() {
+  try {
+    const response = await fetch(`${apiBase}/sync/${telegramId}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        total_clicks: totalClicks,
+        balance: balance,
+        level: level,
+        progress: progress
+      })
+    });
 
-        if (response.ok) {
-          const updatedData = await response.json();
-
-          // ОБНОВЛЯЕМ ДАННЫЕ С СЕРВЕРА
-          balance = parseFloat(updatedData.balance);
-          level = updatedData.level;
-          progress = parseFloat(updatedData.progress);
-          totalClicks = updatedData.total_clicks;
-
-          // Обновляем клик-стоимость по новому уровню
-          clickValue = 2.5 * level;
-
-          saveUserToLocal();
-          updateUI();
-
-        } else if (response.status === 403) {
-          // User banned
-          showToast('Аккаунт заблокирован');
-        } else {
-          console.warn('Sync failed, using local data');
-          // Продолжаем работать с локальными данными
-        }
-      } catch (err) {
-        console.warn('Sync error, using local data:', err);
-        // Продолжаем работать с локальными данными
-      }
+    if (response.ok) {
+      // Просто логируем успех, не перезаписываем локальные данные
+      console.log('✅ Данные синхронизированы с сервером');
+    } else if (response.status === 403) {
+      // User banned
+      showToast('Аккаунт заблокирован');
+    } else {
+      console.warn('Sync failed, using local data');
     }
+  } catch (err) {
+    console.warn('Sync error, using local data:', err);
+  }
+}
 
     // Сохранение в localStorage
     function saveUserToLocal() {
@@ -1940,3 +1942,4 @@
 
 </body>
 </html>
+
