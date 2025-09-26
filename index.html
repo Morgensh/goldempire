@@ -264,6 +264,27 @@
     .hidden {
       display: none;
     }
+    .btn.waiting {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background-color: #ccc !important;
+  pointer-events: none;
+}
+
+.btn.waiting:hover {
+  transform: none !important;
+}
+
+/* Анимация для кнопок в ожидании */
+.btn.waiting {
+  animation: pulse-waiting 1.5s infinite;
+}
+
+@keyframes pulse-waiting {
+  0% { opacity: 0.6; }
+  50% { opacity: 0.8; }
+  100% { opacity: 0.6; }
+}
   </style>
 </head>
 <body>
@@ -390,48 +411,36 @@
       </div>
     </div>
 
-
     <!-- Создание объявления -->
-<div class="section" id="create-ad-section">
-  <h2 class="section-title">Создать объявление</h2>
-  <p>Добавьте бота в админы вашего канала, дав ему права на управление сообщениями и добавление подписчиков. Бот будет проверять подписки и опубликует пост с призывом играть.</p>
-  <p>Создание объявления возможно лишь когда наш бот отправит свой пост в ваш канал, без этого объявление невозможно выложить.</p>
-
-  <div class="card" id="ad-form">
-    <input id="channel-input" placeholder="Юзернейм канала без @">
-    <input id="reward-input" type="number" placeholder="Награда за подписку">
-    <input id="budget-input" type="number" placeholder="Бюджет (снимается сразу)">
-    <div class="btn" id="create-ad-submit">Создать объявление</div>
-  </div>
-
-  <div id="ad-step2" style="display:none;">
-    <div class="btn" id="confirm-bot-added">Я добавил бота в канал</div>
-    <div class="btn disabled" id="publish-bot-post">Бот может опубликовать свой пост</div>
-    <div class="btn disabled" id="publish-ad">Опубликовать объявление</div>
-    <!-- ДОБАВИТЬ ВНУТРЬ ad-step2 -->
-    <div id="waiting-message" style="display:none; text-align:center; margin:10px 0; color:#666;">
-      Подождите <span id="countdown">30</span> секунд...
+    <div class="section" id="create-ad-section">
+      <h2 class="section-title">Создать объявление</h2>
+      <p>Добавьте бота в админы вашего канала, дав ему права на управление сообщениями и добавление подписчиков. Бот будет проверять подписки и опубликует пост с призывом играть.</p>
+      <p>Создание объявления возможно лишь когда наш бот отправит свой пост в ваш канал, без этого объявление невозможно выложить.</p>
+      <div class="card" id="ad-form">
+        <input id="channel-input" placeholder="Юзернейм канала без @">
+        <input id="reward-input" type="number" placeholder="Награда за подписку">
+        <input id="budget-input" type="number" placeholder="Бюджет (снимается сразу)">
+        <div class="btn" id="create-ad-submit">Создать объявление</div>
+      </div>
+      <div id="ad-step2" style="display:none;">
+        <div class="btn" id="confirm-bot-added">Я добавил бота в канал</div>
+        <div class="btn disabled" id="publish-bot-post">Бот может опубликовать свой пост</div>
+        <div class="btn disabled" id="publish-ad">Опубликовать объявление</div>
+      </div>
+      <div class="btn" id="back-to-ads-btn">Назад</div>
     </div>
-  </div>
-
-  <div class="btn" id="back-to-ads-btn">Назад</div>
-</div>
 
     <!-- Получение награды за объявление -->
     <div class="section" id="claim-ad-section">
-  <h2 class="section-title">Объявление</h2>
-  <div class="card">
-    <div>Канал: <span id="claim-channel"></span></div>
-    <a id="subscribe-link" href="" class="btn">Подписаться</a>
-    <div class="btn" id="check-subscribed">Я подписался</div>
-    <div class="btn disabled" id="claim-reward">Получить награду</div>
-    <!-- ПЕРЕМЕСТИТЬ СЮДА -->
-    <div id="claim-waiting" style="display:none; text-align:center; margin:10px 0; color:#666;">
-      Проверяем подписку... <span id="claim-countdown">10</span> сек
+      <h2 class="section-title">Объявление</h2>
+      <div class="card">
+        <div>Канал: <span id="claim-channel"></span></div>
+        <a id="subscribe-link" href="" class="btn">Подписаться</a>
+        <div class="btn" id="check-subscribed">Я подписался</div>
+        <div class="btn disabled" id="claim-reward">Получить награду</div>
+      </div>
+      <div class="btn" id="back-to-ads-from-claim-btn">Назад</div>
     </div>
-  </div>
-  <div class="btn" id="back-to-ads-from-claim-btn">Назад</div>
-</div>
 
     <!-- Покупка акций -->
     <div class="section" id="stock-buy-section">
@@ -1485,29 +1494,38 @@
 
     // Загрузка объявлений
     async function loadAds() {
-      try {
-        const response = await fetch(`${apiBase}/ads`);
-        const ads = await response.json();
-        adsList.innerHTML = '';
-        ads.forEach(ad => {
-          const card = document.createElement('div');
-          card.classList.add('card');
-          card.innerHTML = `
-            <div>Создатель: @${ad.creator_username}</div>
-            <div>Награда: $${Number(ad.reward).toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
-            <div>Бюджет: $${Number(ad.budget).toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
-          `;
-          card.addEventListener('click', () => {
-            currentAdId = ad.id;
-            currentChannel = ad.channel_username;
-            switchToSection('claim-ad');
-          });
-          adsList.appendChild(card);
-        });
-      } catch (err) {
-        console.error('Load ads error:', err);
-      }
-    }
+  try {
+    const response = await fetch(`${apiBase}/ads`);
+    const ads = await response.json();
+    adsList.innerHTML = '';
+    ads.forEach(ad => {
+      const card = document.createElement('div');
+      card.classList.add('card');
+
+      // Рассчитываем сколько человек уже забрали награду
+      const claimedCount = Math.floor((ad.budget - ad.remaining) / ad.reward);
+      const remainingClaims = Math.floor(ad.remaining / ad.reward);
+
+      card.innerHTML = `
+        <div>Создатель: @${ad.creator_username}</div>
+        <div>Награда: $${Number(ad.reward).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>
+        <div>Бюджет: $${Number(ad.budget).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>
+        <div>Осталось бюджета: $${Number(ad.remaining).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>
+        <div style="font-size: 12px; color: #666;">
+          Уже забрали: ${claimedCount} человек | Осталось мест: ${remainingClaims}
+        </div>
+      `;
+      card.addEventListener('click', () => {
+        currentAdId = ad.id;
+        currentChannel = ad.channel_username;
+        switchToSection('claim-ad');
+      });
+      adsList.appendChild(card);
+    });
+  } catch (err) {
+    console.error('Load ads error:', err);
+  }
+}
 
     createAdBtn.addEventListener('click', () => switchToSection('create-ad'));
 
@@ -1544,34 +1562,6 @@
     });
 
     confirmBotAdded.addEventListener('click', async () => {
-  if (confirmBotAdded.classList.contains('disabled')) {
-    showToast('Подождите...');
-    return;
-  }
-
-  // Блокируем кнопку на 30 секунд
-  confirmBotAdded.classList.add('disabled');
-  confirmBotAdded.textContent = 'Проверяем...';
-
-  const waitingMessage = document.getElementById('waiting-message');
-  const countdownEl = document.getElementById('countdown');
-  waitingMessage.style.display = 'block';
-
-  let seconds = 30;
-  const countdown = setInterval(() => {
-    seconds--;
-    countdownEl.textContent = seconds;
-    if (seconds <= 0) {
-      clearInterval(countdown);
-      waitingMessage.style.display = 'none';
-      confirmBotAdded.classList.remove('disabled');
-      confirmBotAdded.textContent = 'Я добавил бота в канал';
-    }
-  }, 1000);
-
-  try {
-    // Ждем 10 секунд перед проверкой
-    setTimeout(async () => {
       try {
         const res = await fetch(`${apiBase}/ad/${currentAdId}/is_bot_admin/${telegramId}`);
         const data = await res.json();
@@ -1582,63 +1572,55 @@
           showToast('Бот не добавлен или без прав');
         }
       } catch (e) {
-        showToast('Ошибка проверки');
+        showToast('Ошибка');
       }
-    }, 10000); // 10 секунд задержки
-  } catch (e) {
-    showToast('Ошибка');
-    clearInterval(countdown);
-    waitingMessage.style.display = 'none';
-    confirmBotAdded.classList.remove('disabled');
-    confirmBotAdded.textContent = 'Я добавил бота в канал';
-  }
-});
+    });
 
     publishBotPost.addEventListener('click', async (e) => {
-  if (e.target.classList.contains('disabled')) return;
+  if (e.target.classList.contains('disabled') || e.target.classList.contains('waiting')) return;
 
-  // Блокируем на 30 секунд
-  publishBotPost.classList.add('disabled');
-  const originalText = publishBotPost.textContent;
-  publishBotPost.textContent = 'Публикуем...';
+  // Блокируем кнопку на 30 секунд
+  e.target.classList.add('waiting');
+  e.target.textContent = 'Ожидайте 30 сек...';
 
-  const waitingMessage = document.getElementById('waiting-message');
-  const countdownEl = document.getElementById('countdown');
-  waitingMessage.style.display = 'block';
-
-  let seconds = 30;
-  const countdown = setInterval(() => {
-    seconds--;
-    countdownEl.textContent = seconds;
-    if (seconds <= 0) {
-      clearInterval(countdown);
-      waitingMessage.style.display = 'none';
-      publishBotPost.classList.remove('disabled');
-      publishBotPost.textContent = originalText;
-    }
-  }, 1000);
+  // Блокируем другие кнопки
+  confirmBotAdded.classList.add('disabled');
+  publishAd.classList.add('disabled');
 
   try {
-    // Ждем 10 секунд перед публикацией
-    setTimeout(async () => {
-      try {
-        const res = await fetch(`${apiBase}/ad/${currentAdId}/publish_post/${telegramId}`, {method: 'POST'});
-        if (res.ok) {
-          publishAd.classList.remove('disabled');
-          showToast('Пост опубликован');
-        } else {
-          showToast('Ошибка публикации поста');
+    const res = await fetch(`${apiBase}/ad/${currentAdId}/publish_post/${telegramId}`, {method: 'POST'});
+
+    if (res.ok) {
+      // Ждем 30 секунд перед разблокировкой
+      setTimeout(() => {
+        publishAd.classList.remove('disabled');
+        publishBotPost.classList.remove('waiting');
+        publishBotPost.textContent = 'Бот может опубликовать свой пост';
+        showToast('Пост опубликован! Теперь можно публиковать объявление');
+      }, 30000);
+
+      // Обратный отсчет
+      let secondsLeft = 30;
+      const countdown = setInterval(() => {
+        secondsLeft--;
+        publishBotPost.textContent = `Ожидайте ${secondsLeft} сек...`;
+        if (secondsLeft <= 0) {
+          clearInterval(countdown);
         }
-      } catch (e) {
-        showToast('Ошибка публикации');
-      }
-    }, 10000); // 10 секунд задержки
+      }, 1000);
+
+    } else {
+      showToast('Ошибка публикации поста');
+      // Разблокируем при ошибке
+      publishBotPost.classList.remove('waiting');
+      publishBotPost.textContent = 'Бот может опубликовать свой пост';
+      confirmBotAdded.classList.remove('disabled');
+    }
   } catch (e) {
-    showToast('Ошибка');
-    clearInterval(countdown);
-    waitingMessage.style.display = 'none';
-    publishBotPost.classList.remove('disabled');
-    publishBotPost.textContent = originalText;
+    showToast('Ошибка сети');
+    publishBotPost.classList.remove('waiting');
+    publishBotPost.textContent = 'Бот может опубликовать свой пост';
+    confirmBotAdded.classList.remove('disabled');
   }
 });
 
@@ -1667,54 +1649,45 @@
     }
 
     checkSubscribed.addEventListener('click', async () => {
-  if (checkSubscribed.classList.contains('disabled')) {
-    showToast('Подождите...');
-    return;
-  }
+  if (checkSubscribed.classList.contains('waiting')) return;
 
   // Блокируем на 10 секунд
-  checkSubscribed.classList.add('disabled');
+  checkSubscribed.classList.add('waiting');
   const originalText = checkSubscribed.textContent;
-  checkSubscribed.textContent = 'Проверяем...';
-
-  const waitingMessage = document.getElementById('claim-waiting');
-  const countdownEl = document.getElementById('claim-countdown');
-  waitingMessage.style.display = 'block';
-
-  let seconds = 10;
-  const countdown = setInterval(() => {
-    seconds--;
-    countdownEl.textContent = seconds;
-    if (seconds <= 0) {
-      clearInterval(countdown);
-      waitingMessage.style.display = 'none';
-      checkSubscribed.classList.remove('disabled');
-      checkSubscribed.textContent = originalText;
-    }
-  }, 1000);
+  checkSubscribed.textContent = 'Проверяем подписку... 10 сек';
 
   try {
-    // Ждем 5 секунд перед проверкой
-    setTimeout(async () => {
-      try {
-        const res = await fetch(`${apiBase}/ad/${currentAdId}/check_subscribed/${telegramId}`);
-        const data = await res.json();
-        if (data.subscribed) {
-          claimReward.classList.remove('disabled');
-          claimReward.classList.add('btn-green');
-          showToast('Подписка подтверждена');
-        } else {
-          showToast('Не подписаны');
-        }
-      } catch (e) {
-        showToast('Ошибка проверки');
+    const res = await fetch(`${apiBase}/ad/${currentAdId}/check_subscribed/${telegramId}`);
+    const data = await res.json();
+
+    // Ждем 10 секунд
+    setTimeout(() => {
+      if (data.subscribed) {
+        claimReward.classList.remove('disabled');
+        claimReward.classList.add('btn-green');
+        showToast('Подписка подтверждена!');
+      } else {
+        showToast(data.details || 'Не подписаны на канал');
       }
-    }, 5000); // 5 секунд задержки
+
+      checkSubscribed.classList.remove('waiting');
+      checkSubscribed.textContent = originalText;
+    }, 10000);
+
+    // Обратный отсчет
+    let secondsLeft = 10;
+    const countdown = setInterval(() => {
+      secondsLeft--;
+      checkSubscribed.textContent = `Проверяем подписку... ${secondsLeft} сек`;
+      if (secondsLeft <= 0) {
+        clearInterval(countdown);
+        checkSubscribed.textContent = 'Проверка завершена';
+      }
+    }, 1000);
+
   } catch (e) {
-    showToast('Ошибка');
-    clearInterval(countdown);
-    waitingMessage.style.display = 'none';
-    checkSubscribed.classList.remove('disabled');
+    showToast('Ошибка проверки');
+    checkSubscribed.classList.remove('waiting');
     checkSubscribed.textContent = originalText;
   }
 });
@@ -2071,4 +2044,5 @@ async function loadHoldings() {
 
 </body>
 </html>
+
 
