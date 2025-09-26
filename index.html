@@ -1473,29 +1473,30 @@
 
     // Загрузка объявлений
     async function loadAds() {
-      try {
-        const response = await fetch(`${apiBase}/ads`);
-        const ads = await response.json();
-        adsList.innerHTML = '';
-        ads.forEach(ad => {
-          const card = document.createElement('div');
-          card.classList.add('card');
-          card.innerHTML = `
-            <div>Создатель: @${ad.creator_username}</div>
-            <div>Награда: $${Number(ad.reward).toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
-            <div>Бюджет: $${Number(ad.budget).toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
-          `;
-          card.addEventListener('click', () => {
-            currentAdId = ad.id;
-            currentChannel = ad.channel_username;
-            switchToSection('claim-ad');
-          });
-          adsList.appendChild(card);
-        });
-      } catch (err) {
-        console.error('Load ads error:', err);
-      }
-    }
+  try {
+    const response = await fetch(`${apiBase}/ads`);
+    const ads = await response.json();
+    adsList.innerHTML = '';
+    ads.forEach(ad => {
+      const card = document.createElement('div');
+      card.classList.add('card');
+      card.innerHTML = `
+        <div>Создатель: @${ad.creator_username}</div>
+        <div>Награда: $${Number(ad.reward).toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
+        <div>Бюджет: $${Number(ad.budget).toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
+        <div>Остаток: $${Number(ad.remaining).toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
+      `;
+      card.addEventListener('click', () => {
+        currentAdId = ad.id;
+        currentChannel = ad.channel_username;
+        switchToSection('claim-ad');
+      });
+      adsList.appendChild(card);
+    });
+  } catch (err) {
+    console.error('Load ads error:', err);
+  }
+}
 
     createAdBtn.addEventListener('click', () => switchToSection('create-ad'));
 
@@ -1547,19 +1548,33 @@
     });
 
     publishBotPost.addEventListener('click', async (e) => {
-      if (e.target.classList.contains('disabled')) return;
-      try {
-        const res = await fetch(`${apiBase}/ad/${currentAdId}/publish_post/${telegramId}`, {method: 'POST'});
-        if (res.ok) {
+  if (e.target.classList.contains('disabled')) return;
+  try {
+    const res = await fetch(`${apiBase}/ad/${currentAdId}/publish_post/${telegramId}`, {method: 'POST'});
+    if (res.ok) {
+      showToast('Пост опубликован');
+      publishBotPost.classList.add('disabled'); // Отключаем повторно
+      let countdown = 30;
+      const timerEl = document.createElement('div');
+      timerEl.textContent = `Подождите ${countdown} сек...`;
+      document.getElementById('ad-step2').appendChild(timerEl);
+      const interval = setInterval(() => {
+        countdown--;
+        timerEl.textContent = `Подождите ${countdown} сек...`;
+        if (countdown <= 0) {
+          clearInterval(interval);
+          timerEl.remove();
           publishAd.classList.remove('disabled');
-          showToast('Пост опубликован');
-        } else {
-          showToast('Ошибка публикации поста');
+          showToast('Теперь можно опубликовать объявление');
         }
-      } catch (e) {
-        showToast('Ошибка');
-      }
-    });
+      }, 1000);
+    } else {
+      showToast('Ошибка публикации поста');
+    }
+  } catch (e) {
+    showToast('Ошибка');
+  }
+});
 
     publishAd.addEventListener('click', async (e) => {
       if (e.target.classList.contains('disabled')) return;
@@ -1602,38 +1617,48 @@
     });
 
     claimReward.addEventListener('click', async (e) => {
-      if (e.target.classList.contains('disabled')) return;
+  if (e.target.classList.contains('disabled')) return;
 
-      claimReward.classList.add('disabled');
-      const originalText = claimReward.textContent;
-      claimReward.textContent = 'Обработка...';
+  claimReward.classList.add('disabled');
+  const originalText = claimReward.textContent;
+  claimReward.textContent = 'Обработка...';
 
-      try {
-        const res = await fetch(`${apiBase}/ad/${currentAdId}/claim/${telegramId}`, {
-          method: 'POST'
-        });
+  try {
+    // Дополнительная проверка на claimed
+    const checkClaimedRes = await fetch(`${apiBase}/ad/${currentAdId}/check_claimed/${telegramId}`);
+    const checkClaimed = await checkClaimedRes.json();
+    if (checkClaimed.claimed) {
+      showToast('Награда уже получена');
+      await loadClaimAd();
+      return;
+    }
 
-        if (res.ok) {
-          const data = await res.json();
-          balance = Number(data.balance);
-          updateUI();
-          saveUserToLocal();
-          showToast(data.message || 'Награда получена успешно!');
-          await syncUserData();
-          switchToSection('market');
-        } else {
-          const errorData = await res.json().catch(() => ({ error: 'unknown' }));
-          showToast(errorData.error || 'Ошибка получения награды');
-          await loadClaimAd();
-        }
-      } catch (err) {
-        console.error('Claim error:', err);
-        showToast('Ошибка сети. Попробуйте позже.');
-        await loadClaimAd();
-      } finally {
-        claimReward.textContent = originalText;
-      }
+    const res = await fetch(`${apiBase}/ad/${currentAdId}/claim/${telegramId}`, {
+      method: 'POST'
     });
+
+    if (res.ok) {
+      const data = await res.json();
+      balance = Number(data.balance);
+      updateUI();
+      saveUserToLocal();
+      showToast(data.message || 'Награда получена успешно!');
+      await syncUserData();
+      await loadAds(); // Обновить список ads с новым remaining
+      switchToSection('market');
+    } else {
+      const errorData = await res.json().catch(() => ({ error: 'unknown' }));
+      showToast(errorData.error || 'Ошибка получения награды');
+      await loadClaimAd();
+    }
+  } catch (err) {
+    console.error('Claim error:', err);
+    showToast('Ошибка сети. Попробуйте позже.');
+    await loadClaimAd();
+  } finally {
+    claimReward.textContent = originalText;
+  }
+});
 
     backToAdsFromClaimBtn.addEventListener('click', () => switchToSection('market'));
 
@@ -1926,3 +1951,4 @@
 
 </body>
 </html>
+
