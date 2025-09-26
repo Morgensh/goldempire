@@ -1730,37 +1730,64 @@
     backToMarketServantBtn.addEventListener('click', () => switchToSection('market'));
 
     // Загрузка холдингов
-    async function loadHoldings() {
+    // Загрузка холдингов - FIXED VERSION
+async function loadHoldings() {
+  try {
+    const response = await fetch(`${apiBase}/holdings/${telegramId}`);
+    const holdings = await response.json();
+    holdingsList.innerHTML = '';
+
+    holdings.forEach(holding => {
+      const card = document.createElement('div');
+      card.classList.add('card');
+
+      // Используем BigInt для больших чисел
+      const shares = BigInt(holding.shares);
+      const avgPrice = parseFloat(holding.avg_price);
+      const currentPrice = parseFloat(holding.current_price);
+
+      // Безопасный расчет дохода
+      let profit = 0;
       try {
-        const response = await fetch(`${apiBase}/holdings/${telegramId}`);
-        const holdings = await response.json();
-        holdingsList.innerHTML = '';
-        holdings.forEach(holding => {
-          const card = document.createElement('div');
-          card.classList.add('card');
-          card.innerHTML = `
-            <div>Компания: ${holding.name}</div>
-            <div>Акций: ${Number(holding.shares).toLocaleString('en-US')}</div>
-            <div>Куплено по: $${Number(holding.avg_price).toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
-            <div>Текущая цена: $${Number(holding.current_price).toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
-            <div>Доход: $${Number(holding.profit).toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
-            <div class="btn" data-action="buy-more">Купить еще</div>
-            <div class="btn" data-action="sell">Продать</div>
-          `;
-          card.querySelector('[data-action="buy-more"]').addEventListener('click', () => {
-            currentCompanyId = holding.company_id;
-            switchToSection('stock-buy');
-          });
-          card.querySelector('[data-action="sell"]').addEventListener('click', () => {
-            currentCompanyId = holding.company_id;
-            switchToSection('stock-sell');
-          });
-          holdingsList.appendChild(card);
-        });
-      } catch (err) {
-        console.error('Load holdings error:', err);
+        // Для очень больших чисел используем BigInt
+        if (shares > 1000000000) { // Если больше 1 миллиарда
+          const priceDiff = BigInt(Math.floor(currentPrice * 100)) - BigInt(Math.floor(avgPrice * 100));
+          profit = Number((priceDiff * shares) / 100n);
+        } else {
+          // Для обычных чисел обычная арифметика
+          profit = (currentPrice - avgPrice) * Number(shares);
+        }
+      } catch (e) {
+        console.error('Profit calculation error:', e);
+        profit = 0;
       }
-    }
+
+      card.innerHTML = `
+        <div>Компания: ${holding.name}</div>
+        <div>Акций: ${shares.toLocaleString('en-US')}</div>
+        <div>Куплено по: $${avgPrice.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>
+        <div>Текущая цена: $${currentPrice.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>
+        <div>Доход: $${profit.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>
+        <div class="btn" data-action="buy-more">Купить еще</div>
+        <div class="btn" data-action="sell">Продать</div>
+      `;
+
+      card.querySelector('[data-action="buy-more"]').addEventListener('click', () => {
+        currentCompanyId = holding.company_id;
+        switchToSection('stock-buy');
+      });
+
+      card.querySelector('[data-action="sell"]').addEventListener('click', () => {
+        currentCompanyId = holding.company_id;
+        switchToSection('stock-sell');
+      });
+
+      holdingsList.appendChild(card);
+    });
+  } catch (err) {
+    console.error('Load holdings error:', err);
+  }
+}
 
     // Загрузка слуг
     async function loadServants() {
@@ -1926,3 +1953,4 @@
 
 </body>
 </html>
+
