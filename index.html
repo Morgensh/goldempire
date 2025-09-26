@@ -264,27 +264,6 @@
     .hidden {
       display: none;
     }
-    .btn.waiting {
-  opacity: 0.6;
-  cursor: not-allowed;
-  background-color: #ccc !important;
-  pointer-events: none;
-}
-
-.btn.waiting:hover {
-  transform: none !important;
-}
-
-/* Анимация для кнопок в ожидании */
-.btn.waiting {
-  animation: pulse-waiting 1.5s infinite;
-}
-
-@keyframes pulse-waiting {
-  0% { opacity: 0.6; }
-  50% { opacity: 0.8; }
-  100% { opacity: 0.6; }
-}
   </style>
 </head>
 <body>
@@ -869,20 +848,52 @@
     }
 
     checkSubBtn.addEventListener('click', async () => {
-      try {
-        const response = await fetch(`${apiBase}/check_channel_sub/${telegramId}`);
-        const data = await response.json();
-        if (data.subscribed) {
-          claimBonusBtn.classList.remove('disabled');
-          claimBonusBtn.classList.add('btn-green');
-          showToast('Подписка подтверждена!');
-        } else {
-          showToast('Вы не подписаны на канал');
-        }
-      } catch (err) {
-        showToast('Ошибка проверки подписки');
+  if (checkSubBtn.classList.contains('waiting')) return;
+
+  // Блокируем кнопку на 10 секунд
+  checkSubBtn.classList.add('waiting');
+  const originalText = checkSubBtn.textContent;
+  checkSubBtn.textContent = 'Проверяем... 10 сек';
+
+  // Блокируем другие кнопки
+  claimBonusBtn.classList.add('disabled');
+
+  try {
+    const response = await fetch(`${apiBase}/check_channel_sub/${telegramId}`);
+    const data = await response.json();
+
+    // Ждем 10 секунд перед показом результата
+    setTimeout(() => {
+      if (data.subscribed) {
+        claimBonusBtn.classList.remove('disabled');
+        claimBonusBtn.classList.add('btn-green');
+        showToast('Подписка подтверждена!');
+      } else {
+        showToast('Вы не подписаны на канал');
       }
-    });
+
+      // Разблокируем кнопку
+      checkSubBtn.classList.remove('waiting');
+      checkSubBtn.textContent = originalText;
+    }, 10000);
+
+    // Обратный отсчет
+    let secondsLeft = 10;
+    const countdown = setInterval(() => {
+      secondsLeft--;
+      checkSubBtn.textContent = `Проверяем... ${secondsLeft} сек`;
+      if (secondsLeft <= 0) {
+        clearInterval(countdown);
+        checkSubBtn.textContent = 'Проверка завершена';
+      }
+    }, 1000);
+
+  } catch (err) {
+    showToast('Ошибка проверки подписки');
+    checkSubBtn.classList.remove('waiting');
+    checkSubBtn.textContent = originalText;
+  }
+});
 
     claimBonusBtn.addEventListener('click', async (e) => {
       if (e.target.classList.contains('disabled')) return;
@@ -1494,38 +1505,29 @@
 
     // Загрузка объявлений
     async function loadAds() {
-  try {
-    const response = await fetch(`${apiBase}/ads`);
-    const ads = await response.json();
-    adsList.innerHTML = '';
-    ads.forEach(ad => {
-      const card = document.createElement('div');
-      card.classList.add('card');
-
-      // Рассчитываем сколько человек уже забрали награду
-      const claimedCount = Math.floor((ad.budget - ad.remaining) / ad.reward);
-      const remainingClaims = Math.floor(ad.remaining / ad.reward);
-
-      card.innerHTML = `
-        <div>Создатель: @${ad.creator_username}</div>
-        <div>Награда: $${Number(ad.reward).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>
-        <div>Бюджет: $${Number(ad.budget).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>
-        <div>Осталось бюджета: $${Number(ad.remaining).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>
-        <div style="font-size: 12px; color: #666;">
-          Уже забрали: ${claimedCount} человек | Осталось мест: ${remainingClaims}
-        </div>
-      `;
-      card.addEventListener('click', () => {
-        currentAdId = ad.id;
-        currentChannel = ad.channel_username;
-        switchToSection('claim-ad');
-      });
-      adsList.appendChild(card);
-    });
-  } catch (err) {
-    console.error('Load ads error:', err);
-  }
-}
+      try {
+        const response = await fetch(`${apiBase}/ads`);
+        const ads = await response.json();
+        adsList.innerHTML = '';
+        ads.forEach(ad => {
+          const card = document.createElement('div');
+          card.classList.add('card');
+          card.innerHTML = `
+            <div>Создатель: @${ad.creator_username}</div>
+            <div>Награда: $${Number(ad.reward).toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
+            <div>Бюджет: $${Number(ad.budget).toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
+          `;
+          card.addEventListener('click', () => {
+            currentAdId = ad.id;
+            currentChannel = ad.channel_username;
+            switchToSection('claim-ad');
+          });
+          adsList.appendChild(card);
+        });
+      } catch (err) {
+        console.error('Load ads error:', err);
+      }
+    }
 
     createAdBtn.addEventListener('click', () => switchToSection('create-ad'));
 
@@ -1577,52 +1579,19 @@
     });
 
     publishBotPost.addEventListener('click', async (e) => {
-  if (e.target.classList.contains('disabled') || e.target.classList.contains('waiting')) return;
-
-  // Блокируем кнопку на 30 секунд
-  e.target.classList.add('waiting');
-  e.target.textContent = 'Ожидайте 30 сек...';
-
-  // Блокируем другие кнопки
-  confirmBotAdded.classList.add('disabled');
-  publishAd.classList.add('disabled');
-
-  try {
-    const res = await fetch(`${apiBase}/ad/${currentAdId}/publish_post/${telegramId}`, {method: 'POST'});
-
-    if (res.ok) {
-      // Ждем 30 секунд перед разблокировкой
-      setTimeout(() => {
-        publishAd.classList.remove('disabled');
-        publishBotPost.classList.remove('waiting');
-        publishBotPost.textContent = 'Бот может опубликовать свой пост';
-        showToast('Пост опубликован! Теперь можно публиковать объявление');
-      }, 30000);
-
-      // Обратный отсчет
-      let secondsLeft = 30;
-      const countdown = setInterval(() => {
-        secondsLeft--;
-        publishBotPost.textContent = `Ожидайте ${secondsLeft} сек...`;
-        if (secondsLeft <= 0) {
-          clearInterval(countdown);
+      if (e.target.classList.contains('disabled')) return;
+      try {
+        const res = await fetch(`${apiBase}/ad/${currentAdId}/publish_post/${telegramId}`, {method: 'POST'});
+        if (res.ok) {
+          publishAd.classList.remove('disabled');
+          showToast('Пост опубликован');
+        } else {
+          showToast('Ошибка публикации поста');
         }
-      }, 1000);
-
-    } else {
-      showToast('Ошибка публикации поста');
-      // Разблокируем при ошибке
-      publishBotPost.classList.remove('waiting');
-      publishBotPost.textContent = 'Бот может опубликовать свой пост';
-      confirmBotAdded.classList.remove('disabled');
-    }
-  } catch (e) {
-    showToast('Ошибка сети');
-    publishBotPost.classList.remove('waiting');
-    publishBotPost.textContent = 'Бот может опубликовать свой пост';
-    confirmBotAdded.classList.remove('disabled');
-  }
-});
+      } catch (e) {
+        showToast('Ошибка');
+      }
+    });
 
     publishAd.addEventListener('click', async (e) => {
       if (e.target.classList.contains('disabled')) return;
@@ -1649,48 +1618,20 @@
     }
 
     checkSubscribed.addEventListener('click', async () => {
-  if (checkSubscribed.classList.contains('waiting')) return;
-
-  // Блокируем на 10 секунд
-  checkSubscribed.classList.add('waiting');
-  const originalText = checkSubscribed.textContent;
-  checkSubscribed.textContent = 'Проверяем подписку... 10 сек';
-
-  try {
-    const res = await fetch(`${apiBase}/ad/${currentAdId}/check_subscribed/${telegramId}`);
-    const data = await res.json();
-
-    // Ждем 10 секунд
-    setTimeout(() => {
-      if (data.subscribed) {
-        claimReward.classList.remove('disabled');
-        claimReward.classList.add('btn-green');
-        showToast('Подписка подтверждена!');
-      } else {
-        showToast(data.details || 'Не подписаны на канал');
+      try {
+        const res = await fetch(`${apiBase}/ad/${currentAdId}/check_subscribed/${telegramId}`);
+        const data = await res.json();
+        if (data.subscribed) {
+          claimReward.classList.remove('disabled');
+          claimReward.classList.add('btn-green');
+          showToast('Подписка подтверждена');
+        } else {
+          showToast('Не подписаны');
+        }
+      } catch (e) {
+        showToast('Ошибка');
       }
-
-      checkSubscribed.classList.remove('waiting');
-      checkSubscribed.textContent = originalText;
-    }, 10000);
-
-    // Обратный отсчет
-    let secondsLeft = 10;
-    const countdown = setInterval(() => {
-      secondsLeft--;
-      checkSubscribed.textContent = `Проверяем подписку... ${secondsLeft} сек`;
-      if (secondsLeft <= 0) {
-        clearInterval(countdown);
-        checkSubscribed.textContent = 'Проверка завершена';
-      }
-    }, 1000);
-
-  } catch (e) {
-    showToast('Ошибка проверки');
-    checkSubscribed.classList.remove('waiting');
-    checkSubscribed.textContent = originalText;
-  }
-});
+    });
 
     claimReward.addEventListener('click', async (e) => {
       if (e.target.classList.contains('disabled')) return;
