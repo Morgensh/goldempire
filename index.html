@@ -693,6 +693,18 @@
     const backToAdsFromClaimBtn = document.getElementById('back-to-ads-from-claim-btn');
     const showMyAdsBtn = document.getElementById('show-my-ads-btn');
 
+    // helper для безопасной работы с числами в элементах
+    function parseNumFromEl(el) {
+      if (!el) return 0;
+      const raw = el.dataset.raw ?? el.textContent ?? '';
+      return Number(String(raw).replace(/[^0-9\.\-]/g, '')) || 0;
+    }
+    function setNumToEl(el, num) {
+      const n = Number(num) || 0;
+      el.dataset.raw = String(n);
+      el.textContent = n.toLocaleString('en-US');
+    }
+
     // Периодическая проверка на сохранение
     setInterval(() => {
       if (Date.now() - lastSaveTime > 3000) {
@@ -1231,7 +1243,7 @@
         const company = await response.json();
         companyNameEl.textContent = company.name;
         companyClientsEl.textContent = Number(company.clients_count).toLocaleString('en-US');
-        companyIssuedEl.textContent = Number(company.issued_shares).toLocaleString('en-US');
+        setNumToEl(companyIssuedEl, company.issued_shares);
         companyAvailableIssueEl.textContent = Number(company.available_to_issue).toLocaleString('en-US');
 
         productionRatePerSecond = Number(company.production_rate_per_second) || 0;
@@ -1265,10 +1277,10 @@
       if (productionRatePerSecond > 0) {
         const elapsed = (Date.now() - lastCollectTimestamp) / 1000;
         producedShares = Math.min(Math.floor(elapsed * productionRatePerSecond), MAX_PRODUCTION);
-        producedSharesEl.textContent = producedShares.toLocaleString('en-US');
+        setNumToEl(producedSharesEl, producedShares);
       } else {
         producedShares = 0;
-        producedSharesEl.textContent = 0;
+        setNumToEl(producedSharesEl, 0);
       }
     }
 
@@ -1288,7 +1300,7 @@
         }
 
         const updated = await response.json();
-        companyIssuedEl.textContent = Number(updated.issued_shares).toLocaleString('en-US');
+        setNumToEl(companyIssuedEl, updated.issued_shares);
         lastCollectTimestamp = Date.now();
         producedShares = 0;
         updateProducedShares();
