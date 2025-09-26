@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
-    /* Только базовые сбросы и белый фон */
+    /* Базовые сбросы и стили */
     * {
       margin: 0;
       padding: 0;
@@ -19,22 +19,19 @@
       background: white;
       color: black;
       min-height: 100vh;
-      padding-bottom: 72px; /* место под навигацию */
+      padding-bottom: 72px;
     }
 
-    /* Простой заголовок */
     .header {
       padding: 20px;
       font-size: 24px;
       font-weight: bold;
     }
 
-    /* Основной контент */
     .main-content {
       padding: 0 20px;
     }
 
-    /* Секции — только блок/скрыто */
     .section {
       display: none;
     }
@@ -43,7 +40,6 @@
       display: block;
     }
 
-    /* Карточки — просто белый фон, граница и отступы */
     .card {
       background: white;
       border: 1px solid #ccc;
@@ -51,7 +47,6 @@
       margin-bottom: 16px;
     }
 
-    /* Банковская карта — просто прямоугольник */
     .bank-card {
       background: white;
       border: 1px solid #ccc;
@@ -59,7 +54,6 @@
       margin-bottom: 24px;
     }
 
-    /* Кликер — просто круглая кнопка */
     .tap-circle {
       width: 120px;
       height: 120px;
@@ -78,7 +72,6 @@
       margin: 10px 0;
     }
 
-    /* Кнопки — просто прямоугольники */
     .btn {
       padding: 12px;
       background: white;
@@ -91,10 +84,9 @@
     .btn.disabled {
       opacity: 0.5;
       cursor: not-allowed;
-      pointer-events: none; /* Prevent clicks */
+      pointer-events: none;
     }
 
-    /* Нижняя навигация — просто ряд иконок */
     .bottom-nav {
       display: flex;
       justify-content: space-around;
@@ -121,7 +113,6 @@
       font-weight: bold;
     }
 
-    /* Toast — просто белый блок с текстом */
     #toast {
       position: fixed;
       bottom: 100px;
@@ -140,14 +131,12 @@
       opacity: 1;
     }
 
-    /* Заголовки секций */
     .section-title {
       font-size: 22px;
       font-weight: bold;
       margin: 20px 0 10px;
     }
 
-    /* Профиль — просто структура */
     .profile-header {
       text-align: center;
       margin-bottom: 20px;
@@ -188,7 +177,6 @@
       width: 0%;
     }
 
-    /* Дополнительно для форм */
     input {
       padding: 8px;
       border: 1px solid #ccc;
@@ -196,7 +184,6 @@
       width: 100%;
     }
 
-    /* Стили для персонала */
     .staff-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
@@ -217,7 +204,6 @@
       margin-bottom: 8px;
     }
 
-    /* Стили для табов в бизнесе */
     .tabs {
       display: flex;
       justify-content: space-around;
@@ -242,7 +228,6 @@
       display: block;
     }
 
-    /* Поисковые поля */
     .search-input {
       margin-bottom: 16px;
     }
@@ -578,7 +563,7 @@
 
     // Глобальные переменные
     let userData = tg.initDataUnsafe.user || {};
-    let telegramId = userData.id || 0;
+    let telegramId = Number(userData.id) || 0;
     let balance = 0;
     let clickValue = 2.5;
     let level = 1;
@@ -594,8 +579,8 @@
     let currentAdId = null;
     let currentChannel = null;
     let currentSection = 'home';
-    let marketCompanies = []; // Для хранения полного списка компаний
-    let marketServants = []; // Для хранения полного списка слуг
+    let marketCompanies = [];
+    let marketServants = [];
     let anonymous = false;
     let claimedChannelBonus = false;
     let touchStartY = 0;
@@ -605,10 +590,12 @@
     let lastCollectTimestamp = null;
     let productionInterval = null;
     let lastClaimTime = 0;
-    let lastSaveTime = 0
+    let lastSaveTime = 0;
     let pendingIncome = 0;
     let incomeInterval = null;
     const LOCAL_STORAGE_KEY = `user_data_${telegramId}`;
+    const MAX_PRODUCTION = 50000;
+    const MAX_PENDING_INCOME = 50000;
 
     // Список типов персонала
     const staffTypes = [
@@ -706,20 +693,21 @@
     const backToAdsFromClaimBtn = document.getElementById('back-to-ads-from-claim-btn');
     const showMyAdsBtn = document.getElementById('show-my-ads-btn');
 
+    // Периодическая проверка на сохранение
     setInterval(() => {
-  if (Date.now() - lastSaveTime > 3000) {
-    saveUserToLocal();
-    lastSaveTime = Date.now();
-  }
-}, 1000);
+      if (Date.now() - lastSaveTime > 3000) {
+        saveUserToLocal();
+        lastSaveTime = Date.now();
+      }
+    }, 1000);
 
-// Сохранять при скрытии приложения
-document.addEventListener('visibilitychange', () => {
-  if (document.hidden) {
-    saveUserToLocal();
-    syncUserData();
-  }
-});
+    // Сохранять при скрытии приложения
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        saveUserToLocal();
+        syncUserData();
+      }
+    });
 
     // Переключение разделов
     function switchToSection(sectionId) {
@@ -766,7 +754,7 @@ document.addEventListener('visibilitychange', () => {
       });
     });
 
-    // Переключение табов (общий handler)
+    // Переключение табов
     const allTabs = document.querySelectorAll('.tab');
     allTabs.forEach(tab => {
       tab.addEventListener('click', () => {
@@ -870,13 +858,13 @@ document.addEventListener('visibilitychange', () => {
         const data = await response.json();
 
         if (response.ok && data.balance) {
-          balance = parseFloat(data.balance);
+          balance = Number(data.balance);
           claimedChannelBonus = true;
           updateUI();
           loadBonusStatus();
           saveUserToLocal();
           showToast('Награда получена!');
-          await syncUserData(); // Immediate sync after claim
+          await syncUserData();
         } else if (data.error === 'already_claimed') {
           claimedChannelBonus = true;
           loadBonusStatus();
@@ -908,7 +896,7 @@ document.addEventListener('visibilitychange', () => {
           item.classList.add('highlighted');
         }
         item.innerHTML = `
-          <div>${index + 1}. ${player.username} <span style="float: right;">$${player.balance.toFixed(2)}</span></div>
+          <div>${index + 1}. ${player.username} <span style="float: right;">$${Number(player.balance).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span></div>
           <div>Уровень ${player.level}</div>
         `;
         listEl.appendChild(item);
@@ -932,18 +920,18 @@ document.addEventListener('visibilitychange', () => {
       }
     });
 
-    // Обработка клика (локально, без сервера)
+    // Обработка клика
     function handleClick() {
       if (!telegramId) return;
 
-      totalClicks++;
-      balance += clickValue;
-      progress += clickValue;
-      const nextThreshold = level * 1000;
+      totalClicks = Number(totalClicks) + 1;
+      balance = Number(balance) + Number(clickValue);
+      progress = Number(progress) + Number(clickValue);
+      const nextThreshold = Number(level) * 1000;
       if (progress >= nextThreshold) {
-        level++;
-        progress -= nextThreshold;
-        clickValue = 2.5 * level;
+        level = Number(level) + 1;
+        progress = Number(progress) - nextThreshold;
+        clickValue = 2.5 * Number(level);
       }
 
       updateUI();
@@ -956,24 +944,23 @@ document.addEventListener('visibilitychange', () => {
       ], { duration: 200 });
     }
 
-    // Расширяем зону клика на всю область ниже карты
     clickerArea.addEventListener('click', handleClick);
 
-    // Обновление UI
+    // Обновление UI с форматированием
     function updateUI() {
-      const formattedBalance = '$ ' + balance.toFixed(2).replace('.', ',');
+      const formattedBalance = '$ ' + Number(balance).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}).replace('.', ',');
       cardBalanceEl.textContent = formattedBalance;
       walletBalanceEl.textContent = formattedBalance;
       cardLevelEl.textContent = level;
       profileLevelEl.textContent = level;
 
-      const nextThreshold = level * 1000;
-      const progressPercent = Math.min(100, Math.round((progress / nextThreshold) * 100));
+      const nextThreshold = Number(level) * 1000;
+      const progressPercent = Math.min(100, Math.round((Number(progress) / nextThreshold) * 100));
       progressFillEl.style.width = `${progressPercent}%`;
-      progressTextEl.textContent = `$${progress.toFixed(0)} / $${nextThreshold.toFixed(0)}`;
+      progressTextEl.textContent = `$${Number(progress).toLocaleString('en-US', {minimumFractionDigits: 0})} / $${nextThreshold.toLocaleString('en-US', {minimumFractionDigits: 0})}`;
       progressPercentEl.textContent = `${progressPercent}%`;
 
-      totalClicksEl.textContent = totalClicks;
+      totalClicksEl.textContent = Number(totalClicks).toLocaleString('en-US');
     }
 
     // Toast уведомления
@@ -986,7 +973,7 @@ document.addEventListener('visibilitychange', () => {
       }, 3000);
     }
 
-    // Обновление информации пользователя на сервере
+    // Обновление информации пользователя
     async function updateUserInfo() {
       try {
         await fetch(`${apiBase}/user/${telegramId}/update`, {
@@ -1004,45 +991,43 @@ document.addEventListener('visibilitychange', () => {
       }
     }
 
-    // Синхронизация данных с сервером
-async function syncUserData() {
-  try {
-    const response = await fetch(`${apiBase}/sync/${telegramId}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        total_clicks: totalClicks,
-        balance: balance,
-        level: level,
-        progress: progress
-      })
-    });
+    // Синхронизация с сервером
+    async function syncUserData() {
+      try {
+        const response = await fetch(`${apiBase}/sync/${telegramId}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            total_clicks: Number(totalClicks),
+            balance: Number(balance),
+            level: Number(level),
+            progress: Number(progress)
+          })
+        });
 
-    if (response.ok) {
-      // Просто логируем успех, не перезаписываем локальные данные
-      console.log('✅ Данные синхронизированы с сервером');
-    } else if (response.status === 403) {
-      // User banned
-      showToast('Аккаунт заблокирован');
-    } else {
-      console.warn('Sync failed, using local data');
+        if (response.ok) {
+          console.log('✅ Данные синхронизированы');
+        } else if (response.status === 403) {
+          showToast('Аккаунт заблокирован');
+        } else {
+          console.warn('Sync failed');
+        }
+      } catch (err) {
+        console.warn('Sync error:', err);
+      }
     }
-  } catch (err) {
-    console.warn('Sync error, using local data:', err);
-  }
-}
 
     // Сохранение в localStorage
     function saveUserToLocal() {
       const user = {
-        balance,
-        level,
-        progress,
-        total_clicks: totalClicks,
-        companies_count: companiesCount,
+        balance: Number(balance),
+        level: Number(level),
+        progress: Number(progress),
+        total_clicks: Number(totalClicks),
+        companies_count: Number(companiesCount),
         master_id: masterId,
-        referrals_count: referralsCount,
-        servants_count: servantsCount,
+        referrals_count: Number(referralsCount),
+        servants_count: Number(servantsCount),
         anonymous,
         claimed_channel_bonus: claimedChannelBonus,
         last_claim: new Date(lastClaimTime).toISOString()
@@ -1055,19 +1040,19 @@ async function syncUserData() {
       const stored = localStorage.getItem(LOCAL_STORAGE_KEY);
       if (stored) {
         const { timestamp, user } = JSON.parse(stored);
-        if (Date.now() - timestamp < 60000) { // 1 минута
-          balance = parseFloat(user.balance);
-          level = user.level;
-          progress = parseFloat(user.progress);
-          totalClicks = user.total_clicks;
-          companiesCount = user.companies_count || 0;
+        if (Date.now() - timestamp < 60000) {
+          balance = Number(user.balance);
+          level = Number(user.level);
+          progress = Number(user.progress);
+          totalClicks = Number(user.total_clicks);
+          companiesCount = Number(user.companies_count) || 0;
           masterId = user.master_id;
-          referralsCount = user.referrals_count;
-          servantsCount = user.servants_count;
+          referralsCount = Number(user.referrals_count);
+          servantsCount = Number(user.servants_count);
           anonymous = user.anonymous;
           claimedChannelBonus = user.claimed_channel_bonus;
           lastClaimTime = new Date(user.last_claim).getTime();
-          clickValue = 2.5 * level;
+          clickValue = 2.5 * Number(level);
           updateUI();
           updateCreateCompanyArea();
           return true;
@@ -1080,43 +1065,38 @@ async function syncUserData() {
     async function initUser() {
       if (!telegramId) return;
 
-      // Попробовать загрузить из localStorage
       const loadedFromLocal = loadFromLocal();
 
       try {
         let response = await fetch(`${apiBase}/user/${telegramId}`);
         let user = await response.json();
         if (user) {
-          balance = parseFloat(user.balance);
-          level = user.level;
-          progress = parseFloat(user.progress);
-          totalClicks = user.total_clicks;
-          companiesCount = user.companies_count || 0;
+          balance = Number(user.balance);
+          level = Number(user.level);
+          progress = Number(user.progress);
+          totalClicks = Number(user.total_clicks);
+          companiesCount = Number(user.companies_count) || 0;
           masterId = user.master_id;
-          referralsCount = user.referrals_count;
-          servantsCount = user.servants_count;
+          referralsCount = Number(user.referrals_count);
+          servantsCount = Number(user.servants_count);
           anonymous = user.anonymous;
           claimedChannelBonus = user.claimed_channel_bonus;
           lastClaimTime = new Date(user.last_claim).getTime();
-          clickValue = 2.5 * level;
+          clickValue = 2.5 * Number(level);
 
-          // Применить налог если слуга
           if (masterId) {
             response = await fetch(`${apiBase}/apply_tax/${telegramId}`, { method: 'POST' });
             user = await response.json();
-            balance = parseFloat(user.balance);
+            balance = Number(user.balance);
           }
 
-          // Заявить доход если есть слуги
           response = await fetch(`${apiBase}/claim_income/${telegramId}`, { method: 'POST' });
           user = await response.json();
-          balance = parseFloat(user.balance);
-          lastClaimTime = Date.now(); // После claim
+          balance = Number(user.balance);
+          lastClaimTime = Date.now();
 
-          // Если данные placeholder, обновляем
           if (user.first_name === 'Unknown' || !user.username) {
             await updateUserInfo();
-            // Перезагружаем данные после обновления
             const updatedResponse = await fetch(`${apiBase}/user/${telegramId}`);
             const updatedUser = await updatedResponse.json();
             user.first_name = updatedUser.first_name;
@@ -1139,7 +1119,6 @@ async function syncUserData() {
       } catch (err) {
         console.error('Init user error:', err);
         if (!loadedFromLocal) {
-          // Если не загрузили из local, показать ошибку
           showToast('Ошибка загрузки данных');
         }
       }
@@ -1147,11 +1126,10 @@ async function syncUserData() {
       updateCreateCompanyArea();
       updateUI();
 
-      // Запускаем синхронизацию каждые 30 секунд
       setInterval(syncUserData, 30000);
     }
 
-    // Загрузка информации о статусе слуги в профиле
+    // Загрузка статуса слуги
     async function loadProfileServantInfo() {
       servantStatusEl.innerHTML = '';
       freeSelfBtnContainer.innerHTML = '';
@@ -1210,7 +1188,7 @@ async function syncUserData() {
           return;
         }
         const newCompany = await response.json();
-        companiesCount++;
+        companiesCount = Number(companiesCount) + 1;
         saveUserToLocal();
         updateCreateCompanyArea();
         companyNameInput.value = '';
@@ -1244,7 +1222,7 @@ async function syncUserData() {
       }
     }
 
-    // Загрузка личного кабинета компании
+    // Загрузка кабинета компании
     async function loadCompanyDashboard() {
       if (!currentCompanyId) return;
 
@@ -1252,32 +1230,29 @@ async function syncUserData() {
         const response = await fetch(`${apiBase}/company/${currentCompanyId}`);
         const company = await response.json();
         companyNameEl.textContent = company.name;
-        companyClientsEl.textContent = company.clients_count;
-        companyIssuedEl.textContent = company.issued_shares;
-        companyAvailableIssueEl.textContent = company.available_to_issue;
+        companyClientsEl.textContent = Number(company.clients_count).toLocaleString('en-US');
+        companyIssuedEl.textContent = Number(company.issued_shares).toLocaleString('en-US');
+        companyAvailableIssueEl.textContent = Number(company.available_to_issue).toLocaleString('en-US');
 
-        // Инициализация производства акций
-        productionRatePerSecond = company.production_rate_per_second || 0;
+        productionRatePerSecond = Number(company.production_rate_per_second) || 0;
         lastCollectTimestamp = new Date(company.last_collect).getTime();
         updateProducedShares();
 
-        // Загрузка персонала
         staffGrid.innerHTML = '';
         staffTypes.forEach(staff => {
           const staffCard = document.createElement('div');
           staffCard.classList.add('staff-card');
-          const currentLevel = company[`staff_${staff.type}_level`] || 1;
+          const currentLevel = Number(company[`staff_${staff.type}_level`]) || 1;
           const cost = 500 * currentLevel;
 
           staffCard.innerHTML = `
             <img src="${staff.img}" alt="${staff.name}" class="staff-img">
             <div>${staff.name}</div>
             <div>Уровень: <span id="staff-${staff.type}-level">${currentLevel}</span></div>
-            <div class="btn" id="upgrade-${staff.type}-btn">Улучшить ($${cost})</div>
+            <div class="btn" id="upgrade-${staff.type}-btn">Улучшить ($${cost.toLocaleString('en-US')})</div>
           `;
           staffGrid.appendChild(staffCard);
 
-          // Добавляем обработчик для кнопки
           document.getElementById(`upgrade-${staff.type}-btn`).addEventListener('click', () => upgradeStaff(staff.type));
         });
       } catch (err) {
@@ -1285,46 +1260,44 @@ async function syncUserData() {
       }
     }
 
-    // Обновление отображаемого количества произведенных акций
+    // Обновление произведенных акций с лимитом
     function updateProducedShares() {
       if (productionRatePerSecond > 0) {
         const elapsed = (Date.now() - lastCollectTimestamp) / 1000;
-        producedShares = Math.floor(elapsed * productionRatePerSecond);
-        producedSharesEl.textContent = producedShares;
+        producedShares = Math.min(Math.floor(elapsed * productionRatePerSecond), MAX_PRODUCTION);
+        producedSharesEl.textContent = producedShares.toLocaleString('en-US');
       } else {
         producedShares = 0;
         producedSharesEl.textContent = 0;
       }
     }
 
-    // Сбор акций от персонала
+    // Сбор акций
     async function collectShares() {
-  try {
-    const response = await fetch(`${apiBase}/company/${currentCompanyId}/collect`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ amount: Math.floor(producedShares) })
-    });
+      try {
+        const response = await fetch(`${apiBase}/company/${currentCompanyId}/collect`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ amount: Math.floor(producedShares) })
+        });
 
-    if (!response.ok) {
-      const error = await response.json();
-      showToast(error.error || 'Ошибка сбора акций');
-      return;
+        if (!response.ok) {
+          const error = await response.json();
+          showToast(error.error || 'Ошибка сбора акций');
+          return;
+        }
+
+        const updated = await response.json();
+        companyIssuedEl.textContent = Number(updated.issued_shares).toLocaleString('en-US');
+        lastCollectTimestamp = Date.now();
+        producedShares = 0;
+        updateProducedShares();
+        showToast('Акции собраны успешно');
+      } catch (err) {
+        showToast('Ошибка сбора акций');
+      }
     }
 
-    const updated = await response.json();
-    companyIssuedEl.textContent = updated.issued_shares;
-
-    // ФИКС: Обновляем время последнего сбора
-    lastCollectTimestamp = Date.now(); // ← ДОБАВЬ ЭТУ СТРОЧКУ
-    producedShares = 0;
-
-    updateProducedShares();
-    showToast('Акции собраны успешно');
-  } catch (err) {
-    showToast('Ошибка сбора акций');
-  }
-}
     collectSharesBtn.addEventListener('click', collectShares);
 
     // Улучшение персонала
@@ -1341,8 +1314,8 @@ async function syncUserData() {
           return;
         }
         const updated = await response.json();
-        balance = parseFloat(updated.balance);
-        productionRatePerSecond = updated.production_rate_per_second || productionRatePerSecond;
+        balance = Number(updated.balance);
+        productionRatePerSecond = Number(updated.production_rate_per_second) || productionRatePerSecond;
         saveUserToLocal();
         showToast('Персонал улучшен успешно');
         updateUI();
@@ -1354,7 +1327,7 @@ async function syncUserData() {
 
     // Выпуск акций
     async function issueShares() {
-      const amount = parseInt(issueAmountInput.value);
+      const amount = Number(issueAmountInput.value);
       if (isNaN(amount) || amount <= 0) {
         showToast('Введите положительное количество');
         return;
@@ -1395,7 +1368,7 @@ async function syncUserData() {
       }
     }
 
-    // Рендер списка акций с фильтром
+    // Рендер рынка акций
     function renderMarketList(companies) {
       marketList.innerHTML = '';
       companies.forEach(company => {
@@ -1404,8 +1377,8 @@ async function syncUserData() {
         card.innerHTML = `
           <div>Компания: ${company.name}</div>
           <div>Владелец: @${company.owner_username}</div>
-          <div>Клиентов: ${company.clients_count}</div>
-          <div>Цена: $${company.price}</div>
+          <div>Клиентов: ${Number(company.clients_count).toLocaleString('en-US')}</div>
+          <div>Цена: $${Number(company.price).toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
         `;
         card.addEventListener('click', () => {
           currentCompanyId = company.id;
@@ -1415,7 +1388,6 @@ async function syncUserData() {
       });
     }
 
-    // Поиск по акциям
     searchStocks.addEventListener('input', (e) => {
       const query = e.target.value.toLowerCase();
       const filtered = marketCompanies.filter(c => c.name.toLowerCase().includes(query));
@@ -1434,7 +1406,7 @@ async function syncUserData() {
       }
     }
 
-    // Рендер списка слуг с фильтром
+    // Рендер рынка слуг
     function renderServantMarketList(servants) {
       servantMarketList.innerHTML = '';
       servants.forEach(servant => {
@@ -1442,7 +1414,7 @@ async function syncUserData() {
         card.classList.add('card');
         card.innerHTML = `
           <div>Слуга: @${servant.username}</div>
-          <div>Цена: $${servant.price}</div>
+          <div>Цена: $${Number(servant.price).toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
         `;
         card.addEventListener('click', () => {
           currentServantId = servant.servant_id;
@@ -1452,7 +1424,6 @@ async function syncUserData() {
       });
     }
 
-    // Поиск по слугам
     searchServants.addEventListener('input', (e) => {
       const query = e.target.value.toLowerCase();
       const filtered = marketServants.filter(s => s.username.toLowerCase().includes(query));
@@ -1470,9 +1441,9 @@ async function syncUserData() {
           card.classList.add('card');
           card.innerHTML = `
             <div>Канал: @${ad.channel_username}</div>
-            <div>Награда: $${ad.reward}</div>
-            <div>Бюджет: $${ad.budget}</div>
-            <div>Остаток: $${ad.remaining}</div>
+            <div>Награда: $${Number(ad.reward).toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
+            <div>Бюджет: $${Number(ad.budget).toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
+            <div>Остаток: $${Number(ad.remaining).toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
             <div>Опубликовано: ${ad.published ? 'Да' : 'Нет'}</div>
             <div>Активно: ${ad.active ? 'Да' : 'Нет'}</div>
           `;
@@ -1488,7 +1459,7 @@ async function syncUserData() {
       loadMyAds();
     });
 
-    // Загрузка активных объявлений
+    // Загрузка объявлений
     async function loadAds() {
       try {
         const response = await fetch(`${apiBase}/ads`);
@@ -1499,8 +1470,8 @@ async function syncUserData() {
           card.classList.add('card');
           card.innerHTML = `
             <div>Создатель: @${ad.creator_username}</div>
-            <div>Награда: $${ad.reward}</div>
-            <div>Бюджет: $${ad.budget}</div>
+            <div>Награда: $${Number(ad.reward).toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
+            <div>Бюджет: $${Number(ad.budget).toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
           `;
           card.addEventListener('click', () => {
             currentAdId = ad.id;
@@ -1518,8 +1489,8 @@ async function syncUserData() {
 
     createAdSubmit.addEventListener('click', async () => {
       const channel = document.getElementById('channel-input').value.trim();
-      const reward = parseFloat(document.getElementById('reward-input').value);
-      const budget = parseFloat(document.getElementById('budget-input').value);
+      const reward = Number(document.getElementById('reward-input').value);
+      const budget = Number(document.getElementById('budget-input').value);
       if (!channel || isNaN(reward) || isNaN(budget) || reward <= 0 || budget <= 0 || reward > budget) {
         showToast('Неверные данные');
         return;
@@ -1537,7 +1508,7 @@ async function syncUserData() {
         }
         const ad = await res.json();
         currentAdId = ad.id;
-        balance -= budget;
+        balance = Number(balance) - budget;
         updateUI();
         saveUserToLocal();
         document.getElementById('ad-form').style.display = 'none';
@@ -1632,28 +1603,20 @@ async function syncUserData() {
 
         if (res.ok) {
           const data = await res.json();
-
-          // ФИКС: Правильное извлечение баланса
-          balance = parseFloat(data.balance); // Убедись что это число
+          balance = Number(data.balance);
           updateUI();
           saveUserToLocal();
           showToast(data.message || 'Награда получена успешно!');
-
-          // Немедленная синхронизация
           await syncUserData();
           switchToSection('market');
         } else {
           const errorData = await res.json().catch(() => ({ error: 'unknown' }));
           showToast(errorData.error || 'Ошибка получения награды');
-
-          // Перезагружаем статус кнопки
           await loadClaimAd();
         }
       } catch (err) {
         console.error('Claim error:', err);
         showToast('Ошибка сети. Попробуйте позже.');
-
-        // Всегда восстанавливаем кнопку при ошибке
         await loadClaimAd();
       } finally {
         claimReward.textContent = originalText;
@@ -1671,9 +1634,9 @@ async function syncUserData() {
         const company = await response.json();
         buyCompanyNameEl.textContent = company.name;
         buyCompanyOwnerEl.textContent = `@${company.owner_username}`;
-        buyCompanyClientsEl.textContent = company.clients_count;
-        buyCompanyPriceEl.textContent = `$${company.price}`;
-        buyCompanyAvailableEl.textContent = company.available;
+        buyCompanyClientsEl.textContent = Number(company.clients_count).toLocaleString('en-US');
+        buyCompanyPriceEl.textContent = `$${Number(company.price).toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+        buyCompanyAvailableEl.textContent = Number(company.available).toLocaleString('en-US');
       } catch (err) {
         console.error('Load buy error:', err);
       }
@@ -1687,7 +1650,7 @@ async function syncUserData() {
         const response = await fetch(`${apiBase}/servant_market/${currentServantId}`);
         const servant = await response.json();
         buyServantUsernameEl.textContent = `@${servant.username}`;
-        buyServantPriceEl.textContent = `$${servant.price}`;
+        buyServantPriceEl.textContent = `$${Number(servant.price).toLocaleString('en-US', {minimumFractionDigits: 2})}`;
       } catch (err) {
         console.error('Load servant buy error:', err);
       }
@@ -1695,7 +1658,7 @@ async function syncUserData() {
 
     // Покупка акций
     async function buyShares() {
-      const amount = parseInt(buyAmountInput.value);
+      const amount = Number(buyAmountInput.value);
       if (isNaN(amount) || amount <= 0) {
         showToast('Введите положительное количество');
         return;
@@ -1713,7 +1676,7 @@ async function syncUserData() {
           return;
         }
         const updated = await response.json();
-        balance = parseFloat(updated.balance);
+        balance = Number(updated.balance);
         saveUserToLocal();
         buyAmountInput.value = '';
         showToast('Акции куплены успешно');
@@ -1738,8 +1701,8 @@ async function syncUserData() {
           return;
         }
         const updated = await response.json();
-        balance = parseFloat(updated.balance);
-        servantsCount = updated.servants_count;
+        balance = Number(updated.balance);
+        servantsCount = Number(updated.servants_count);
         saveUserToLocal();
         showToast('Слуга куплен успешно');
         updateUI();
@@ -1765,10 +1728,10 @@ async function syncUserData() {
           card.classList.add('card');
           card.innerHTML = `
             <div>Компания: ${holding.name}</div>
-            <div>Акций: ${holding.shares}</div>
-            <div>Куплено по: $${holding.avg_price}</div>
-            <div>Текущая цена: $${holding.current_price}</div>
-            <div>Доход: $${holding.profit}</div>
+            <div>Акций: ${Number(holding.shares).toLocaleString('en-US')}</div>
+            <div>Куплено по: $${Number(holding.avg_price).toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
+            <div>Текущая цена: $${Number(holding.current_price).toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
+            <div>Доход: $${Number(holding.profit).toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
             <div class="btn" data-action="buy-more">Купить еще</div>
             <div class="btn" data-action="sell">Продать</div>
           `;
@@ -1795,11 +1758,11 @@ async function syncUserData() {
         let totalSec = 0;
         let totalTax = 0;
         if (servants.length > 0) {
-          totalSec = servants.length * 1;
+          totalSec = Number(servants.length) * 1;
         }
         servantsList.innerHTML = '';
         servants.forEach(serv => {
-          totalTax += 0.05 * serv.balance;
+          totalTax = Number(totalTax) + (0.05 * Number(serv.balance));
           const card = document.createElement('div');
           card.classList.add('card');
           card.innerHTML = `
@@ -1817,11 +1780,11 @@ async function syncUserData() {
           });
           card.querySelector('[data-action="sell"]').addEventListener('click', async () => {
             const price = prompt('Сумма продажи');
-            if (price && !isNaN(price)) {
+            if (price && !isNaN(Number(price))) {
               await fetch(`${apiBase}/sell_servant/${telegramId}/${serv.telegram_id}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ price: parseFloat(price) })
+                body: JSON.stringify({ price: Number(price) })
               });
               showToast('Слуга выставлен на продажу');
               loadServants();
@@ -1829,24 +1792,24 @@ async function syncUserData() {
           });
           servantsList.appendChild(card);
         });
-        secIncomeEl.textContent = totalSec;
-        dailyTaxEl.textContent = totalTax.toFixed(2);
+        secIncomeEl.textContent = totalSec.toLocaleString('en-US');
+        dailyTaxEl.textContent = totalTax.toLocaleString('en-US', {minimumFractionDigits: 2});
       } catch (err) {
         console.error('Load servants error:', err);
       }
       updatePendingIncome();
     }
 
-    // Обновление накопленного дохода
+    // Обновление накопленного дохода с лимитом
     function updatePendingIncome() {
       if (servantsCount === 0) {
         pendingIncome = 0;
       } else {
         const now = Date.now();
         const elapsed = (now - lastClaimTime) / 1000;
-        pendingIncome = servantsCount * elapsed;
+        pendingIncome = Math.min(servantsCount * elapsed, MAX_PENDING_INCOME);
       }
-      pendingIncomeEl.textContent = pendingIncome.toFixed(2);
+      pendingIncomeEl.textContent = Number(pendingIncome).toLocaleString('en-US', {minimumFractionDigits: 2});
     }
 
     // Заявка дохода
@@ -1859,7 +1822,7 @@ async function syncUserData() {
           return;
         }
         const updated = await response.json();
-        balance = parseFloat(updated.balance);
+        balance = Number(updated.balance);
         lastClaimTime = Date.now();
         pendingIncome = 0;
         saveUserToLocal();
@@ -1873,7 +1836,7 @@ async function syncUserData() {
 
     claimIncomeBtn.addEventListener('click', claimIncome);
 
-    // Pull-to-refresh и double click для market
+    // Pull-to-refresh для market
     marketSection.addEventListener('touchstart', (e) => {
       touchStartY = e.touches[0].clientY;
     });
@@ -1951,4 +1914,3 @@ async function syncUserData() {
 
 </body>
 </html>
-
