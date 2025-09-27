@@ -1764,7 +1764,7 @@ async function loadClaimAd() {
         console.error('Load buy error:', err);
       }
     }
-    
+
     // Загрузка страницы продажи акций
 async function loadStockSell() {
   if (!currentCompanyId) return;
@@ -1786,6 +1786,43 @@ async function loadStockSell() {
     showNotification("Не удалось загрузить данные для продажи");
   }
 }
+
+   // Кнопка "Продать акции"
+const sellSharesBtn = document.getElementById("sell-shares-btn");
+
+async function sellShares() {
+  if (!currentCompanyId) return;
+  const amount = Number(document.getElementById("sell-amount-input").value);
+  if (!amount || amount <= 0) {
+    showNotification("Введите количество акций для продажи");
+    return;
+  }
+
+  try {
+    const response = await fetch(`${apiBase}/sell/${telegramId}/${currentCompanyId}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ amount })
+    });
+
+    const result = await response.json();
+    if (!response.ok) {
+      showNotification(result.error || "Ошибка при продаже");
+      return;
+    }
+
+    balance = result.balance; // обновляем баланс
+    updateUI();
+    showNotification("Акции успешно проданы!");
+    switchToSection("wallet-section"); // вернуться в кошелёк
+  } catch (err) {
+    console.error("Sell error:", err);
+    showNotification("Не удалось продать акции");
+  }
+}
+
+sellSharesBtn.addEventListener("click", sellShares);
+
 
 
     // Загрузка страницы покупки слуги
