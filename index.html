@@ -1764,6 +1764,27 @@ async function loadClaimAd() {
         console.error('Load buy error:', err);
       }
     }
+    
+    // Загрузка страницы продажи акций
+async function loadStockSell() {
+  if (!currentCompanyId) return;
+
+  try {
+    const response = await fetch(`${apiBase}/holding/${telegramId}/${currentCompanyId}`);
+    const holding = await response.json();
+    
+    const companyResponse = await fetch(`${apiBase}/company/${currentCompanyId}`);
+    const company = await companyResponse.json();
+    
+    sellCompanyNameEl.textContent = holding.name || company.name;
+    sellCompanySharesEl.textContent = Number(holding.shares).toLocaleString('en-US');
+    sellCompanyPriceEl.textContent = `$${Number(company.price).toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+    
+  } catch (err) {
+    console.error('Load stock sell error:', err);
+    showToast('Ошибка загрузки данных');
+  }
+}
 
     // Загрузка страницы покупки слуги
     async function loadServantBuy() {
@@ -2068,3 +2089,4 @@ async function loadHoldings() {
 
 </body>
 </html>
+
