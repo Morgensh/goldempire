@@ -264,6 +264,15 @@
     .hidden {
       display: none;
     }
+    /* Добавь в секцию style (примерно строка 150): */
+.budget-info {
+  font-size: 14px;
+  color: #666;
+  margin-top: 5px;
+  padding: 5px;
+  background: #f9f9f9;
+  border-radius: 4px;
+}
   </style>
 </head>
 <body>
@@ -411,15 +420,17 @@
 
     <!-- Получение награды за объявление -->
     <div class="section" id="claim-ad-section">
-      <h2 class="section-title">Объявление</h2>
-      <div class="card">
-        <div>Канал: <span id="claim-channel"></span></div>
-        <a id="subscribe-link" href="" class="btn">Подписаться</a>
-        <div class="btn" id="check-subscribed">Я подписался</div>
-        <div class="btn disabled" id="claim-reward">Получить награду</div>
-      </div>
-      <div class="btn" id="back-to-ads-from-claim-btn">Назад</div>
-    </div>
+  <h2 class="section-title">Объявление</h2>
+  <div class="card">
+    <div>Канал: <span id="claim-channel"></span></div>
+    <!-- ДОБАВЬ ЭТУ СТРОКУ -->
+    <div id="budget-info" style="display: none;"></div>
+    <a id="subscribe-link" href="" class="btn">Подписаться</a>
+    <div class="btn" id="check-subscribed">Я подписался</div>
+    <div class="btn disabled" id="claim-reward">Получить награду</div>
+  </div>
+  <div class="btn" id="back-to-ads-from-claim-btn">Назад</div>
+</div>
 
     <!-- Покупка акций -->
     <div class="section" id="stock-buy-section">
@@ -1610,12 +1621,48 @@
 
     backToAdsBtn.addEventListener('click', () => switchToSection('market'));
 
-    async function loadClaimAd() {
-      claimChannel.textContent = '@' + currentChannel;
-      subscribeLink.href = 'https://t.me/' + currentChannel;
-      claimReward.classList.add('disabled');
-      claimReward.classList.remove('btn-green');
+    // Если хочешь разделить информацию, замени в loadClaimAd():
+async function loadClaimAd() {
+  try {
+    const response = await fetch(`${apiBase}/ad/${currentAdId}?telegram_id=${telegramId}`);
+    if (!response.ok) throw new Error('Ошибка загрузки');
+
+    const ad = await response.json();
+
+    // Обновляем основную информацию
+    claimChannel.textContent = `@${ad.channel_username}`;
+    subscribeLink.href = 'https://t.me/' + ad.channel_username;
+
+    // Находим или создаем элемент для бюджета
+    let budgetInfo = document.getElementById('budget-info');
+    if (!budgetInfo) {
+      budgetInfo = document.createElement('div');
+      budgetInfo.id = 'budget-info';
+      budgetInfo.className = 'budget-info';
+      claimChannel.parentNode.insertBefore(budgetInfo, claimChannel.nextSibling);
     }
+
+    // Показываем и обновляем информацию о бюджете
+    budgetInfo.style.display = 'block';
+    budgetInfo.innerHTML = `Бюджет: $${Number(ad.remaining).toLocaleString('en-US')} / $${Number(ad.budget).toLocaleString('en-US')} осталось`;
+
+    claimReward.classList.add('disabled');
+    claimReward.classList.remove('btn-green');
+
+  } catch (err) {
+    console.error('Ошибка загрузки объявления:', err);
+
+    // Fallback на старые данные
+    claimChannel.textContent = '@' + currentChannel;
+    subscribeLink.href = 'https://t.me/' + currentChannel;
+
+    // Скрываем информацию о бюджете при ошибке
+    const budgetInfo = document.getElementById('budget-info');
+    if (budgetInfo) budgetInfo.style.display = 'none';
+
+    showToast('Ошибка загрузки данных объявления');
+  }
+}
 
     checkSubscribed.addEventListener('click', async () => {
       try {
