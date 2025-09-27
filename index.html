@@ -1357,10 +1357,11 @@
     // Сбор акций
     async function collectShares() {
   try {
+    // Отправляем POST запрос БЕЗ тела (бэкенд сам рассчитает сколько собрать)
     const response = await fetch(`${apiBase}/company/${currentCompanyId}/collect`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ amount: Math.floor(producedShares) })
+      headers: { 'Content-Type': 'application/json' }
+      // УБИРАЕМ body полностью!
     });
 
     if (!response.ok) {
@@ -1371,21 +1372,18 @@
 
     const updated = await response.json();
 
-    // Обновляем только issued_shares (как было)
-    setNumToEl(companyIssuedEl, updated.issued_shares);
+    // Просто перезагружаем все данные компании
+    await loadCompanyDashboard();
+    
     lastCollectTimestamp = Date.now();
     producedShares = 0;
     updateProducedShares();
 
-    // ✅ ДОБАВЬ ЭТУ СТРОКУ - перезагружаем ВСЕ данные компании
-    await loadCompanyDashboard();
-
-    showToast('Акции собраны успешно');
+    showToast(`Собрано акций успешно!`);
   } catch (err) {
     showToast('Ошибка сбора акций');
   }
 }
-
     collectSharesBtn.addEventListener('click', collectShares);
 
     // Улучшение персонала
