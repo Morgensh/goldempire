@@ -411,16 +411,13 @@
 
     <!-- Получение награды за объявление -->
     <div class="section" id="claim-ad-section">
-  <h2 class="section-title">Объявление</h2>
-  <div class="card">
-    <div>Канал: <span id="claim-channel"></span></div>
-    <div>Награда: $<span id="claim-reward-amount">0</span></div>
-    <div>Осталось бюджета: $<span id="claim-remaining">0</span></div>
-    <div>Забрали наград: <span id="claim-claimed">0</span> человек</div>
-    <a id="subscribe-link" href="" class="btn">Подписаться</a>
-    <div class="btn" id="check-subscribed">Я подписался</div>
-    <div class="btn disabled" id="claim-reward">Получить награду</div>
-  </div>
+      <h2 class="section-title">Объявление</h2>
+      <div class="card">
+        <div>Канал: <span id="claim-channel"></span></div>
+        <a id="subscribe-link" href="" class="btn">Подписаться</a>
+        <div class="btn" id="check-subscribed">Я подписался</div>
+        <div class="btn disabled" id="claim-reward">Получить награду</div>
+      </div>
       <div class="btn" id="back-to-ads-from-claim-btn">Назад</div>
     </div>
 
@@ -1507,46 +1504,30 @@
     });
 
     // Загрузка объявлений
-// Загрузка объявлений - ИСПРАВЛЕННАЯ ВЕРСИЯ
-async function loadAds() {
-  try {
-    const response = await fetch(`${apiBase}/ads`);
-    const ads = await response.json();
-    adsList.innerHTML = '';
-    ads.forEach(ad => {
-      const card = document.createElement('div');
-      card.classList.add('card');
-
-      // Безопасный парсинг чисел
-      const budget = Number(ad.budget) || 0;
-      const remaining = Number(ad.remaining) || 0;
-      const reward = Number(ad.reward) || 0;
-
-      // Рассчитываем сколько человек уже забрали награду
-      const claimedCount = reward > 0 ? Math.floor((budget - remaining) / reward) : 0;
-      const remainingClaims = reward > 0 ? Math.floor(remaining / reward) : 0;
-
-      card.innerHTML = `
-        <div>Создатель: @${ad.creator_username}</div>
-        <div>Награда: $${reward.toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
-        <div>Бюджет: $${budget.toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
-        <div>Осталось бюджета: $${remaining.toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
-        <div>Забрали награду: ${claimedCount} человек</div>
-        <div>Осталось наград: ${remainingClaims} шт</div>
-      `;
-
-      card.addEventListener('click', () => {
-        currentAdId = ad.id;
-        currentChannel = ad.channel_username;
-        switchToSection('claim-ad');
-      });
-
-      adsList.appendChild(card);
-    });
-  } catch (err) {
-    console.error('Load ads error:', err);
-  }
-}
+    async function loadAds() {
+      try {
+        const response = await fetch(`${apiBase}/ads`);
+        const ads = await response.json();
+        adsList.innerHTML = '';
+        ads.forEach(ad => {
+          const card = document.createElement('div');
+          card.classList.add('card');
+          card.innerHTML = `
+            <div>Создатель: @${ad.creator_username}</div>
+            <div>Награда: $${Number(ad.reward).toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
+            <div>Бюджет: $${Number(ad.budget).toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
+          `;
+          card.addEventListener('click', () => {
+            currentAdId = ad.id;
+            currentChannel = ad.channel_username;
+            switchToSection('claim-ad');
+          });
+          adsList.appendChild(card);
+        });
+      } catch (err) {
+        console.error('Load ads error:', err);
+      }
+    }
 
     createAdBtn.addEventListener('click', () => switchToSection('create-ad'));
 
@@ -1630,35 +1611,11 @@ async function loadAds() {
     backToAdsBtn.addEventListener('click', () => switchToSection('market'));
 
     async function loadClaimAd() {
-  try {
-    // Получаем детали объявления
-    const response = await fetch(`${apiBase}/ads`);
-    const ads = await response.json();
-    const currentAd = ads.find(ad => ad.id === currentAdId);
-
-    if (currentAd) {
-      // Безопасный парсинг чисел
-      const reward = Number(currentAd.reward) || 0;
-      const remaining = Number(currentAd.remaining) || 0;
-      const budget = Number(currentAd.budget) || 0;
-
-      claimChannel.textContent = '@' + currentAd.channel_username;
-      document.getElementById('claim-reward-amount').textContent =
-        reward.toLocaleString('en-US', {minimumFractionDigits: 2});
-      document.getElementById('claim-remaining').textContent =
-        remaining.toLocaleString('en-US', {minimumFractionDigits: 2});
-
-      const claimedCount = reward > 0 ? Math.floor((budget - remaining) / reward) : 0;
-      document.getElementById('claim-claimed').textContent = claimedCount;
+      claimChannel.textContent = '@' + currentChannel;
+      subscribeLink.href = 'https://t.me/' + currentChannel;
+      claimReward.classList.add('disabled');
+      claimReward.classList.remove('btn-green');
     }
-
-    subscribeLink.href = 'https://t.me/' + currentChannel;
-    claimReward.classList.add('disabled');
-    claimReward.classList.remove('btn-green');
-  } catch (err) {
-    console.error('Load claim ad error:', err);
-  }
-}
 
     checkSubscribed.addEventListener('click', async () => {
       try {
