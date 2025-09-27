@@ -1355,29 +1355,35 @@
 
     // Сбор акций
     async function collectShares() {
-      try {
-        const response = await fetch(`${apiBase}/company/${currentCompanyId}/collect`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ amount: Math.floor(producedShares) })
-        });
+  try {
+    const response = await fetch(`${apiBase}/company/${currentCompanyId}/collect`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ amount: Math.floor(producedShares) })
+    });
 
-        if (!response.ok) {
-          const error = await response.json();
-          showToast(error.error || 'Ошибка сбора акций');
-          return;
-        }
-
-        const updated = await response.json();
-        setNumToEl(companyIssuedEl, updated.issued_shares);
-        lastCollectTimestamp = Date.now();
-        producedShares = 0;
-        updateProducedShares();
-        showToast('Акции собраны успешно');
-      } catch (err) {
-        showToast('Ошибка сбора акций');
-      }
+    if (!response.ok) {
+      const error = await response.json();
+      showToast(error.error || 'Ошибка сбора акций');
+      return;
     }
+
+    const updated = await response.json();
+
+    // Обновляем только issued_shares (как было)
+    setNumToEl(companyIssuedEl, updated.issued_shares);
+    lastCollectTimestamp = Date.now();
+    producedShares = 0;
+    updateProducedShares();
+
+    // ✅ ДОБАВЬ ЭТУ СТРОКУ - перезагружаем ВСЕ данные компании
+    await loadCompanyDashboard();
+
+    showToast('Акции собраны успешно');
+  } catch (err) {
+    showToast('Ошибка сбора акций');
+  }
+}
 
     collectSharesBtn.addEventListener('click', collectShares);
 
