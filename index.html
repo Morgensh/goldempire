@@ -600,7 +600,7 @@
     let userData = tg.initDataUnsafe.user || {};
     let telegramId = Number(userData.id) || 0;
     let balance = 0;
-    let clickValue = 2.5;
+    let clickValue = 1; // стартовое значение: 1 доллар за клик
     let level = 1;
     let progress = 0;
     let totalClicks = 0;
@@ -1002,27 +1002,28 @@
 
     // Обработка клика
     function handleClick() {
-      if (!telegramId) return;
+    if (!telegramId) return;
 
-      totalClicks = Number(totalClicks) + 1;
-      balance = Number(balance) + Number(clickValue);
-      progress = Number(progress) + Number(clickValue);
-      const nextThreshold = Number(level) * 1000;
-      if (progress >= nextThreshold) {
+    totalClicks = Number(totalClicks) + 1;
+    balance = Number(balance) + Number(clickValue); // +1$ на первом уровне
+    progress = Number(progress) + Number(clickValue);
+
+    const nextThreshold = Number(level) * 1000; // или просто 1000
+    if (progress >= nextThreshold) {
         level = Number(level) + 1;
         progress = Number(progress) - nextThreshold;
-        clickValue = 2.5 * Number(level);
-      }
+        clickValue = 1 + Number(level); // НОВАЯ ФОРМУЛА: 1$ + уровень
+    }
 
-      updateUI();
+    updateUI();
 
-      // Анимация
-      tapCircle.animate([
+    // Анимация
+    tapCircle.animate([
         { transform: 'scale(1)' },
         { transform: 'scale(0.95)' },
         { transform: 'scale(1)' }
-      ], { duration: 200 });
-    }
+    ], { duration: 200 });
+}
 
     clickerArea.addEventListener('click', handleClick);
 
