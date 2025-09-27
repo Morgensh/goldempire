@@ -1764,7 +1764,7 @@ async function loadClaimAd() {
         console.error('Load buy error:', err);
       }
     }
-    
+
     // Загрузка страницы продажи акций
 async function loadStockSell() {
   if (!currentCompanyId) return;
@@ -1772,14 +1772,14 @@ async function loadStockSell() {
   try {
     const response = await fetch(`${apiBase}/holding/${telegramId}/${currentCompanyId}`);
     const holding = await response.json();
-    
+
     const companyResponse = await fetch(`${apiBase}/company/${currentCompanyId}`);
     const company = await companyResponse.json();
-    
+
     sellCompanyNameEl.textContent = holding.name || company.name;
     sellCompanySharesEl.textContent = Number(holding.shares).toLocaleString('en-US');
     sellCompanyPriceEl.textContent = `$${Number(company.price).toLocaleString('en-US', {minimumFractionDigits: 2})}`;
-    
+
   } catch (err) {
     console.error('Load stock sell error:', err);
     showToast('Ошибка загрузки данных');
@@ -1837,6 +1837,38 @@ async function buyShares() {
 
     buySharesBtn.addEventListener('click', buyShares);
 
+// Продажа акций
+async function sellShares() {
+  const amount = Number(sellAmountInput.value);
+  if (isNaN(amount) || amount <= 0) {
+    showToast('Введите положительное количество');
+    return;
+  }
+
+  try {
+    const response = await fetch(`${apiBase}/sell/${telegramId}/${currentCompanyId}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ amount })
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      showToast(error.error || 'Ошибка продажи');
+      return;
+    }
+
+    const updated = await response.json();
+    balance = Number(updated.balance);
+    saveUserToLocal();
+    sellAmountInput.value = '';
+    showToast('Акции проданы успешно');
+    updateUI();
+    await loadStockSell(); // Перезагружаем данные
+  } catch (err) {
+    showToast('Ошибка продажи');
+  }
+}
     // Покупка слуги
     async function buyServant() {
       try {
@@ -1862,8 +1894,12 @@ async function buyShares() {
 
     buyServantBtn.addEventListener('click', buyServant);
 
+    // ДОБАВЬ ЭТУ СТРОКУ:
+    sellSharesBtn.addEventListener('click', sellShares);
+
     backToMarketBtn.addEventListener('click', () => switchToSection('market'));
     backToMarketServantBtn.addEventListener('click', () => switchToSection('market'));
+
 
     // Загрузка холдингов
     // Загрузка холдингов - FIXED VERSION
