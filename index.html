@@ -1507,6 +1507,7 @@
     });
 
     // Загрузка объявлений
+// Загрузка объявлений - ИСПРАВЛЕННАЯ ВЕРСИЯ
 async function loadAds() {
   try {
     const response = await fetch(`${apiBase}/ads`);
@@ -1516,15 +1517,20 @@ async function loadAds() {
       const card = document.createElement('div');
       card.classList.add('card');
 
+      // Безопасный парсинг чисел
+      const budget = Number(ad.budget) || 0;
+      const remaining = Number(ad.remaining) || 0;
+      const reward = Number(ad.reward) || 0;
+
       // Рассчитываем сколько человек уже забрали награду
-      const claimedCount = Math.floor((ad.budget - ad.remaining) / ad.reward);
-      const remainingClaims = Math.floor(ad.remaining / ad.reward);
+      const claimedCount = reward > 0 ? Math.floor((budget - remaining) / reward) : 0;
+      const remainingClaims = reward > 0 ? Math.floor(remaining / reward) : 0;
 
       card.innerHTML = `
         <div>Создатель: @${ad.creator_username}</div>
-        <div>Награда: $${Number(ad.reward).toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
-        <div>Бюджет: $${Number(ad.budget).toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
-        <div>Осталось бюджета: $${Number(ad.remaining).toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
+        <div>Награда: $${reward.toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
+        <div>Бюджет: $${budget.toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
+        <div>Осталось бюджета: $${remaining.toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
         <div>Забрали награду: ${claimedCount} человек</div>
         <div>Осталось наград: ${remainingClaims} шт</div>
       `;
@@ -1541,7 +1547,6 @@ async function loadAds() {
     console.error('Load ads error:', err);
   }
 }
-
 
     createAdBtn.addEventListener('click', () => switchToSection('create-ad'));
 
@@ -1632,13 +1637,18 @@ async function loadAds() {
     const currentAd = ads.find(ad => ad.id === currentAdId);
 
     if (currentAd) {
+      // Безопасный парсинг чисел
+      const reward = Number(currentAd.reward) || 0;
+      const remaining = Number(currentAd.remaining) || 0;
+      const budget = Number(currentAd.budget) || 0;
+
       claimChannel.textContent = '@' + currentAd.channel_username;
       document.getElementById('claim-reward-amount').textContent =
-        Number(currentAd.reward).toLocaleString('en-US', {minimumFractionDigits: 2});
+        reward.toLocaleString('en-US', {minimumFractionDigits: 2});
       document.getElementById('claim-remaining').textContent =
-        Number(currentAd.remaining).toLocaleString('en-US', {minimumFractionDigits: 2});
+        remaining.toLocaleString('en-US', {minimumFractionDigits: 2});
 
-      const claimedCount = Math.floor((currentAd.budget - currentAd.remaining) / currentAd.reward);
+      const claimedCount = reward > 0 ? Math.floor((budget - remaining) / reward) : 0;
       document.getElementById('claim-claimed').textContent = claimedCount;
     }
 
