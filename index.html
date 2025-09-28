@@ -1344,18 +1344,30 @@
 
     // Обновление произведенных акций с лимитом
     function updateProducedShares() {
-      if (productionRatePerSecond > 0) {
-        const elapsed = (Date.now() - lastCollectTimestamp) / 1000;
-        producedShares = Math.min(Math.floor(elapsed * productionRatePerSecond), MAX_PRODUCTION, 50000);
-        setNumToEl(producedSharesEl, producedShares);
-      } else {
-        producedShares = 0;
-        setNumToEl(producedSharesEl, 0);
-      }
-    }
+  if (productionRatePerSecond > 0) {
+    const elapsed = (Date.now() - lastCollectTimestamp) / 1000;
+    // ДОБАВЬ ВТОРОЙ ЛИМИТ 50000
+    producedShares = Math.min(
+      Math.floor(elapsed * productionRatePerSecond), 
+      MAX_PRODUCTION,
+      50000  // ← ДОБАВЬ ЭТУ СТРОКУ
+    );
+    setNumToEl(producedSharesEl, producedShares);
+  } else {
+    producedShares = 0;
+    setNumToEl(producedSharesEl, 0);
+  }
+}
 
     // Сбор акций
-    async function collectShares() {
+    // Сбор акций
+async function collectShares() {
+  // ДОБАВЬ ПРОВЕРКУ ПЕРЕД ОТПРАВКОЙ - В САМОМ НАЧАЛЕ ФУНКЦИИ!
+  if (producedShares > 50000) {
+    showToast("Слишком много акций для сбора! Собирайте чаще.");
+    return;
+  }
+
   try {
     const response = await fetch(`${apiBase}/company/${currentCompanyId}/collect`, {
       method: 'POST'
@@ -1367,16 +1379,10 @@
       return;
     }
 
-    // ДОБАВЬ ПРОВЕРКУ ПЕРЕД ОТПРАВКОЙ
-if (producedShares > 50000) {
-    showToast("Слишком много акций для сбора! Собирайте чаще.");
-    return;
-}
-
     const updated = await response.json();
 
     // ⚡️ ВАЖНО: ПЕРЕЗАГРУЖАЕМ данные компании!
-    await loadCompanyDashboard(); // Эта функция уже есть у тебя!
+    await loadCompanyDashboard();
 
     // Обновляем локальные переменные
     lastCollectTimestamp = Date.now();
