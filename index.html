@@ -381,6 +381,11 @@
   <div>Доступно на рынке: <span id="company-available-market">0</span></div>
   <input type="number" id="issue-amount-input" placeholder="Количество акций для выпуска">
   <div class="btn" id="issue-shares-btn">Выпустить акции</div>
+        <div class="capital-section">
+  <div>Капитал компании: $<span id="company-capital">0</span></div>
+  <input type="number" id="withdraw-amount" placeholder="Сумма для вывода">
+  <div class="btn" id="withdraw-btn">Вывести деньги</div>
+</div>
 </div>
 
       <!-- Раздел Персонал -->
@@ -1316,6 +1321,9 @@
         companyAvailableIssueEl.textContent = Number(company.available_to_issue).toLocaleString('en-US');
         companyAvailableMarketEl.textContent = Number(company.available).toLocaleString('en-US');
 
+        document.getElementById('company-capital').textContent = Number(company.capital).toLocaleString('en-US');
+
+
         productionRatePerSecond = Number(company.production_rate_per_second) || 0;
         lastCollectTimestamp = new Date(company.last_collect).getTime();
         updateProducedShares();
@@ -1774,6 +1782,30 @@ async function loadClaimAd() {
       }
     }
 
+document.getElementById('withdraw-btn').addEventListener('click', async () => {
+  const amount = Number(document.getElementById('withdraw-amount').value);
+  if (isNaN(amount) || amount <= 0) return;
+
+  try {
+    const response = await fetch(`${apiBase}/company/${currentCompanyId}/withdraw/${telegramId}`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ amount })
+    });
+
+    if (response.ok) {
+      showToast('Деньги выведены');
+      await loadCompanyDashboard();
+      updateUI();
+    } else {
+      const error = await response.json();
+      showToast(error.error);
+    }
+  } catch (err) {
+    showToast('Ошибка');
+  }
+});
+
     // Загрузка страницы продажи акций
 async function loadStockSell() {
   if (!currentCompanyId) return;
@@ -2134,6 +2166,7 @@ async function loadHoldings() {
 
 </body>
 </html>
+
 
 
 
