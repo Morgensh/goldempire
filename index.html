@@ -1133,7 +1133,7 @@
           anonymous = user.anonymous;
           claimedChannelBonus = user.claimed_channel_bonus;
           lastClaimTime = new Date(user.last_claim).getTime();
-          clickValue = 2.5 * Number(level);
+          clickValue = 1 + Number(level); // 1$ + уровень
           updateUI();
           updateCreateCompanyArea();
           return true;
@@ -1348,7 +1348,7 @@
     const elapsed = (Date.now() - lastCollectTimestamp) / 1000;
     // ДОБАВЬ ВТОРОЙ ЛИМИТ 50000
     producedShares = Math.min(
-      Math.floor(elapsed * productionRatePerSecond), 
+      Math.floor(elapsed * productionRatePerSecond),
       MAX_PRODUCTION,
       50000  // ← ДОБАВЬ ЭТУ СТРОКУ
     );
@@ -2134,5 +2134,6 @@ async function loadHoldings() {
 
 </body>
 </html>
+
 
 
