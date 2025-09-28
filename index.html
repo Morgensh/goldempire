@@ -1163,7 +1163,7 @@
           anonymous = user.anonymous;
           claimedChannelBonus = user.claimed_channel_bonus;
           lastClaimTime = new Date(user.last_claim).getTime();
-          clickValue = 2.5 * Number(level);
+          clickValue = 1 + Number(level);
 
           if (masterId) {
             response = await fetch(`${apiBase}/apply_tax/${telegramId}`, { method: 'POST' });
