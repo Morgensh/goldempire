@@ -158,17 +158,39 @@
     </div>
 
     <!-- Получение награды за объявление -->
-    <div class="section" id="claim-ad-section">
+    <!-- Получение награды за объявление -->
+<div class="section" id="claim-ad-section">
   <h2 class="section-title">Объявление</h2>
-  <div class="card">
-    <div>Канал: <span id="claim-channel"></span></div>
-    <!-- ДОБАВЬ ЭТУ СТРОКУ -->
-    <div id="budget-info" style="display: none;"></div>
-    <a id="subscribe-link" href="" class="btn">Подписаться</a>
-    <div class="btn" id="check-subscribed">Я подписался</div>
-    <div class="btn disabled" id="claim-reward">Получить награду</div>
+  <div class="market-card">
+    <div class="market-card-header">
+      <div class="company-name" id="claim-channel">@channel</div>
+      <div class="stock-price" id="claim-reward-amount">$0</div>
+    </div>
+    <div class="market-card-details">
+  <div class="detail-item">
+    <span class="detail-label">Канал</span>
+    <span class="detail-value" id="claim-channel-value">@channel</span>
   </div>
-  <div class="btn" id="back-to-ads-from-claim-btn">Назад</div>
+  <div class="detail-item">
+    <span class="detail-label">Награда</span>
+    <span class="detail-value" id="claim-reward-value">$0</span>
+  </div>
+  <div class="detail-item">
+    <span class="detail-label">Бюджет</span>
+    <span class="detail-value" id="claim-budget-value">$0</span>
+  </div>
+  <div class="detail-item">
+    <span class="detail-label">Осталось</span>
+    <span class="detail-value" id="claim-remaining-value">$0</span>
+  </div>
+</div>
+    <div class="claim-ad-buttons">
+      <a id="subscribe-link" href="" class="btn" target="_blank">📺 Подписаться на канал</a>
+      <div class="btn" id="check-subscribed">✅ Я подписался</div>
+      <div class="btn disabled" id="claim-reward">🎁 Получить награду</div>
+    </div>
+  </div>
+  <div class="btn" id="back-to-ads-from-claim-btn">← Назад к объявлениям</div>
 </div>
 
     <!-- Покупка акций -->
