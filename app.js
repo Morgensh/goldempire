@@ -1132,18 +1132,11 @@ async function loadClaimAd() {
     claimChannel.textContent = `@${ad.channel_username}`;
     subscribeLink.href = 'https://t.me/' + ad.channel_username;
 
-    // Находим или создаем элемент для бюджета
-    let budgetInfo = document.getElementById('budget-info');
-    if (!budgetInfo) {
-      budgetInfo = document.createElement('div');
-      budgetInfo.id = 'budget-info';
-      budgetInfo.className = 'budget-info';
-      claimChannel.parentNode.insertBefore(budgetInfo, claimChannel.nextSibling);
-    }
-
-    // Показываем и обновляем информацию о бюджете
-    budgetInfo.style.display = 'block';
-    budgetInfo.innerHTML = `Бюджет: $${Number(ad.remaining).toLocaleString('en-US')} / $${Number(ad.budget).toLocaleString('en-US')} осталось`;
+    // Обновляем детали объявления
+    document.getElementById('claim-channel-value').textContent = '@' + ad.channel_username;
+    document.getElementById('claim-reward-value').textContent = '$' + Number(ad.reward).toLocaleString('en-US');
+    document.getElementById('claim-budget-value').textContent = '$' + Number(ad.budget).toLocaleString('en-US');
+    document.getElementById('claim-remaining-value').textContent = '$' + Number(ad.remaining).toLocaleString('en-US');
 
     claimReward.classList.add('disabled');
     claimReward.classList.remove('btn-green');
@@ -1154,10 +1147,6 @@ async function loadClaimAd() {
     // Fallback на старые данные
     claimChannel.textContent = '@' + currentChannel;
     subscribeLink.href = 'https://t.me/' + currentChannel;
-
-    // Скрываем информацию о бюджете при ошибке
-    const budgetInfo = document.getElementById('budget-info');
-    if (budgetInfo) budgetInfo.style.display = 'none';
 
     showToast('Ошибка загрузки данных объявления');
   }
