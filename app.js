@@ -3,6 +3,28 @@
     tg.ready();
     tg.expand();
 
+    function initTheme() {
+  const savedTheme = localStorage.getItem('theme') || 'light';
+  document.documentElement.setAttribute('data-theme', savedTheme);
+
+  const themeBtn = document.getElementById('theme-toggle-btn');
+   themeBtn.className = savedTheme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+   themeBtn.onclick = toggleTheme;
+}
+
+function toggleTheme() {
+  const currentTheme = document.documentElement.getAttribute('data-theme');
+  const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+
+  document.documentElement.setAttribute('data-theme', newTheme);
+  localStorage.setItem('theme', newTheme);
+
+  const themeBtn = document.getElementById('theme-toggle-btn');
+  themeBtn.className = newTheme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+  themeBtn.classList.add('fa-spin');
+  setTimeout(() => themeBtn.classList.remove('fa-spin'), 500);
+}
+
     // Глобальные переменные
     let userData = tg.initDataUnsafe.user || {};
     let telegramId = Number(userData.id) || 0;
@@ -558,6 +580,7 @@
     // Инициализация пользователя
     async function initUser() {
       if (!telegramId) return;
+      initTheme();
 
       const loadedFromLocal = loadFromLocal();
 
