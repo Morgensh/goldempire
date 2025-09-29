@@ -754,11 +754,12 @@ async function loadCompanyDashboard() {
     document.getElementById('company-available-issue').textContent = Number(company.available_to_issue).toLocaleString('en-US');
     document.getElementById('company-available-market').textContent = Number(company.available).toLocaleString('en-US');
 
-    // Добавляем красивый профит
-    profitEl.textContent = '$' + Number(company.price).toLocaleString('en-US', {minimumFractionDigits: 2});
+    // Расчет дохода компании от продажи акций
+    const soldShares = company.issued_shares - company.available;
+    const companyIncome = soldShares * company.price;
     const profitEl = document.getElementById('company-profit');
-    profitEl.textContent = profit >= 0 ? '+$' + profit.toLocaleString('en-US', {minimumFractionDigits: 2}) : '-$' + Math.abs(profit).toLocaleString('en-US', {minimumFractionDigits: 2});
-    profitEl.className = profit >= 0 ? 'stock-price text-success' : 'stock-price text-danger';
+    profitEl.textContent = '+$' + companyIncome.toLocaleString('en-US', {minimumFractionDigits: 2});
+    profitEl.className = 'stock-price text-success';
 
     productionRatePerSecond = Number(company.production_rate_per_second) || 0;
     lastCollectTimestamp = new Date(company.last_collect).getTime();
@@ -1613,6 +1614,4 @@ settingsBtn.addEventListener('click', () => switchToSection('settings'));
 
     // Инициализация
     initUser();
-
-
 
