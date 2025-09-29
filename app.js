@@ -755,7 +755,7 @@ async function loadCompanyDashboard() {
     document.getElementById('company-available-market').textContent = Number(company.available).toLocaleString('en-US');
 
     // Добавляем красивый профит
-    const profit = (company.available * company.price) - (company.issued_shares * 1);
+    const profit = company.available * company.price;
     const profitEl = document.getElementById('company-profit');
     profitEl.textContent = profit >= 0 ? '+$' + profit.toLocaleString('en-US', {minimumFractionDigits: 2}) : '-$' + Math.abs(profit).toLocaleString('en-US', {minimumFractionDigits: 2});
     profitEl.className = profit >= 0 ? 'stock-price text-success' : 'stock-price text-danger';
@@ -1613,4 +1613,5 @@ settingsBtn.addEventListener('click', () => switchToSection('settings'));
 
     // Инициализация
     initUser();
+
 
