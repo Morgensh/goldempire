@@ -14,10 +14,9 @@
   <div class="header">
   Gold Empire
   <div style="float:right;">
-  <i id="shop-btn" class="fas fa-store" style="cursor:pointer; margin-right: 15px;"></i>
-  <i id="theme-toggle-btn" class="fas fa-moon" style="cursor:pointer; margin-right: 15px;"></i>
-  <i id="settings-btn" class="fas fa-cog" style="cursor:pointer;"></i>
-</div>
+    <i id="shop-btn" class="fas fa-store" style="cursor:pointer; margin-right: 15px;"></i>
+    <i id="settings-btn" class="fas fa-cog" style="cursor:pointer;"></i>
+  </div>
 </div>
 
   <!-- Основной контент -->
@@ -87,33 +86,15 @@
     <!-- Личный кабинет компании -->
     <div class="section" id="company-dashboard-section">
       <h2 class="section-title">Личный кабинет компании</h2>
-      <div class="market-card">
-  <div class="market-card-header">
-    <div class="company-name" id="company-name">COMPANY</div>
-    <div class="stock-price" id="company-profit">+$0.00</div>
-  </div>
-  <div class="market-card-details">
-    <div class="detail-item">
-      <span class="detail-label">Клиентов</span>
-      <span class="detail-value" id="company-clients">0</span>
-    </div>
-    <div class="detail-item">
-      <span class="detail-label">Акций выпущено</span>
-      <span class="detail-value" id="company-issued">0</span>
-    </div>
-    <div class="detail-item">
-      <span class="detail-label">Доступно для выпуска</span>
-      <span class="detail-value" id="company-available-issue">0</span>
-    </div>
-    <div class="detail-item">
-      <span class="detail-label">На рынке</span>
-      <span class="detail-value" id="company-available-market">0</span>
-    </div>
-  </div>
-  <div style="display: flex; gap: 8px; margin-top: 12px;">
-    <input type="number" id="issue-amount-input" placeholder="Кол-во акций" style="flex: 2;">
-    <div class="btn" id="issue-shares-btn" style="flex: 1;">Выпустить</div>
-  </div>
+      <div class="card">
+  <div>Название: <span id="company-name"></span></div>
+  <div>Клиентов: <span id="company-clients"></span></div>
+  <div>Выпущено акций: <span id="company-issued"></span></div>
+  <div>Доступно для выпуска: <span id="company-available-issue"></span></div>
+  <!-- ДОБАВЬ ЭТУ СТРОКУ -->
+  <div>Доступно на рынке: <span id="company-available-market">0</span></div>
+  <input type="number" id="issue-amount-input" placeholder="Количество акций для выпуска">
+  <div class="btn" id="issue-shares-btn">Выпустить акции</div>
 </div>
 
       <!-- Раздел Персонал -->
@@ -176,39 +157,17 @@
     </div>
 
     <!-- Получение награды за объявление -->
-    <!-- Получение награды за объявление -->
-<div class="section" id="claim-ad-section">
+    <div class="section" id="claim-ad-section">
   <h2 class="section-title">Объявление</h2>
-  <div class="market-card">
-    <div class="market-card-header">
-      <div class="company-name" id="claim-channel">@channel</div>
-      <div class="stock-price" id="claim-reward-amount">$0</div>
-    </div>
-    <div class="market-card-details">
-  <div class="detail-item">
-    <span class="detail-label">Канал</span>
-    <span class="detail-value" id="claim-channel-value">@channel</span>
+  <div class="card">
+    <div>Канал: <span id="claim-channel"></span></div>
+    <!-- ДОБАВЬ ЭТУ СТРОКУ -->
+    <div id="budget-info" style="display: none;"></div>
+    <a id="subscribe-link" href="" class="btn">Подписаться</a>
+    <div class="btn" id="check-subscribed">Я подписался</div>
+    <div class="btn disabled" id="claim-reward">Получить награду</div>
   </div>
-  <div class="detail-item">
-    <span class="detail-label">Награда</span>
-    <span class="detail-value" id="claim-reward-value">$0</span>
-  </div>
-  <div class="detail-item">
-    <span class="detail-label">Бюджет</span>
-    <span class="detail-value" id="claim-budget-value">$0</span>
-  </div>
-  <div class="detail-item">
-    <span class="detail-label">Осталось</span>
-    <span class="detail-value" id="claim-remaining-value">$0</span>
-  </div>
-</div>
-    <div class="claim-ad-buttons">
-      <a id="subscribe-link" href="" class="btn" target="_blank">📺 Подписаться на канал</a>
-      <div class="btn" id="check-subscribed">✅ Я подписался</div>
-      <div class="btn disabled" id="claim-reward">🎁 Получить награду</div>
-    </div>
-  </div>
-  <div class="btn" id="back-to-ads-from-claim-btn">← Назад к объявлениям</div>
+  <div class="btn" id="back-to-ads-from-claim-btn">Назад</div>
 </div>
 
     <!-- Покупка акций -->
@@ -384,4 +343,3 @@
 
 </body>
 </html>
-
