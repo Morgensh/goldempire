@@ -1,29 +1,7 @@
-  // Telegram WebApp init
+    // Telegram WebApp init
     const tg = window.Telegram.WebApp;
     tg.ready();
     tg.expand();
-
-    function initTheme() {
-  const savedTheme = localStorage.getItem('theme') || 'light';
-  document.documentElement.setAttribute('data-theme', savedTheme);
-
-  const themeBtn = document.getElementById('theme-toggle-btn');
-   themeBtn.className = savedTheme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
-   themeBtn.onclick = toggleTheme;
-}
-
-function toggleTheme() {
-  const currentTheme = document.documentElement.getAttribute('data-theme');
-  const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-
-  document.documentElement.setAttribute('data-theme', newTheme);
-  localStorage.setItem('theme', newTheme);
-
-  const themeBtn = document.getElementById('theme-toggle-btn');
-  themeBtn.className = newTheme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
-  themeBtn.classList.add('fa-spin');
-  setTimeout(() => themeBtn.classList.remove('fa-spin'), 500);
-}
 
     // Глобальные переменные
     let userData = tg.initDataUnsafe.user || {};
@@ -580,7 +558,6 @@ function toggleTheme() {
     // Инициализация пользователя
     async function initUser() {
       if (!telegramId) return;
-      initTheme();
 
       const loadedFromLocal = loadFromLocal();
 
@@ -902,33 +879,23 @@ async function collectShares() {
 
     // Рендер рынка акций
     function renderMarketList(companies) {
-  marketList.innerHTML = '';
-  companies.forEach(company => {
-    const card = document.createElement('div');
-    card.classList.add('market-card');
-    card.innerHTML = `
-      <div class="market-card-header">
-        <div class="company-name">${company.name}</div>
-        <div class="stock-price">$${Number(company.price).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>
-      </div>
-      <div class="market-card-details">
-        <div class="detail-item">
-          <span class="detail-label">Владелец</span>
-          <span class="detail-value">@${company.owner_username}</span>
-        </div>
-        <div class="detail-item">
-          <span class="detail-label">Клиентов</span>
-          <span class="detail-value">${Number(company.clients_count).toLocaleString('en-US')}</span>
-        </div>
-      </div>
-    `;
-    card.addEventListener('click', () => {
-      currentCompanyId = company.id;
-      switchToSection('stock-buy');
-    });
-    marketList.appendChild(card);
-  });
-}
+      marketList.innerHTML = '';
+      companies.forEach(company => {
+        const card = document.createElement('div');
+        card.classList.add('card');
+        card.innerHTML = `
+          <div>Компания: ${company.name}</div>
+          <div>Владелец: @${company.owner_username}</div>
+          <div>Клиентов: ${Number(company.clients_count).toLocaleString('en-US')}</div>
+          <div>Цена: $${Number(company.price).toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
+        `;
+        card.addEventListener('click', () => {
+          currentCompanyId = company.id;
+          switchToSection('stock-buy');
+        });
+        marketList.appendChild(card);
+      });
+    }
 
     searchStocks.addEventListener('input', (e) => {
       const query = e.target.value.toLowerCase();
@@ -950,33 +917,21 @@ async function collectShares() {
 
     // Рендер рынка слуг
     function renderServantMarketList(servants) {
-  servantMarketList.innerHTML = '';
-  servants.forEach(servant => {
-    const card = document.createElement('div');
-    card.classList.add('market-card');
-    card.innerHTML = `
-      <div class="market-card-header">
-        <div class="company-name">@${servant.username}</div>
-        <div class="stock-price">$${Number(servant.price).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>
-      </div>
-      <div class="market-card-details">
-        <div class="detail-item">
-          <span class="detail-label">Статус</span>
-          <span class="detail-value">Слуга</span>
-        </div>
-        <div class="detail-item">
-          <span class="detail-label">Доход</span>
-          <span class="detail-value">$1/сек</span>
-        </div>
-      </div>
-    `;
-    card.addEventListener('click', () => {
-      currentServantId = servant.servant_id;
-      switchToSection('servant-buy');
-    });
-    servantMarketList.appendChild(card);
-  });
-}
+      servantMarketList.innerHTML = '';
+      servants.forEach(servant => {
+        const card = document.createElement('div');
+        card.classList.add('card');
+        card.innerHTML = `
+          <div>Слуга: @${servant.username}</div>
+          <div>Цена: $${Number(servant.price).toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
+        `;
+        card.addEventListener('click', () => {
+          currentServantId = servant.servant_id;
+          switchToSection('servant-buy');
+        });
+        servantMarketList.appendChild(card);
+      });
+    }
 
     searchServants.addEventListener('input', (e) => {
       const query = e.target.value.toLowerCase();
@@ -1380,7 +1335,7 @@ async function loadHoldings() {
 
     holdings.forEach(holding => {
       const card = document.createElement('div');
-      card.classList.add('market-card');
+      card.classList.add('card');
 
       // Используем BigInt для больших чисел
       const shares = BigInt(holding.shares);
@@ -1403,37 +1358,14 @@ async function loadHoldings() {
         profit = 0;
       }
 
-      // Определяем цвет для дохода (зеленый/красный)
-      const profitClass = profit >= 0 ? 'text-success' : 'text-danger';
-      const profitSign = profit >= 0 ? '+' : '';
-
       card.innerHTML = `
-        <div class="market-card-header">
-          <div class="company-name">${holding.name}</div>
-          <div class="stock-price ${profitClass}">${profitSign}$${profit.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>
-        </div>
-        <div class="market-card-details">
-          <div class="detail-item">
-            <span class="detail-label">Акций</span>
-            <span class="detail-value">${shares.toLocaleString('en-US')}</span>
-          </div>
-          <div class="detail-item">
-            <span class="detail-label">Цена покупки</span>
-            <span class="detail-value">$${avgPrice.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
-          </div>
-          <div class="detail-item">
-            <span class="detail-label">Текущая цена</span>
-            <span class="detail-value">$${currentPrice.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
-          </div>
-          <div class="detail-item">
-            <span class="detail-label">Стоимость</span>
-            <span class="detail-value">$${(Number(shares) * currentPrice).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
-          </div>
-        </div>
-        <div style="display: flex; gap: 8px; margin-top: 12px;">
-          <div class="btn" data-action="buy-more" style="flex: 1;">Купить еще</div>
-          <div class="btn" data-action="sell" style="flex: 1;">Продать</div>
-        </div>
+        <div>Компания: ${holding.name}</div>
+        <div>Акций: ${shares.toLocaleString('en-US')}</div>
+        <div>Куплено по: $${avgPrice.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>
+        <div>Текущая цена: $${currentPrice.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>
+        <div>Доход: $${profit.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>
+        <div class="btn" data-action="buy-more">Купить еще</div>
+        <div class="btn" data-action="sell">Продать</div>
       `;
 
       card.querySelector('[data-action="buy-more"]').addEventListener('click', () => {
