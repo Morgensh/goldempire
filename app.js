@@ -1401,60 +1401,36 @@ async function loadHoldings() {
     holdingsList.innerHTML = '';
 
     holdings.forEach(holding => {
-      const card = document.createElement('div');
-      card.classList.add('card');
-
-      // Используем BigInt для больших чисел
-      const shares = BigInt(holding.shares);
+      const shares = Number(holding.shares);
       const avgPrice = parseFloat(holding.avg_price);
       const currentPrice = parseFloat(holding.current_price);
 
-      // Безопасный расчет дохода
-      let profit = 0;
-      try {
-        // Для очень больших чисел используем BigInt
-        if (shares > 1000000000) { // Если больше 1 миллиарда
-          const priceDiff = BigInt(Math.floor(currentPrice * 100)) - BigInt(Math.floor(avgPrice * 100));
-          profit = Number((priceDiff * shares) / 100n);
-        } else {
-          // Для обычных чисел обычная арифметика
-          profit = (currentPrice - avgPrice) * Number(shares);
-        }
-      } catch (e) {
-        console.error('Profit calculation error:', e);
-        profit = 0;
-      }
+      // Расчет прибыли
+      const profit = (currentPrice - avgPrice) * shares;
+      const profitColor = profit >= 0 ? 'green' : 'red';
 
+      // Общая стоимость
+      const totalValue = currentPrice * shares;
+
+      const card = document.createElement('div');
+      card.classList.add('card');
+      card.style.marginBottom = '15px';
       card.innerHTML = `
-  <div style="font-size: 18px; font-weight: bold; margin-bottom: 10px;">${holding.name}</div>
-  <div style="color: #10b981; font-size: 16px; font-weight: bold; margin-bottom: 15px;">+$${profit.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>
-  
-  <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-    <span>Акций</span>
-    <span>${shares.toLocaleString('en-US')}</span>
-  </div>
-  
-  <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-    <span>Цена покупки</span>
-    <span>$${avgPrice.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
-  </div>
-  
-  <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-    <span>Текущая цена</span>
-    <span style="color: #10b981; font-weight: bold;">$${currentPrice.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
-  </div>
-  
-  <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
-    <span>Стоимость</span>
-    <span style="font-weight: bold;">$${(Number(shares) * currentPrice).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
-  </div>
-  
-  <div style="display: flex; gap: 10px;">
-    <div class="btn" data-action="buy-more" style="flex: 1;">Купить еще</div>
-    <div class="btn" data-action="sell" style="flex: 1;">Продать</div>
-  </div>
-`;
+        <div style="font-weight: bold; font-size: 18px;">
+          ${holding.name}
+          <span style="float:right; color:${profitColor};">
+            ${profit >= 0 ? '+' : ''}$${profit.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}
+          </span>
+        </div>
+        <div>Акций: ${shares.toLocaleString('en-US')} &nbsp; Цена покупки: $${avgPrice.toFixed(2)}</div>
+        <div>Текущая цена: $${currentPrice.toFixed(2)} &nbsp; Стоимость: $${totalValue.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>
+        <div style="margin-top:10px; display:flex; gap:10px;">
+          <div class="btn" data-action="buy-more">Купить еще</div>
+          <div class="btn" data-action="sell">Продать</div>
+        </div>
+      `;
 
+      // кнопки
       card.querySelector('[data-action="buy-more"]').addEventListener('click', () => {
         currentCompanyId = holding.company_id;
         switchToSection('stock-buy');
@@ -1471,6 +1447,7 @@ async function loadHoldings() {
     console.error('Load holdings error:', err);
   }
 }
+
 
     // Загрузка слуг
     async function loadServants() {
