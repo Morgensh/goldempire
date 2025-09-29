@@ -752,7 +752,9 @@ async function loadCompanyDashboard() {
     document.getElementById('company-clients').textContent = Number(company.clients_count).toLocaleString('en-US');
     document.getElementById('company-issued').textContent = Number(company.issued_shares).toLocaleString('en-US');
     document.getElementById('company-available-issue').textContent = Number(company.available_to_issue).toLocaleString('en-US');
-    document.getElementById('company-available-market').textContent = Number(company.available).toLocaleString('en-US');
+    // ЗАЩИТА ОТ НЕРЕАЛЬНЫХ ЧИСЕЛ
+const availableMarket = Math.min(Number(company.available), 1000000);
+document.getElementById('company-available-market').textContent = availableMarket.toLocaleString('en-US');
 
     // Расчет дохода компании от продажи акций
     const soldShares = company.issued_shares - company.available;
@@ -1224,7 +1226,9 @@ async function loadClaimAd() {
         buyCompanyOwnerEl.textContent = `@${company.owner_username}`;
         buyCompanyClientsEl.textContent = Number(company.clients_count).toLocaleString('en-US');
         buyCompanyPriceEl.textContent = `$${Number(company.price).toLocaleString('en-US', {minimumFractionDigits: 2})}`;
-        buyCompanyAvailableEl.textContent = Number(company.available).toLocaleString('en-US');
+        // ЗАЩИТА ОТ НЕРЕАЛЬНЫХ ЧИСЕЛ
+const available = Math.min(Number(company.available), 1000000);
+buyCompanyAvailableEl.textContent = available.toLocaleString('en-US');
       } catch (err) {
         console.error('Load buy error:', err);
       }
@@ -1241,9 +1245,13 @@ async function loadStockSell() {
     const companyResponse = await fetch(`${apiBase}/company/${currentCompanyId}`);
     const company = await companyResponse.json();
 
+    // ЗАЩИТА ОТ НЕРЕАЛЬНЫХ ЧИСЕЛ
+    const shares = Math.min(Number(holding.shares), 1000000);
+    const price = Math.min(Number(company.price), 1000);
+
     sellCompanyNameEl.textContent = holding.name || company.name;
-    sellCompanySharesEl.textContent = Number(holding.shares).toLocaleString('en-US');
-    sellCompanyPriceEl.textContent = `$${Number(company.price).toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+    sellCompanySharesEl.textContent = shares.toLocaleString('en-US');
+    sellCompanyPriceEl.textContent = `$${price.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
 
   } catch (err) {
     console.error('Load stock sell error:', err);
@@ -1386,20 +1394,20 @@ async function loadHoldings() {
       const currentPrice = parseFloat(holding.current_price);
 
       // Безопасный расчет дохода
-      let profit = 0;
-      try {
-        // Для очень больших чисел используем BigInt
-        if (shares > 1000000000) { // Если больше 1 миллиарда
-          const priceDiff = BigInt(Math.floor(currentPrice * 100)) - BigInt(Math.floor(avgPrice * 100));
-          profit = Number((priceDiff * shares) / 100n);
-        } else {
-          // Для обычных чисел обычная арифметика
-          profit = (currentPrice - avgPrice) * Number(shares);
-        }
-      } catch (e) {
-        console.error('Profit calculation error:', e);
-        profit = 0;
-      }
+      // Безопасный расчет дохода
+let profit = 0;
+try {
+  const sharesNum = Number(shares);
+  profit = (currentPrice - avgPrice) * sharesNum;
+
+  // Защита от астрономических чисел
+  if (Math.abs(profit) > 1000000000) {
+    profit = (currentPrice - avgPrice) * Math.min(sharesNum, 1000000);
+  }
+} catch (e) {
+  console.error('Profit calculation error:', e);
+  profit = 0;
+}
 
       // Определяем цвет для дохода (зеленый/красный)
       const profitClass = profit >= 0 ? 'text-success' : 'text-danger';
@@ -1424,9 +1432,9 @@ async function loadHoldings() {
             <span class="detail-value">$${currentPrice.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
           </div>
           <div class="detail-item">
-            <span class="detail-label">Стоимость</span>
-            <span class="detail-value">$${(Number(shares) * currentPrice).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
-          </div>
+  <span class="detail-label">Стоимость</span>
+  <span class="detail-value">$${Math.min(Number(shares) * currentPrice, 10000000).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
+</div>
         </div>
         <div style="display: flex; gap: 8px; margin-top: 12px;">
           <div class="btn" data-action="buy-more" style="flex: 1;">Купить еще</div>
