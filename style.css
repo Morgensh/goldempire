@@ -1,309 +1,760 @@
-    /* Базовые сбросы и стили */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: Arial, sans-serif;
-    }
+/* ===== БАЗОВЫЕ СТИЛИ И ПЕРЕМЕННЫЕ ===== */
+:root {
+  /* Светлая тема */
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8f9fa;
+  --bg-card: #ffffff;
+  --text-primary: #1a1a1a;
+  --text-secondary: #666666;
+  --text-muted: #888888;
+  --border-color: #e1e5e9;
+  --accent-primary: #2563eb;
+  --accent-success: #10b981;
+  --accent-warning: #f59e0b;
+  --accent-danger: #ef4444;
+  --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+  --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --gradient-gold: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+}
 
-    body {
-      background: white;
-      color: black;
-      min-height: 100vh;
-      padding-bottom: 72px;
-    }
+[data-theme="dark"] {
+  /* Тёмная тема */
+  --bg-primary: #0f172a;
+  --bg-secondary: #1e293b;
+  --bg-card: #1e293b;
+  --text-primary: #f1f5f9;
+  --text-secondary: #cbd5e1;
+  --text-muted: #94a3b8;
+  --border-color: #334155;
+  --shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.35);
+}
 
-    .header {
-      padding: 20px;
-      font-size: 24px;
-      font-weight: bold;
-    }
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
 
-    .main-content {
-      padding: 0 20px;
-    }
+body {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  min-height: 100vh;
+  padding-bottom: 80px;
+  line-height: 1.6;
+}
 
-    .section {
-      display: none;
-    }
+/* ===== ШАПКА ===== */
+.header {
+  padding: 20px;
+  font-size: 24px;
+  font-weight: 700;
+  background: var(--bg-primary);
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: var(--shadow);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
 
-    .section.active {
-      display: block;
-    }
+.header i {
+  font-size: 20px;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
 
-    .card {
-      background: white;
-      border: 1px solid #ccc;
-      padding: 20px;
-      margin-bottom: 16px;
-    }
+.header i:hover {
+  background: var(--bg-secondary);
+  transform: scale(1.1);
+}
 
-    .bank-card {
-      background: white;
-      border: 1px solid #ccc;
-      padding: 20px;
-      margin-bottom: 24px;
-    }
+/* ===== ОСНОВНОЙ КОНТЕНТ ===== */
+.main-content {
+  padding: 0 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
 
-    .tap-circle {
-      width: 120px;
-      height: 120px;
-      border-radius: 50%;
-      background: white;
-      border: 2px solid #ccc;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 20px auto;
-      cursor: pointer;
-    }
+.section {
+  display: none;
+  animation: fadeIn 0.4s ease;
+}
 
-    .tap-text {
-      text-align: center;
-      margin: 10px 0;
-    }
+.section.active {
+  display: block;
+}
 
-    .btn {
-      padding: 12px;
-      background: white;
-      border: 1px solid #ccc;
-      cursor: pointer;
-      margin: 8px 0;
-      text-align: center;
-    }
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
 
-    .btn.disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-      pointer-events: none;
-    }
+.section-title {
+  font-size: 28px;
+  font-weight: 700;
+  margin: 24px 0 16px;
+  text-align: center;
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
 
-    .bottom-nav {
-      display: flex;
-      justify-content: space-around;
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      height: 72px;
-      background: white;
-      border-top: 1px solid #ccc;
-    }
+/* ===== БАНКОВСКАЯ КАРТА (ГЛАВНАЯ) ===== */
+.bank-card {
+  background: var(--gradient-gold);
+  border-radius: 20px;
+  padding: 24px;
+  margin: 24px 0;
+  color: white;
+  box-shadow: var(--shadow-lg);
+  position: relative;
+  overflow: hidden;
+  min-height: 180px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
 
-    .nav-item {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      font-size: 12px;
-      padding: 8px 0;
-    }
+.bank-card::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -50%;
+  width: 200px;
+  height: 200px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+}
 
-    .nav-item.active {
-      color: black;
-      font-weight: bold;
-    }
+.bank-card::after {
+  content: '';
+  position: absolute;
+  bottom: -30%;
+  left: -30%;
+  width: 150px;
+  height: 150px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 50%;
+}
 
-    #toast {
-      position: fixed;
-      bottom: 100px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: white;
-      border: 1px solid #ccc;
-      padding: 12px 24px;
-      border-radius: 4px;
-      z-index: 1000;
-      opacity: 0;
-      transition: opacity 0.3s;
-    }
+.bank-card > div:first-child {
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  z-index: 2;
+}
 
-    #toast.show {
-      opacity: 1;
-    }
+.bank-card > div:nth-child(2) {
+  font-size: 22px;
+  font-weight: 500;
+  letter-spacing: 2px;
+  margin: 12px 0;
+  z-index: 2;
+}
 
-    .section-title {
-      font-size: 22px;
-      font-weight: bold;
-      margin: 20px 0 10px;
-    }
+.bank-card > div:last-child {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 2;
+}
 
-    .profile-header {
-      text-align: center;
-      margin-bottom: 20px;
-    }
+#card-balance {
+  font-size: 24px;
+  font-weight: 700;
+}
 
-    .profile-avatar {
-      width: 80px;
-      height: 80px;
-      border-radius: 50%;
-      background: #eee;
-      margin: 0 auto 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
+#card-level {
+  background: rgba(255, 255, 255, 0.2);
+  padding: 6px 12px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  backdrop-filter: blur(10px);
+}
 
-    .profile-level, .stat-row {
-      margin: 8px 0;
-    }
+/* ===== КЛИКЕР ===== */
+.clicker-area {
+  text-align: center;
+  margin: 40px 0;
+}
 
-    .stat-row {
-      display: flex;
-      justify-content: space-between;
-      padding: 10px 0;
-      border-bottom: 1px solid #eee;
-    }
+.tap-circle {
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  background: var(--gradient-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+  cursor: pointer;
+  box-shadow: var(--shadow-lg);
+  transition: all 0.2s ease;
+  border: 4px solid var(--bg-primary);
+}
 
-    .progress-container {
-      width: 100%;
-      height: 8px;
-      background: #eee;
-      margin: 10px 0;
-    }
+.tap-circle:active {
+  transform: scale(0.95);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
 
-    .progress-fill {
-      height: 100%;
-      background: #ccc;
-      width: 0%;
-    }
+.tap-circle i {
+  font-size: 48px;
+  color: white;
+}
 
-    input {
-      padding: 8px;
-      border: 1px solid #ccc;
-      margin: 8px 0;
-      width: 100%;
-    }
+.tap-text {
+  color: var(--text-secondary);
+  font-size: 16px;
+  font-weight: 500;
+}
 
-    .staff-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 16px;
-    }
+/* ===== КАРТОЧКИ ===== */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 16px;
+  box-shadow: var(--shadow);
+  transition: all 0.3s ease;
+}
 
-    .staff-card {
-      background: white;
-      border: 1px solid #ccc;
-      padding: 12px;
-      text-align: center;
-    }
+.card:hover {
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-2px);
+}
 
-    .staff-img {
-      width: 80px;
-      height: 80px;
-      border-radius: 50%;
-      margin-bottom: 8px;
-    }
+/* ===== КНОПКИ ===== */
+.btn {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 14px 20px;
+  cursor: pointer;
+  margin: 8px 0;
+  text-align: center;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  display: block;
+  width: 100%;
+}
 
-    .tabs {
-      display: flex;
-      justify-content: space-around;
-      margin-bottom: 16px;
-    }
+.btn:hover:not(.disabled) {
+  background: var(--accent-primary);
+  color: white;
+  transform: translateY(-1px);
+  box-shadow: var(--shadow);
+}
 
-    .tab {
-      padding: 12px;
-      cursor: pointer;
-    }
+.btn.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
 
-    .tab.active {
-      font-weight: bold;
-      border-bottom: 2px solid black;
-    }
+.btn-green {
+  background: var(--accent-success);
+  color: white;
+  border: none;
+}
 
-    .tab-content {
-      display: none;
-    }
+/* ===== НИЖНЯЯ НАВИГАЦИЯ ===== */
+.bottom-nav {
+  display: flex;
+  justify-content: space-around;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 80px;
+  background: var(--bg-card);
+  border-top: 1px solid var(--border-color);
+  backdrop-filter: blur(10px);
+  z-index: 1000;
+}
 
-    .tab-content.active {
-      display: block;
-    }
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  padding: 8px 0;
+  color: var(--text-secondary);
+  transition: all 0.3s ease;
+  flex: 1;
+}
 
-    .search-input {
-      margin-bottom: 16px;
-    }
+.nav-item.active {
+  color: var(--accent-primary);
+  font-weight: 600;
+}
 
-    .btn-green {
-      background: green;
-      color: white;
-    }
+.nav-item i {
+  font-size: 20px;
+  margin-bottom: 4px;
+}
 
-    .top-players-content {
-      display: flex;
-      flex-direction: column;
-    }
+.nav-item.active i {
+  transform: scale(1.1);
+}
 
-    .top-list {
-      margin-bottom: 20px;
-    }
+/* ===== TOAST УВЕДОМЛЕНИЯ ===== */
+#toast {
+  position: fixed;
+  bottom: 100px;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  padding: 16px 24px;
+  border-radius: 12px;
+  z-index: 10000;
+  opacity: 0;
+  transition: all 0.3s ease;
+  box-shadow: var(--shadow-lg);
+  font-weight: 500;
+}
 
-    .top-item {
-      padding: 10px;
-      border-bottom: 1px solid #ccc;
-    }
+#toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
 
-    .top-item.highlighted {
-      background-color: #ffff99;
-    }
+/* ===== ПРОФИЛЬ ===== */
+.profile-header {
+  text-align: center;
+  margin-bottom: 24px;
+}
 
-    .staff-produced {
-      font-size: 18px;
-      margin-bottom: 10px;
-      text-align: center;
-    }
+.profile-avatar {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: var(--gradient-primary);
+  margin: 0 auto 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 4px solid var(--bg-card);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
 
-    .hidden {
-      display: none;
-    }
-    /* Добавь в секцию style (примерно строка 150): */
+.profile-name {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.profile-username {
+  color: var(--text-secondary);
+  font-size: 16px;
+  margin-bottom: 8px;
+}
+
+.profile-level {
+  background: var(--gradient-primary);
+  color: white;
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-weight: 600;
+  display: inline-block;
+}
+
+.stat-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.stat-row:last-child {
+  border-bottom: none;
+}
+
+/* ===== ПРОГРЕСС БАР ===== */
+.progress-container {
+  width: 100%;
+  height: 12px;
+  background: var(--bg-secondary);
+  border-radius: 10px;
+  margin: 16px 0;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: var(--gradient-primary);
+  border-radius: 10px;
+  width: 0%;
+  transition: width 0.5s ease;
+}
+
+/* ===== ФОРМЫ И ИНПУТЫ ===== */
+input {
+  padding: 14px 16px;
+  border: 2px solid var(--border-color);
+  border-radius: 12px;
+  margin: 8px 0;
+  width: 100%;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-size: 16px;
+  transition: all 0.3s ease;
+}
+
+input:focus {
+  outline: none;
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+input::placeholder {
+  color: var(--text-muted);
+}
+
+.search-input {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23666'%3E%3Cpath d='M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: 16px center;
+  background-size: 20px;
+  padding-left: 48px;
+}
+
+/* ===== СИСТЕМА ВКЛАДОК ===== */
+.tabs {
+  display: flex;
+  background: var(--bg-secondary);
+  border-radius: 12px;
+  padding: 4px;
+  margin-bottom: 20px;
+}
+
+.tab {
+  flex: 1;
+  padding: 12px;
+  text-align: center;
+  cursor: pointer;
+  border-radius: 8px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.tab.active {
+  background: var(--accent-primary);
+  color: white;
+  box-shadow: var(--shadow);
+}
+
+.tab-content {
+  display: none;
+  animation: fadeIn 0.4s ease;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+/* ===== ПЕРСОНАЛ КОМПАНИИ ===== */
+.staff-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.staff-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 16px;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.staff-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow);
+}
+
+.staff-img {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  margin-bottom: 12px;
+  border: 2px solid var(--border-color);
+}
+
+.staff-produced {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 16px;
+  text-align: center;
+  padding: 16px;
+  background: var(--bg-secondary);
+  border-radius: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* ===== РЫНОК АКЦИЙ ===== */
+.market-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 12px;
+  transition: all 0.3s ease;
+}
+
+.market-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow);
+}
+
+.market-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
+.company-name {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.stock-price {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--accent-success);
+}
+
+.market-card-details {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  font-size: 14px;
+}
+
+.detail-item {
+  display: flex;
+  justify-content: space-between;
+  color: var(--text-secondary);
+}
+
+.detail-label {
+  font-weight: 500;
+}
+
+.detail-value {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* ===== ТОП ИГРОКИ ===== */
+.top-list {
+  margin-bottom: 20px;
+}
+
+.top-item {
+  padding: 16px;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.3s ease;
+}
+
+.top-item:hover {
+  background: var(--bg-secondary);
+}
+
+.top-item.highlighted {
+  background: var(--accent-primary);
+  color: white;
+  border-radius: 8px;
+  margin: 4px 0;
+}
+
+.top-item.highlighted .top-player-balance {
+  color: white;
+}
+
+.top-player-info {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.top-player-name {
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.top-player-balance {
+  font-size: 14px;
+  color: var(--accent-success);
+  font-weight: 600;
+}
+
+.top-player-level {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+/* ===== СЛУГИ ===== */
+.servant-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.stat-card {
+  background: var(--bg-secondary);
+  padding: 16px;
+  border-radius: 12px;
+  text-align: center;
+}
+
+.stat-value {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--accent-success);
+  margin-bottom: 4px;
+}
+
+.stat-label {
+  font-size: 12px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* ===== ОБЪЯВЛЕНИЯ ===== */
 .budget-info {
   font-size: 14px;
-  color: #666;
-  margin-top: 5px;
-  padding: 5px;
-  background: #f9f9f9;
-  border-radius: 4px;
+  color: var(--text-secondary);
+  margin: 12px 0;
+  padding: 12px;
+  background: var(--bg-secondary);
+  border-radius: 8px;
+  border-left: 4px solid var(--accent-primary);
 }
-    /* Добавь в секцию style (примерно строка 150): */
+
 .claim-ad-buttons {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  margin-top: 15px;
+  margin-top: 16px;
 }
 
 .claim-ad-buttons .btn {
   margin: 0;
-  width: 100%;
 }
 
-.budget-info {
-  font-size: 14px;
-  color: #666;
-  margin: 10px 0;
-  padding: 8px;
-  background: #f9f9f9;
-  border-radius: 4px;
-  border-left: 3px solid #ccc;
-}
-    /* Стили для секции настроек */
+/* ===== НАСТРОЙКИ ===== */
 .settings-section .card {
-  background: white;
-  border: 1px solid #ccc;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
   padding: 20px;
   margin-bottom: 16px;
   line-height: 1.6;
 }
 
 .settings-section h3 {
-  margin-bottom: 15px;
-  color: #333;
+  margin-bottom: 16px;
+  color: var(--text-primary);
+  font-size: 20px;
 }
 
 .settings-section p {
   margin-bottom: 12px;
+  color: var(--text-secondary);
 }
 
 .settings-section strong {
-  color: #d35400;
+  color: var(--accent-warning);
+}
+
+/* ===== АДАПТИВНОСТЬ ===== */
+@media (max-width: 768px) {
+  .main-content {
+    padding: 0 16px;
+  }
+  
+  .bank-card {
+    padding: 20px;
+    min-height: 160px;
+  }
+  
+  .staff-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .servant-stats {
+    grid-template-columns: 1fr;
+  }
+  
+  .section-title {
+    font-size: 24px;
+  }
+}
+
+/* ===== УТИЛИТЫ ===== */
+.hidden {
+  display: none !important;
+}
+
+.text-success {
+  color: var(--accent-success);
+}
+
+.text-warning {
+  color: var(--accent-warning);
+}
+
+.text-danger {
+  color: var(--accent-danger);
+}
+
+.text-muted {
+  color: var(--text-muted);
+}
+
+/* ===== АНИМАЦИИ ===== */
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+.pulse {
+  animation: pulse 2s infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.fa-spin {
+  animation: spin 1s linear infinite;
 }
