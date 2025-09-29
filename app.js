@@ -1616,3 +1616,4 @@ settingsBtn.addEventListener('click', () => switchToSection('settings'));
 
     // Инициализация
     initUser();
+
