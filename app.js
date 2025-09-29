@@ -740,43 +740,51 @@ function toggleTheme() {
     }
 
     // Загрузка кабинета компании
-    async function loadCompanyDashboard() {
-      if (!currentCompanyId) return;
+async function loadCompanyDashboard() {
+  if (!currentCompanyId) return;
 
-      try {
-        const response = await fetch(`${apiBase}/company/${currentCompanyId}`);
-        const company = await response.json();
-        companyNameEl.textContent = company.name;
-        companyClientsEl.textContent = Number(company.clients_count).toLocaleString('en-US');
-        setNumToEl(companyIssuedEl, company.issued_shares);
-        companyAvailableIssueEl.textContent = Number(company.available_to_issue).toLocaleString('en-US');
-        companyAvailableMarketEl.textContent = Number(company.available).toLocaleString('en-US');
+  try {
+    const response = await fetch(`${apiBase}/company/${currentCompanyId}`);
+    const company = await response.json();
 
-        productionRatePerSecond = Number(company.production_rate_per_second) || 0;
-        lastCollectTimestamp = new Date(company.last_collect).getTime();
-        updateProducedShares();
+    // Обновляем данные в новом формате
+    companyNameEl.textContent = company.name;
+    document.getElementById('company-clients').textContent = Number(company.clients_count).toLocaleString('en-US');
+    document.getElementById('company-issued').textContent = Number(company.issued_shares).toLocaleString('en-US');
+    document.getElementById('company-available-issue').textContent = Number(company.available_to_issue).toLocaleString('en-US');
+    document.getElementById('company-available-market').textContent = Number(company.available).toLocaleString('en-US');
 
-        staffGrid.innerHTML = '';
-        staffTypes.forEach(staff => {
-          const staffCard = document.createElement('div');
-          staffCard.classList.add('staff-card');
-          const currentLevel = Number(company[`staff_${staff.type}_level`]) || 1;
-          const cost = 500 * currentLevel;
+    // Добавляем красивый профит
+    const profit = (company.available * company.price) - (company.issued_shares * 1);
+    const profitEl = document.getElementById('company-profit');
+    profitEl.textContent = profit >= 0 ? '+$' + profit.toLocaleString('en-US', {minimumFractionDigits: 2}) : '-$' + Math.abs(profit).toLocaleString('en-US', {minimumFractionDigits: 2});
+    profitEl.className = profit >= 0 ? 'stock-price text-success' : 'stock-price text-danger';
 
-          staffCard.innerHTML = `
-            <img src="${staff.img}" alt="${staff.name}" class="staff-img">
-            <div>${staff.name}</div>
-            <div>Уровень: <span id="staff-${staff.type}-level">${currentLevel}</span></div>
-            <div class="btn" id="upgrade-${staff.type}-btn">Улучшить ($${cost.toLocaleString('en-US')})</div>
-          `;
-          staffGrid.appendChild(staffCard);
+    productionRatePerSecond = Number(company.production_rate_per_second) || 0;
+    lastCollectTimestamp = new Date(company.last_collect).getTime();
+    updateProducedShares();
 
-          document.getElementById(`upgrade-${staff.type}-btn`).addEventListener('click', () => upgradeStaff(staff.type));
-        });
-      } catch (err) {
-        console.error('Load dashboard error:', err);
-      }
-    }
+    staffGrid.innerHTML = '';
+    staffTypes.forEach(staff => {
+      const staffCard = document.createElement('div');
+      staffCard.classList.add('staff-card');
+      const currentLevel = Number(company[`staff_${staff.type}_level`]) || 1;
+      const cost = 500 * currentLevel;
+
+      staffCard.innerHTML = `
+        <img src="${staff.img}" alt="${staff.name}" class="staff-img">
+        <div>${staff.name}</div>
+        <div>Уровень: <span id="staff-${staff.type}-level">${currentLevel}</span></div>
+        <div class="btn" id="upgrade-${staff.type}-btn">Улучшить ($${cost.toLocaleString('en-US')})</div>
+      `;
+      staffGrid.appendChild(staffCard);
+
+      document.getElementById(`upgrade-${staff.type}-btn`).addEventListener('click', () => upgradeStaff(staff.type));
+    });
+  } catch (err) {
+    console.error('Load dashboard error:', err);
+  }
+}
 
     // Обновление произведенных акций с лимитом
     function updateProducedShares() {
