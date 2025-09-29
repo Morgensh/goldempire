@@ -1426,14 +1426,34 @@ async function loadHoldings() {
       }
 
       card.innerHTML = `
-        <div>Компания: ${holding.name}</div>
-        <div>Акций: ${shares.toLocaleString('en-US')}</div>
-        <div>Куплено по: $${avgPrice.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>
-        <div>Текущая цена: $${currentPrice.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>
-        <div>Доход: $${profit.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>
-        <div class="btn" data-action="buy-more">Купить еще</div>
-        <div class="btn" data-action="sell">Продать</div>
-      `;
+  <div style="font-size: 18px; font-weight: bold; margin-bottom: 10px;">${holding.name}</div>
+  <div style="color: #10b981; font-size: 16px; font-weight: bold; margin-bottom: 15px;">+$${profit.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>
+  
+  <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+    <span>Акций</span>
+    <span>${shares.toLocaleString('en-US')}</span>
+  </div>
+  
+  <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+    <span>Цена покупки</span>
+    <span>$${avgPrice.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
+  </div>
+  
+  <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+    <span>Текущая цена</span>
+    <span style="color: #10b981; font-weight: bold;">$${currentPrice.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
+  </div>
+  
+  <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
+    <span>Стоимость</span>
+    <span style="font-weight: bold;">$${(Number(shares) * currentPrice).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
+  </div>
+  
+  <div style="display: flex; gap: 10px;">
+    <div class="btn" data-action="buy-more" style="flex: 1;">Купить еще</div>
+    <div class="btn" data-action="sell" style="flex: 1;">Продать</div>
+  </div>
+`;
 
       card.querySelector('[data-action="buy-more"]').addEventListener('click', () => {
         currentCompanyId = holding.company_id;
@@ -1615,4 +1635,3 @@ settingsBtn.addEventListener('click', () => switchToSection('settings'));
 
     // Инициализация
     initUser();
-
