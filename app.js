@@ -1,4 +1,4 @@
-    // Telegram WebApp init
+  // Telegram WebApp init
     const tg = window.Telegram.WebApp;
     tg.ready();
     tg.expand();
@@ -740,79 +740,43 @@ function toggleTheme() {
     }
 
     // Загрузка кабинета компании
-async function loadCompanyDashboard() {
-  if (!currentCompanyId) return;
+    async function loadCompanyDashboard() {
+      if (!currentCompanyId) return;
 
-  try {
-    const response = await fetch(`${apiBase}/company/${currentCompanyId}`);
-    const company = await response.json();
+      try {
+        const response = await fetch(`${apiBase}/company/${currentCompanyId}`);
+        const company = await response.json();
+        companyNameEl.textContent = company.name;
+        companyClientsEl.textContent = Number(company.clients_count).toLocaleString('en-US');
+        setNumToEl(companyIssuedEl, company.issued_shares);
+        companyAvailableIssueEl.textContent = Number(company.available_to_issue).toLocaleString('en-US');
+        companyAvailableMarketEl.textContent = Number(company.available).toLocaleString('en-US');
 
-    // ДЕБАГ: посмотрим что приходит с сервера
-    console.log('Company raw data:', company);
+        productionRatePerSecond = Number(company.production_rate_per_second) || 0;
+        lastCollectTimestamp = new Date(company.last_collect).getTime();
+        updateProducedShares();
 
-    // БЕЗОПАСНОЕ ОБНОВЛЕНИЕ ДАННЫХ С ЗАЩИТОЙ ОТ ОШИБОК
-    companyNameEl.textContent = company.name || 'Unknown Company';
+        staffGrid.innerHTML = '';
+        staffTypes.forEach(staff => {
+          const staffCard = document.createElement('div');
+          staffCard.classList.add('staff-card');
+          const currentLevel = Number(company[`staff_${staff.type}_level`]) || 1;
+          const cost = 500 * currentLevel;
 
-    // ЗАЩИТА ОТ НЕРЕАЛЬНЫХ ЧИСЕЛ - ВСЕГДА ОГРАНИЧИВАЕМ
-    const clients = Math.max(0, Math.min(Number(company.clients_count) || 0, 1000000));
-    const issued = Math.max(0, Math.min(Number(company.issued_shares) || 0, 1000000));
-    const availableIssue = Math.max(0, Math.min(Number(company.available_to_issue) || 0, 1000000));
-    const availableMarket = Math.max(0, Math.min(Number(company.available) || 0, 1000000));
-    const companyPrice = Math.max(0.01, Math.min(Number(company.price) || 1.00, 1000));
+          staffCard.innerHTML = `
+            <img src="${staff.img}" alt="${staff.name}" class="staff-img">
+            <div>${staff.name}</div>
+            <div>Уровень: <span id="staff-${staff.type}-level">${currentLevel}</span></div>
+            <div class="btn" id="upgrade-${staff.type}-btn">Улучшить ($${cost.toLocaleString('en-US')})</div>
+          `;
+          staffGrid.appendChild(staffCard);
 
-    // ОБНОВЛЯЕМ ИНТЕРФЕЙС
-    document.getElementById('company-clients').textContent = clients.toLocaleString('en-US');
-    document.getElementById('company-issued').textContent = issued.toLocaleString('en-US');
-    document.getElementById('company-available-issue').textContent = availableIssue.toLocaleString('en-US');
-    document.getElementById('company-available-market').textContent = availableMarket.toLocaleString('en-US');
-
-    // РАСЧЕТ ДОХОДА КОМПАНИИ - С ЗАЩИТОЙ ОТ ПЕРЕПОЛНЕНИЯ
-    const soldShares = Math.max(0, issued - availableMarket);
-    const companyIncome = Math.min(soldShares * companyPrice, 10000000); // Лимит 10M
-
-    const profitEl = document.getElementById('company-profit');
-    profitEl.textContent = '+$' + companyIncome.toLocaleString('en-US', {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2
-    });
-    profitEl.className = 'stock-price text-success';
-
-    // ПРОИЗВОДСТВО АКЦИЙ
-    productionRatePerSecond = Math.max(0, Math.min(Number(company.production_rate_per_second) || 0, 1000));
-    lastCollectTimestamp = new Date(company.last_collect || Date.now()).getTime();
-    updateProducedShares();
-
-    // ОБНОВЛЯЕМ ПЕРСОНАЛ
-    staffGrid.innerHTML = '';
-    staffTypes.forEach(staff => {
-      const staffCard = document.createElement('div');
-      staffCard.classList.add('staff-card');
-
-      const currentLevel = Math.max(1, Math.min(Number(company[`staff_${staff.type}_level`]) || 1, 100));
-      const cost = 500 * currentLevel;
-
-      staffCard.innerHTML = `
-        <img src="${staff.img}" alt="${staff.name}" class="staff-img">
-        <div>${staff.name}</div>
-        <div>Уровень: <span id="staff-${staff.type}-level">${currentLevel}</span></div>
-        <div class="btn" id="upgrade-${staff.type}-btn">Улучшить ($${cost.toLocaleString('en-US')})</div>
-      `;
-      staffGrid.appendChild(staffCard);
-
-      document.getElementById(`upgrade-${staff.type}-btn`).addEventListener('click', () => upgradeStaff(staff.type));
-    });
-
-    // ДЕБАГ: покажем обработанные данные
-    console.log('Company processed:', {
-      clients, issued, availableIssue, availableMarket,
-      companyPrice, soldShares, companyIncome
-    });
-
-  } catch (err) {
-    console.error('Load dashboard error:', err);
-    showToast('Ошибка загрузки данных компании');
-  }
-}
+          document.getElementById(`upgrade-${staff.type}-btn`).addEventListener('click', () => upgradeStaff(staff.type));
+        });
+      } catch (err) {
+        console.error('Load dashboard error:', err);
+      }
+    }
 
     // Обновление произведенных акций с лимитом
     function updateProducedShares() {
@@ -1168,11 +1132,18 @@ async function loadClaimAd() {
     claimChannel.textContent = `@${ad.channel_username}`;
     subscribeLink.href = 'https://t.me/' + ad.channel_username;
 
-    // Обновляем детали объявления
-    document.getElementById('claim-channel-value').textContent = '@' + ad.channel_username;
-    document.getElementById('claim-reward-value').textContent = '$' + Number(ad.reward).toLocaleString('en-US');
-    document.getElementById('claim-budget-value').textContent = '$' + Number(ad.budget).toLocaleString('en-US');
-    document.getElementById('claim-remaining-value').textContent = '$' + Number(ad.remaining).toLocaleString('en-US');
+    // Находим или создаем элемент для бюджета
+    let budgetInfo = document.getElementById('budget-info');
+    if (!budgetInfo) {
+      budgetInfo = document.createElement('div');
+      budgetInfo.id = 'budget-info';
+      budgetInfo.className = 'budget-info';
+      claimChannel.parentNode.insertBefore(budgetInfo, claimChannel.nextSibling);
+    }
+
+    // Показываем и обновляем информацию о бюджете
+    budgetInfo.style.display = 'block';
+    budgetInfo.innerHTML = `Бюджет: $${Number(ad.remaining).toLocaleString('en-US')} / $${Number(ad.budget).toLocaleString('en-US')} осталось`;
 
     claimReward.classList.add('disabled');
     claimReward.classList.remove('btn-green');
@@ -1183,6 +1154,10 @@ async function loadClaimAd() {
     // Fallback на старые данные
     claimChannel.textContent = '@' + currentChannel;
     subscribeLink.href = 'https://t.me/' + currentChannel;
+
+    // Скрываем информацию о бюджете при ошибке
+    const budgetInfo = document.getElementById('budget-info');
+    if (budgetInfo) budgetInfo.style.display = 'none';
 
     showToast('Ошибка загрузки данных объявления');
   }
@@ -1251,9 +1226,7 @@ async function loadClaimAd() {
         buyCompanyOwnerEl.textContent = `@${company.owner_username}`;
         buyCompanyClientsEl.textContent = Number(company.clients_count).toLocaleString('en-US');
         buyCompanyPriceEl.textContent = `$${Number(company.price).toLocaleString('en-US', {minimumFractionDigits: 2})}`;
-        // ЗАЩИТА ОТ НЕРЕАЛЬНЫХ ЧИСЕЛ
-const available = Math.min(Number(company.available), 1000000);
-buyCompanyAvailableEl.textContent = available.toLocaleString('en-US');
+        buyCompanyAvailableEl.textContent = Number(company.available).toLocaleString('en-US');
       } catch (err) {
         console.error('Load buy error:', err);
       }
@@ -1270,13 +1243,9 @@ async function loadStockSell() {
     const companyResponse = await fetch(`${apiBase}/company/${currentCompanyId}`);
     const company = await companyResponse.json();
 
-    // ЗАЩИТА ОТ НЕРЕАЛЬНЫХ ЧИСЕЛ
-    const shares = Math.min(Number(holding.shares), 1000000);
-    const price = Math.min(Number(company.price), 1000);
-
     sellCompanyNameEl.textContent = holding.name || company.name;
-    sellCompanySharesEl.textContent = shares.toLocaleString('en-US');
-    sellCompanyPriceEl.textContent = `$${price.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+    sellCompanySharesEl.textContent = Number(holding.shares).toLocaleString('en-US');
+    sellCompanyPriceEl.textContent = `$${Number(company.price).toLocaleString('en-US', {minimumFractionDigits: 2})}`;
 
   } catch (err) {
     console.error('Load stock sell error:', err);
@@ -1401,8 +1370,8 @@ async function sellShares() {
     backToMarketServantBtn.addEventListener('click', () => switchToSection('market'));
 
 
-
-// Загрузка холдингов - ИСПРАВЛЕННАЯ ВЕРСИЯ
+    // Загрузка холдингов
+    // Загрузка холдингов - FIXED VERSION
 async function loadHoldings() {
   try {
     const response = await fetch(`${apiBase}/holdings/${telegramId}`);
@@ -1413,13 +1382,26 @@ async function loadHoldings() {
       const card = document.createElement('div');
       card.classList.add('market-card');
 
-      // ИСПРАВЛЕНИЕ: Убираем BigInt, используем обычные числа с защитой
-      const shares = Math.min(Number(holding.shares), 10000); // Лимит 10к акций
-      const avgPrice = Math.min(parseFloat(holding.avg_price), 1000); // Лимит цены
-      const currentPrice = Math.min(parseFloat(holding.current_price), 1000);
+      // Используем BigInt для больших чисел
+      const shares = BigInt(holding.shares);
+      const avgPrice = parseFloat(holding.avg_price);
+      const currentPrice = parseFloat(holding.current_price);
 
       // Безопасный расчет дохода
-      const profit = (currentPrice - avgPrice) * shares;
+      let profit = 0;
+      try {
+        // Для очень больших чисел используем BigInt
+        if (shares > 1000000000) { // Если больше 1 миллиарда
+          const priceDiff = BigInt(Math.floor(currentPrice * 100)) - BigInt(Math.floor(avgPrice * 100));
+          profit = Number((priceDiff * shares) / 100n);
+        } else {
+          // Для обычных чисел обычная арифметика
+          profit = (currentPrice - avgPrice) * Number(shares);
+        }
+      } catch (e) {
+        console.error('Profit calculation error:', e);
+        profit = 0;
+      }
 
       // Определяем цвет для дохода (зеленый/красный)
       const profitClass = profit >= 0 ? 'text-success' : 'text-danger';
@@ -1445,7 +1427,7 @@ async function loadHoldings() {
           </div>
           <div class="detail-item">
             <span class="detail-label">Стоимость</span>
-            <span class="detail-value">$${(shares * currentPrice).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
+            <span class="detail-value">$${(Number(shares) * currentPrice).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
           </div>
         </div>
         <div style="display: flex; gap: 8px; margin-top: 12px;">
@@ -1470,6 +1452,7 @@ async function loadHoldings() {
     console.error('Load holdings error:', err);
   }
 }
+
     // Загрузка слуг
     async function loadServants() {
       try {
@@ -1633,4 +1616,3 @@ settingsBtn.addEventListener('click', () => switchToSection('settings'));
 
     // Инициализация
     initUser();
-
