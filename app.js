@@ -747,31 +747,48 @@ async function loadCompanyDashboard() {
     const response = await fetch(`${apiBase}/company/${currentCompanyId}`);
     const company = await response.json();
 
-    // Обновляем данные в новом формате
-    companyNameEl.textContent = company.name;
-    document.getElementById('company-clients').textContent = Number(company.clients_count).toLocaleString('en-US');
-    document.getElementById('company-issued').textContent = Number(company.issued_shares).toLocaleString('en-US');
-    document.getElementById('company-available-issue').textContent = Number(company.available_to_issue).toLocaleString('en-US');
-    // ЗАЩИТА ОТ НЕРЕАЛЬНЫХ ЧИСЕЛ
-const availableMarket = Math.min(Number(company.available), 1000000);
-document.getElementById('company-available-market').textContent = availableMarket.toLocaleString('en-US');
+    // ДЕБАГ: посмотрим что приходит с сервера
+    console.log('Company raw data:', company);
 
-    // Расчет дохода компании от продажи акций
-    const soldShares = company.issued_shares - company.available;
-    const companyIncome = soldShares * company.price;
+    // БЕЗОПАСНОЕ ОБНОВЛЕНИЕ ДАННЫХ С ЗАЩИТОЙ ОТ ОШИБОК
+    companyNameEl.textContent = company.name || 'Unknown Company';
+
+    // ЗАЩИТА ОТ НЕРЕАЛЬНЫХ ЧИСЕЛ - ВСЕГДА ОГРАНИЧИВАЕМ
+    const clients = Math.max(0, Math.min(Number(company.clients_count) || 0, 1000000));
+    const issued = Math.max(0, Math.min(Number(company.issued_shares) || 0, 1000000));
+    const availableIssue = Math.max(0, Math.min(Number(company.available_to_issue) || 0, 1000000));
+    const availableMarket = Math.max(0, Math.min(Number(company.available) || 0, 1000000));
+    const companyPrice = Math.max(0.01, Math.min(Number(company.price) || 1.00, 1000));
+
+    // ОБНОВЛЯЕМ ИНТЕРФЕЙС
+    document.getElementById('company-clients').textContent = clients.toLocaleString('en-US');
+    document.getElementById('company-issued').textContent = issued.toLocaleString('en-US');
+    document.getElementById('company-available-issue').textContent = availableIssue.toLocaleString('en-US');
+    document.getElementById('company-available-market').textContent = availableMarket.toLocaleString('en-US');
+
+    // РАСЧЕТ ДОХОДА КОМПАНИИ - С ЗАЩИТОЙ ОТ ПЕРЕПОЛНЕНИЯ
+    const soldShares = Math.max(0, issued - availableMarket);
+    const companyIncome = Math.min(soldShares * companyPrice, 10000000); // Лимит 10M
+
     const profitEl = document.getElementById('company-profit');
-    profitEl.textContent = '+$' + companyIncome.toLocaleString('en-US', {minimumFractionDigits: 2});
+    profitEl.textContent = '+$' + companyIncome.toLocaleString('en-US', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    });
     profitEl.className = 'stock-price text-success';
 
-    productionRatePerSecond = Number(company.production_rate_per_second) || 0;
-    lastCollectTimestamp = new Date(company.last_collect).getTime();
+    // ПРОИЗВОДСТВО АКЦИЙ
+    productionRatePerSecond = Math.max(0, Math.min(Number(company.production_rate_per_second) || 0, 1000));
+    lastCollectTimestamp = new Date(company.last_collect || Date.now()).getTime();
     updateProducedShares();
 
+    // ОБНОВЛЯЕМ ПЕРСОНАЛ
     staffGrid.innerHTML = '';
     staffTypes.forEach(staff => {
       const staffCard = document.createElement('div');
       staffCard.classList.add('staff-card');
-      const currentLevel = Number(company[`staff_${staff.type}_level`]) || 1;
+
+      const currentLevel = Math.max(1, Math.min(Number(company[`staff_${staff.type}_level`]) || 1, 100));
       const cost = 500 * currentLevel;
 
       staffCard.innerHTML = `
@@ -784,8 +801,16 @@ document.getElementById('company-available-market').textContent = availableMarke
 
       document.getElementById(`upgrade-${staff.type}-btn`).addEventListener('click', () => upgradeStaff(staff.type));
     });
+
+    // ДЕБАГ: покажем обработанные данные
+    console.log('Company processed:', {
+      clients, issued, availableIssue, availableMarket,
+      companyPrice, soldShares, companyIncome
+    });
+
   } catch (err) {
     console.error('Load dashboard error:', err);
+    showToast('Ошибка загрузки данных компании');
   }
 }
 
@@ -1376,8 +1401,8 @@ async function sellShares() {
     backToMarketServantBtn.addEventListener('click', () => switchToSection('market'));
 
 
-    // Загрузка холдингов
-    // Загрузка холдингов - FIXED VERSION
+
+// Загрузка холдингов - ИСПРАВЛЕННАЯ ВЕРСИЯ
 async function loadHoldings() {
   try {
     const response = await fetch(`${apiBase}/holdings/${telegramId}`);
@@ -1388,26 +1413,13 @@ async function loadHoldings() {
       const card = document.createElement('div');
       card.classList.add('market-card');
 
-      // Используем BigInt для больших чисел
-      const shares = BigInt(holding.shares);
-      const avgPrice = parseFloat(holding.avg_price);
-      const currentPrice = parseFloat(holding.current_price);
+      // ИСПРАВЛЕНИЕ: Убираем BigInt, используем обычные числа с защитой
+      const shares = Math.min(Number(holding.shares), 10000); // Лимит 10к акций
+      const avgPrice = Math.min(parseFloat(holding.avg_price), 1000); // Лимит цены
+      const currentPrice = Math.min(parseFloat(holding.current_price), 1000);
 
       // Безопасный расчет дохода
-      // Безопасный расчет дохода
-let profit = 0;
-try {
-  const sharesNum = Number(shares);
-  profit = (currentPrice - avgPrice) * sharesNum;
-
-  // Защита от астрономических чисел
-  if (Math.abs(profit) > 1000000000) {
-    profit = (currentPrice - avgPrice) * Math.min(sharesNum, 1000000);
-  }
-} catch (e) {
-  console.error('Profit calculation error:', e);
-  profit = 0;
-}
+      const profit = (currentPrice - avgPrice) * shares;
 
       // Определяем цвет для дохода (зеленый/красный)
       const profitClass = profit >= 0 ? 'text-success' : 'text-danger';
@@ -1432,9 +1444,9 @@ try {
             <span class="detail-value">$${currentPrice.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
           </div>
           <div class="detail-item">
-  <span class="detail-label">Стоимость</span>
-  <span class="detail-value">$${Math.min(Number(shares) * currentPrice, 10000000).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
-</div>
+            <span class="detail-label">Стоимость</span>
+            <span class="detail-value">$${(shares * currentPrice).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
+          </div>
         </div>
         <div style="display: flex; gap: 8px; margin-top: 12px;">
           <div class="btn" data-action="buy-more" style="flex: 1;">Купить еще</div>
@@ -1458,7 +1470,6 @@ try {
     console.error('Load holdings error:', err);
   }
 }
-
     // Загрузка слуг
     async function loadServants() {
       try {
