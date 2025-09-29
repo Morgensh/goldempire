@@ -1878,11 +1878,54 @@ async function loadStockSell() {
     // Покупка акций
 async function buyShares() {
   const amount = Number(buyAmountInput.value);
+
+  // 🔴 ПРОВЕРКА 1: Валидация ввода
   if (isNaN(amount) || amount <= 0) {
     showToast('Введите положительное количество');
     return;
   }
 
+  // 🔴 ПРОВЕРКА 2: Максимум за одну покупку
+  if (amount > 10000) {
+    showToast('Максимум 10,000 акций за покупку');
+    return;
+  }
+
+  // 🔴 ПРОВЕРКА 3: Проверяем текущие акции и лимит
+  try {
+    const holdingRes = await fetch(`${apiBase}/holding/${telegramId}/${currentCompanyId}`);
+    if (holdingRes.ok) {
+      const holding = await holdingRes.json();
+      const currentShares = Number(holding.shares) || 0;
+
+      if (currentShares + amount > 3000) {
+        const canBuy = 3000 - currentShares;
+        showToast(`Лимит 3,000 акций! У вас: ${currentShares}. Можете купить: ${canBuy}`);
+        return;
+      }
+    }
+  } catch (err) {
+    // Если холдинга нет - это нормально, значит можно покупать
+    console.log('Холдинг не найден, можно покупать');
+  }
+
+  // 🔴 ПРОВЕРКА 4: Проверяем доступные акции на рынке
+  try {
+    const companyRes = await fetch(`${apiBase}/company/${currentCompanyId}`);
+    if (companyRes.ok) {
+      const company = await companyRes.json();
+      const available = Number(company.available) || 0;
+
+      if (amount > available) {
+        showToast(`На рынке только ${available} акций`);
+        return;
+      }
+    }
+  } catch (err) {
+    console.log('Ошибка проверки доступных акций');
+  }
+
+  // ✅ ВСЕ ПРОВЕРКИ ПРОЙДЕНЫ - ПОКУПАЕМ
   try {
     const response = await fetch(`${apiBase}/buy/${telegramId}/${currentCompanyId}`, {
       method: 'POST',
@@ -1890,7 +1933,6 @@ async function buyShares() {
       body: JSON.stringify({ amount })
     });
 
-    // ЭТА ПРОВЕРКА ДОЛЖНА БЫТЬ ЗДЕСЬ, после fetch
     if (!response.ok) {
       const error = await response.json();
       showToast(error.error || 'Ошибка покупки');
@@ -1901,7 +1943,7 @@ async function buyShares() {
     balance = Number(updated.balance);
     saveUserToLocal();
     buyAmountInput.value = '';
-    showToast('Акции куплены успешно');
+    showToast(`Куплено ${amount} акций за $${(amount * parseFloat(buyCompanyPriceEl.textContent.replace('$', ''))).toLocaleString()}`);
     updateUI();
     await loadStockBuy();
   } catch (err) {
