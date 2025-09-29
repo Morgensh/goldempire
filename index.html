@@ -87,15 +87,33 @@
     <!-- Личный кабинет компании -->
     <div class="section" id="company-dashboard-section">
       <h2 class="section-title">Личный кабинет компании</h2>
-      <div class="card">
-  <div>Название: <span id="company-name"></span></div>
-  <div>Клиентов: <span id="company-clients"></span></div>
-  <div>Выпущено акций: <span id="company-issued"></span></div>
-  <div>Доступно для выпуска: <span id="company-available-issue"></span></div>
-  <!-- ДОБАВЬ ЭТУ СТРОКУ -->
-  <div>Доступно на рынке: <span id="company-available-market">0</span></div>
-  <input type="number" id="issue-amount-input" placeholder="Количество акций для выпуска">
-  <div class="btn" id="issue-shares-btn">Выпустить акции</div>
+      <div class="market-card">
+  <div class="market-card-header">
+    <div class="company-name" id="company-name">COMPANY</div>
+    <div class="stock-price" id="company-profit">+$0.00</div>
+  </div>
+  <div class="market-card-details">
+    <div class="detail-item">
+      <span class="detail-label">Клиентов</span>
+      <span class="detail-value" id="company-clients">0</span>
+    </div>
+    <div class="detail-item">
+      <span class="detail-label">Акций выпущено</span>
+      <span class="detail-value" id="company-issued">0</span>
+    </div>
+    <div class="detail-item">
+      <span class="detail-label">Доступно для выпуска</span>
+      <span class="detail-value" id="company-available-issue">0</span>
+    </div>
+    <div class="detail-item">
+      <span class="detail-label">На рынке</span>
+      <span class="detail-value" id="company-available-market">0</span>
+    </div>
+  </div>
+  <div style="display: flex; gap: 8px; margin-top: 12px;">
+    <input type="number" id="issue-amount-input" placeholder="Кол-во акций" style="flex: 2;">
+    <div class="btn" id="issue-shares-btn" style="flex: 1;">Выпустить</div>
+  </div>
 </div>
 
       <!-- Раздел Персонал -->
