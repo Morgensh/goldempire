@@ -3,6 +3,7 @@
     tg.ready();
     tg.expand();
 
+
     // Глобальные переменные
     let userData = tg.initDataUnsafe.user || {};
     let telegramId = Number(userData.id) || 0;
@@ -38,6 +39,26 @@
     const LOCAL_STORAGE_KEY = `user_data_${telegramId}`;
     const MAX_PRODUCTION = 50000;
     const MAX_PENDING_INCOME = 50000;
+
+// Переключение темы
+const themeToggleBtn = document.getElementById('theme-toggle-btn');
+const currentTheme = localStorage.getItem('theme') || 'light';
+document.documentElement.setAttribute('data-theme', currentTheme);
+updateThemeIcon();
+
+themeToggleBtn.addEventListener('click', () => {
+  const currentTheme = document.documentElement.getAttribute('data-theme');
+  const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+
+  document.documentElement.setAttribute('data-theme', newTheme);
+  localStorage.setItem('theme', newTheme);
+  updateThemeIcon();
+});
+
+function updateThemeIcon() {
+  const currentTheme = document.documentElement.getAttribute('data-theme');
+  themeToggleBtn.className = currentTheme === 'light' ? 'fas fa-moon' : 'fas fa-sun';
+}
 
     // Список типов персонала
     const staffTypes = [
