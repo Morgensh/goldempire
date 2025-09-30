@@ -1451,14 +1451,35 @@ async function loadHoldings() {
       }
 
       card.innerHTML = `
-        <div>Компания: ${holding.name}</div>
-        <div>Акций: ${shares.toLocaleString('en-US')}</div>
-        <div>Куплено по: $${avgPrice.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>
-        <div>Текущая цена: $${currentPrice.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>
-        <div>Доход: $${profit.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>
-        <div class="btn" data-action="buy-more">Купить еще</div>
-        <div class="btn" data-action="sell">Продать</div>
-      `;
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+    <div style="font-size: 18px; font-weight: bold;">${holding.name}</div>
+    <div style="font-size: 24px; font-weight: bold; color: var(--accent-success);">+$${profit.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>
+  </div>
+  
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px;">
+    <div>
+      <div style="font-size: 12px; color: var(--text-secondary);">Акций</div>
+      <div style="font-size: 16px; font-weight: bold;">${shares.toLocaleString('en-US')}</div>
+    </div>
+    <div>
+      <div style="font-size: 12px; color: var(--text-secondary);">Цена покупки</div>
+      <div style="font-size: 16px; font-weight: bold;">$${avgPrice.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>
+    </div>
+    <div>
+      <div style="font-size: 12px; color: var(--text-secondary);">Текущая цена</div>
+      <div style="font-size: 16px; font-weight: bold;">$${currentPrice.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>
+    </div>
+    <div>
+      <div style="font-size: 12px; color: var(--text-secondary);">Доход</div>
+      <div style="font-size: 16px; font-weight: bold;">$${profit.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>
+    </div>
+  </div>
+  
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+    <div class="btn" data-action="buy-more">Купить еще</div>
+    <div class="btn" data-action="sell">Продать</div>
+  </div>
+`;
 
       card.querySelector('[data-action="buy-more"]').addEventListener('click', () => {
         currentCompanyId = holding.company_id;
