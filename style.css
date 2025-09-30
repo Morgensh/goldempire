@@ -934,3 +934,155 @@ input::placeholder {
     font-size: 16px;
   }
 }
+/* ===== ТОП ИГРОКИ - FORBES STYLE ===== */
+.top-players-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.top-player-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 16px;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.top-player-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--accent-primary);
+}
+
+.top-player-card.highlighted {
+  background: linear-gradient(135deg, var(--accent-primary) 0%, #1e40af 100%);
+  color: white;
+  border: none;
+}
+
+.top-player-card.highlighted::before {
+  content: '★';
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  font-size: 20px;
+  color: gold;
+}
+
+.top-player-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
+.top-player-rank {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-muted);
+  background: var(--bg-secondary);
+  padding: 4px 8px;
+  border-radius: 8px;
+  min-width: 24px;
+  text-align: center;
+}
+
+.top-player-card.highlighted .top-player-rank {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+}
+
+.top-player-name {
+  flex: 1;
+  margin: 0 12px;
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.top-player-balance {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--accent-success);
+}
+
+.top-player-card.highlighted .top-player-balance {
+  color: white;
+}
+
+.top-player-details {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  font-size: 13px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border-color);
+}
+
+.top-player-card.highlighted .top-player-details {
+  border-top-color: rgba(255, 255, 255, 0.3);
+}
+
+.detail-item {
+  display: flex;
+  justify-content: space-between;
+}
+
+.detail-label {
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.top-player-card.highlighted .detail-label {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.detail-value {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.top-player-card.highlighted .detail-value {
+  color: white;
+}
+
+/* Медали для топ-3 */
+.top-player-card:nth-child(1) .top-player-rank {
+  background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+  color: #000;
+  font-weight: 800;
+}
+
+.top-player-card:nth-child(2) .top-player-rank {
+  background: linear-gradient(135deg, #C0C0C0 0%, #A0A0A0 100%);
+  color: #000;
+  font-weight: 800;
+}
+
+.top-player-card:nth-child(3) .top-player-rank {
+  background: linear-gradient(135deg, #CD7F32 0%, #8B4513 100%);
+  color: white;
+  font-weight: 800;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+  .top-player-card {
+    padding: 12px;
+  }
+
+  .top-player-name {
+    font-size: 14px;
+  }
+
+  .top-player-balance {
+    font-size: 16px;
+  }
+
+  .top-player-details {
+    font-size: 12px;
+  }
+}
