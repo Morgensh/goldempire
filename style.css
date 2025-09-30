@@ -758,3 +758,93 @@ input::placeholder {
 .fa-spin {
   animation: spin 1s linear infinite;
 }
+
+/* Стили для карточек акций в кошельке */
+.holding-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 16px;
+  box-shadow: var(--shadow);
+  transition: all 0.3s ease;
+}
+
+.holding-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.holding-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.holding-name {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.holding-profit {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.holding-details-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.holding-detail-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.holding-detail-label {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin-bottom: 4px;
+}
+
+.holding-detail-value {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.holding-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.holding-actions .btn {
+  flex: 1;
+  margin: 0;
+  padding: 12px;
+  font-size: 14px;
+}
+
+@media (max-width: 768px) {
+  .holding-details-grid {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .holding-actions {
+    flex-direction: column;
+  }
+
+  .holding-name {
+    font-size: 18px;
+  }
+
+  .holding-profit {
+    font-size: 16px;
+  }
+}
+
