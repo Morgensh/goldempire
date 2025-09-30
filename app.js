@@ -925,23 +925,37 @@ async function collectShares() {
 
     // Рендер рынка акций
     function renderMarketList(companies) {
-      marketList.innerHTML = '';
-      companies.forEach(company => {
-        const card = document.createElement('div');
-        card.classList.add('card');
-        card.innerHTML = `
-          <div>Компания: ${company.name}</div>
-          <div>Владелец: @${company.owner_username}</div>
-          <div>Клиентов: ${Number(company.clients_count).toLocaleString('en-US')}</div>
-          <div>Цена: $${Number(company.price).toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
-        `;
-        card.addEventListener('click', () => {
-          currentCompanyId = company.id;
-          switchToSection('stock-buy');
-        });
-        marketList.appendChild(card);
-      });
-    }
+  marketList.innerHTML = '';
+  companies.forEach(company => {
+    const card = document.createElement('div');
+    card.classList.add('market-card');
+    card.innerHTML = `
+      <div class="market-card-header">
+        <div class="stock-ticker">${company.name}</div>
+        <div class="stock-price">$${Number(company.price).toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
+      </div>
+      <div class="market-card-details">
+        <div class="detail-item">
+          <span class="detail-label">Владелец</span>
+          <span class="detail-value">@${company.owner_username}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Клиенты</span>
+          <span class="detail-value">${Number(company.clients_count).toLocaleString('en-US')}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Доступно</span>
+          <span class="detail-value">${Number(company.available).toLocaleString('en-US')} акций</span>
+        </div>
+      </div>
+    `;
+    card.addEventListener('click', () => {
+      currentCompanyId = company.id;
+      switchToSection('stock-buy');
+    });
+    marketList.appendChild(card);
+  });
+}
 
     searchStocks.addEventListener('input', (e) => {
       const query = e.target.value.toLowerCase();
