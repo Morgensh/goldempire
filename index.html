@@ -176,24 +176,11 @@
     <div class="section" id="stock-buy-section">
       <h2 class="section-title">Покупка акций</h2>
       <div class="card">
-        <div class="stock-header">
-  <div class="stock-ticker-large" id="buy-company-name"></div>
-  <div class="stock-price-large" id="buy-company-price"></div>
-</div>
-<div class="stock-details-grid">
-  <div class="detail-row">
-    <span class="detail-label">Эмитент</span>
-    <span class="detail-value" id="buy-company-owner"></span>
-  </div>
-  <div class="detail-row">
-    <span class="detail-label">Клиентская база</span>
-    <span class="detail-value" id="buy-company-clients"></span>
-  </div>
-  <div class="detail-row">
-    <span class="detail-label">Акций в обращении</span>
-    <span class="detail-value" id="buy-company-available"></span>
-  </div>
-</div>
+        <div>Компания: <span id="buy-company-name"></span></div>
+        <div>Владелец: <span id="buy-company-owner"></span></div>
+        <div>Клиентов: <span id="buy-company-clients"></span></div>
+        <div>Цена за акцию: <span id="buy-company-price"></span></div>
+        <div>Доступно на рынке: <span id="buy-company-available"></span></div>
         <input type="number" id="buy-amount-input" placeholder="Количество акций">
         <div class="btn" id="buy-shares-btn">Купить</div>
       </div>
