@@ -994,27 +994,37 @@ async function collectShares() {
     });
 
     // Загрузка объявлений
-    // Загрузка объявлений
-async function loadAds() {
+    async function loadAds() {
   try {
     const response = await fetch(`${apiBase}/ads`);
     const ads = await response.json();
     adsList.innerHTML = '';
+
     ads.forEach(ad => {
+      const progressPercent = (ad.remaining / ad.budget) * 100;
+
       const card = document.createElement('div');
-      card.classList.add('card', 'ad-card');
+      card.classList.add('ad-card');
       card.innerHTML = `
         <div class="ad-header">
-          <div class="ad-creator">Создатель: @${ad.creator_username}</div>
+          <div class="ad-creator">@${ad.creator_username}</div>
           <div class="ad-reward">$${Number(ad.reward).toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
         </div>
         <div class="ad-details">
-          <div class="detail-item">
-            <div class="detail-label">Бюджет</div>
-            <div class="detail-value">$${Number(ad.budget).toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
+          <div class="ad-detail-item">
+            <span class="detail-label">Бюджет</span>
+            <span class="detail-value">$${Number(ad.budget).toLocaleString('en-US', {minimumFractionDigits: 2})}</span>
+          </div>
+          <div class="ad-detail-item">
+            <span class="detail-label">Осталось</span>
+            <span class="detail-value">$${Number(ad.remaining).toLocaleString('en-US', {minimumFractionDigits: 2})}</span>
           </div>
         </div>
+        <div class="progress-container">
+          <div class="progress-fill" style="width: ${progressPercent}%"></div>
+        </div>
       `;
+
       card.addEventListener('click', () => {
         currentAdId = ad.id;
         currentChannel = ad.channel_username;
@@ -1115,91 +1125,120 @@ async function loadClaimAd() {
     if (!response.ok) throw new Error('Ошибка загрузки');
 
     const ad = await response.json();
+    const progressPercent = (ad.remaining / ad.budget) * 100;
 
-    // Обновляем основную информацию
-    claimChannel.textContent = `@${ad.channel_username}`;
-    subscribeLink.href = 'https://t.me/' + ad.channel_username;
+    // Очищаем и перестраиваем полностью
+    const claimSection = document.getElementById('claim-ad-section');
+    claimSection.innerHTML = `
+      <h2 class="section-title">Рекламная кампания</h2>
 
-    // Находим или создаем элемент для бюджета
-    let budgetInfo = document.getElementById('budget-info');
-    if (!budgetInfo) {
-      budgetInfo = document.createElement('div');
-      budgetInfo.id = 'budget-info';
-      budgetInfo.className = 'budget-info';
-      claimChannel.parentNode.insertBefore(budgetInfo, claimChannel.nextSibling);
-    }
+      <div class="ad-detail-card">
+        <div class="ad-detail-header">
+          <div class="ad-detail-title">@${ad.channel_username}</div>
+        </div>
 
-    // Показываем и обновляем информацию о бюджете
-    budgetInfo.style.display = 'block';
-    budgetInfo.innerHTML = `Бюджет: $${Number(ad.remaining).toLocaleString('en-US')} / $${Number(ad.budget).toLocaleString('en-US')} осталось`;
+        <div class="ad-detail-stats">
+          <div class="stat-card">
+            <div class="stat-value reward">$${Number(ad.reward).toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
+            <div class="stat-label">Награда за подписку</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value budget">$${Number(ad.budget).toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
+            <div class="stat-label">Общий бюджет</div>
+          </div>
+        </div>
 
-    claimReward.classList.add('disabled');
-    claimReward.classList.remove('btn-green');
+        <div style="margin-bottom: 24px;">
+          <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+            <span style="color: var(--text-secondary);">Прогресс бюджета</span>
+            <span style="font-weight: 600;">${progressPercent.toFixed(1)}%</span>
+          </div>
+          <div class="progress-container">
+            <div class="progress-fill" style="width: ${progressPercent}%"></div>
+          </div>
+          <div class="budget-info">
+            <span>Осталось: $${Number(ad.remaining).toLocaleString('en-US', {minimumFractionDigits: 2})}</span>
+            <span>Изначально: $${Number(ad.budget).toLocaleString('en-US', {minimumFractionDigits: 2})}</span>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px;">
+          <a href="https://t.me/${ad.channel_username}" class="btn" style="text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px;">
+            <i class="fab fa-telegram"></i>
+            Подписаться
+          </a>
+          <div class="btn" id="check-subscribed">Я подписался</div>
+        </div>
+
+        <div class="btn disabled" id="claim-reward" style="margin-bottom: 16px;">Получить награду</div>
+      </div>
+
+      <div class="btn" id="back-to-ads-from-claim-btn">Назад к объявлениям</div>
+    `;
+
+    // Перепривязываем события
+    document.getElementById('check-subscribed').addEventListener('click', checkSubscribedHandler);
+    document.getElementById('claim-reward').addEventListener('click', claimRewardHandler);
+    document.getElementById('back-to-ads-from-claim-btn').addEventListener('click', () => switchToSection('market'));
 
   } catch (err) {
     console.error('Ошибка загрузки объявления:', err);
-
-    // Fallback на старые данные
-    claimChannel.textContent = '@' + currentChannel;
-    subscribeLink.href = 'https://t.me/' + currentChannel;
-
-    // Скрываем информацию о бюджете при ошибке
-    const budgetInfo = document.getElementById('budget-info');
-    if (budgetInfo) budgetInfo.style.display = 'none';
-
     showToast('Ошибка загрузки данных объявления');
   }
 }
 
-    checkSubscribed.addEventListener('click', async () => {
-      try {
-        const res = await fetch(`${apiBase}/ad/${currentAdId}/check_subscribed/${telegramId}`);
-        const data = await res.json();
-        if (data.subscribed) {
-          claimReward.classList.remove('disabled');
-          claimReward.classList.add('btn-green');
-          showToast('Подписка подтверждена');
-        } else {
-          showToast('Не подписаны');
-        }
-      } catch (e) {
-        showToast('Ошибка');
-      }
+// Выносим обработчики в отдельные функции для переиспользования
+async function checkSubscribedHandler() {
+  try {
+    const res = await fetch(`${apiBase}/ad/${currentAdId}/check_subscribed/${telegramId}`);
+    const data = await res.json();
+    if (data.subscribed) {
+      const claimBtn = document.getElementById('claim-reward');
+      claimBtn.classList.remove('disabled');
+      claimBtn.classList.add('btn-green');
+      showToast('Подписка подтверждена!');
+    } else {
+      showToast('Вы не подписаны на канал');
+    }
+  } catch (e) {
+    showToast('Ошибка проверки подписки');
+  }
+}
+
+async function claimRewardHandler(e) {
+  if (e.target.classList.contains('disabled')) return;
+
+  const claimBtn = document.getElementById('claim-reward');
+  claimBtn.classList.add('disabled');
+  const originalText = claimBtn.textContent;
+  claimBtn.textContent = 'Обработка...';
+
+  try {
+    const res = await fetch(`${apiBase}/ad/${currentAdId}/claim/${telegramId}`, {
+      method: 'POST'
     });
 
-    claimReward.addEventListener('click', async (e) => {
-      if (e.target.classList.contains('disabled')) return;
-
-      claimReward.classList.add('disabled');
-      const originalText = claimReward.textContent;
-      claimReward.textContent = 'Обработка...';
-
-      try {
-        const res = await fetch(`${apiBase}/ad/${currentAdId}/claim/${telegramId}`, {
-          method: 'POST'
-        });
-
-        if (res.ok) {
-          const data = await res.json();
-          balance = Number(data.balance);
-          updateUI();
-          saveUserToLocal();
-          showToast(data.message || 'Награда получена успешно!');
-          await syncUserData();
-          switchToSection('market');
-        } else {
-          const errorData = await res.json().catch(() => ({ error: 'unknown' }));
-          showToast(errorData.error || 'Ошибка получения награды');
-          await loadClaimAd();
-        }
-      } catch (err) {
-        console.error('Claim error:', err);
-        showToast('Ошибка сети. Попробуйте позже.');
-        await loadClaimAd();
-      } finally {
-        claimReward.textContent = originalText;
-      }
-    });
+    if (res.ok) {
+      const data = await res.json();
+      balance = Number(data.balance);
+      updateUI();
+      saveUserToLocal();
+      showToast(data.message || 'Награда получена успешно!');
+      await syncUserData();
+      switchToSection('market');
+    } else {
+      const errorData = await res.json().catch(() => ({ error: 'unknown' }));
+      showToast(errorData.error || 'Ошибка получения награды');
+      await loadClaimAd();
+    }
+  } catch (err) {
+    console.error('Claim error:', err);
+    showToast('Ошибка сети. Попробуйте позже.');
+    await loadClaimAd();
+  } finally {
+    claimBtn.textContent = originalText;
+  }
+}
 
     backToAdsFromClaimBtn.addEventListener('click', () => switchToSection('market'));
 
