@@ -1127,7 +1127,6 @@ async function loadClaimAd() {
     const ad = await response.json();
     const progressPercent = (ad.remaining / ad.budget) * 100;
 
-    // Очищаем и перестраиваем полностью
     const claimSection = document.getElementById('claim-ad-section');
     claimSection.innerHTML = `
       <h2 class="section-title">Рекламная кампания</h2>
@@ -1139,17 +1138,17 @@ async function loadClaimAd() {
 
         <div class="ad-detail-stats">
           <div class="stat-card">
-            <div class="stat-value reward">$${Number(ad.reward).toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
-            <div class="stat-label">Награда за подписку</div>
+            <div class="stat-value reward">$${Number(ad.reward).toLocaleString('en-US', {minimumFractionDigits: 0})}</div>
+            <div class="stat-label">Награда</div>
           </div>
           <div class="stat-card">
-            <div class="stat-value budget">$${Number(ad.budget).toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
-            <div class="stat-label">Общий бюджет</div>
+            <div class="stat-value budget">$${Number(ad.budget).toLocaleString('en-US', {minimumFractionDigits: 0})}</div>
+            <div class="stat-label">Бюджет</div>
           </div>
         </div>
 
-        <div style="margin-bottom: 24px;">
-          <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+        <div style="margin-bottom: 16px;">
+          <div style="display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 13px;">
             <span style="color: var(--text-secondary);">Прогресс бюджета</span>
             <span style="font-weight: 600;">${progressPercent.toFixed(1)}%</span>
           </div>
@@ -1157,23 +1156,23 @@ async function loadClaimAd() {
             <div class="progress-fill" style="width: ${progressPercent}%"></div>
           </div>
           <div class="budget-info">
-            <span>Осталось: $${Number(ad.remaining).toLocaleString('en-US', {minimumFractionDigits: 2})}</span>
-            <span>Изначально: $${Number(ad.budget).toLocaleString('en-US', {minimumFractionDigits: 2})}</span>
+            <span>Осталось: $${Number(ad.remaining).toLocaleString('en-US', {minimumFractionDigits: 0})}</span>
+            <span>Было: $${Number(ad.budget).toLocaleString('en-US', {minimumFractionDigits: 0})}</span>
           </div>
         </div>
 
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px;">
-          <a href="https://t.me/${ad.channel_username}" class="btn" style="text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px;">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px;">
+          <a href="https://t.me/${ad.channel_username}" class="btn" style="text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 10px; font-size: 14px;">
             <i class="fab fa-telegram"></i>
             Подписаться
           </a>
-          <div class="btn" id="check-subscribed">Я подписался</div>
+          <div class="btn" id="check-subscribed" style="padding: 10px; font-size: 14px;">Я подписался</div>
         </div>
 
-        <div class="btn disabled" id="claim-reward" style="margin-bottom: 16px;">Получить награду</div>
+        <div class="btn disabled" id="claim-reward" style="margin-bottom: 12px; padding: 12px; font-size: 14px;">Получить награду</div>
       </div>
 
-      <div class="btn" id="back-to-ads-from-claim-btn">Назад к объявлениям</div>
+      <div class="btn" id="back-to-ads-from-claim-btn" style="padding: 12px;">Назад к объявлениям</div>
     `;
 
     // Перепривязываем события
