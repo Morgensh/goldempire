@@ -995,29 +995,50 @@ async function collectShares() {
 
     // Загрузка объявлений
     async function loadAds() {
-      try {
-        const response = await fetch(`${apiBase}/ads`);
-        const ads = await response.json();
-        adsList.innerHTML = '';
-        ads.forEach(ad => {
-          const card = document.createElement('div');
-          card.classList.add('card');
-          card.innerHTML = `
-            <div>Создатель: @${ad.creator_username}</div>
-            <div>Награда: $${Number(ad.reward).toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
-            <div>Бюджет: $${Number(ad.budget).toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
-          `;
-          card.addEventListener('click', () => {
-            currentAdId = ad.id;
-            currentChannel = ad.channel_username;
-            switchToSection('claim-ad');
-          });
-          adsList.appendChild(card);
-        });
-      } catch (err) {
-        console.error('Load ads error:', err);
-      }
-    }
+  try {
+    const response = await fetch(`${apiBase}/ads`);
+    const ads = await response.json();
+    adsList.innerHTML = '';
+
+    ads.forEach(ad => {
+      const card = document.createElement('div');
+      card.classList.add('market-card');
+
+      // Проверяем выполнено ли объявление для текущего пользователя
+      const isCompleted = ad.completed || false; // Это нужно будет добавить в ответ сервера
+
+      card.innerHTML = `
+        <div class="market-card-header">
+          <div class="company-name">@${ad.creator_username}</div>
+          <div class="stock-price">$${Number(ad.reward).toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
+        </div>
+
+        <div class="market-card-details">
+          <div class="detail-item">
+            <span class="detail-label">Бюджет:</span>
+            <span class="detail-value">$${Number(ad.budget).toLocaleString('en-US', {minimumFractionDigits: 0})}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Статус:</span>
+            <span class="detail-value ${isCompleted ? 'text-success' : 'text-warning'}">
+              ${isCompleted ? '✓ Выполнено' : '✗ Не выполнено'}
+            </span>
+          </div>
+        </div>
+      `;
+
+      card.addEventListener('click', () => {
+        currentAdId = ad.id;
+        currentChannel = ad.channel_username;
+        switchToSection('claim-ad');
+      });
+
+      adsList.appendChild(card);
+    });
+  } catch (err) {
+    console.error('Load ads error:', err);
+  }
+}
 
     createAdBtn.addEventListener('click', () => switchToSection('create-ad'));
 
@@ -1107,38 +1128,64 @@ async function loadClaimAd() {
     if (!response.ok) throw new Error('Ошибка загрузки');
 
     const ad = await response.json();
+    const isCompleted = ad.completed || false;
 
-    // Обновляем основную информацию
-    claimChannel.textContent = `@${ad.channel_username}`;
+    // Обновляем основную информацию в красивом формате
+    document.querySelector('#claim-ad-section .card').innerHTML = `
+      <div style="margin-bottom: 20px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+          <div style="font-size: 16px; font-weight: 600; color: var(--text-secondary);">Создатель</div>
+          <div style="font-size: 18px; font-weight: bold; color: var(--text-primary);">@${ad.creator_username}</div>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+          <div style="font-size: 16px; font-weight: 600; color: var(--text-secondary);">Статус</div>
+          <div style="font-size: 18px; font-weight: bold; color: ${isCompleted ? 'var(--accent-success)' : 'var(--accent-warning)'};">
+            ${isCompleted ? '✓ Выполнено' : '✗ Не выполнено'}
+          </div>
+        </div>
+      </div>
+
+      <div style="background: var(--bg-secondary); padding: 16px; border-radius: 12px; margin-bottom: 20px;">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
+          <div style="display: flex; flex-direction: column; width: 48%;">
+            <div style="font-size: 14px; font-weight: 600; color: var(--text-secondary); margin-bottom: 4px;">Канал</div>
+            <div style="font-size: 16px; font-weight: bold; color: var(--text-primary);">@${ad.channel_username}</div>
+          </div>
+          <div style="display: flex; flex-direction: column; width: 48%;">
+            <div style="font-size: 14px; font-weight: 600; color: var(--text-secondary); margin-bottom: 4px;">Награда</div>
+            <div style="font-size: 16px; font-weight: bold; color: var(--accent-success);">$${Number(ad.reward).toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
+          </div>
+        </div>
+
+        <div style="display: flex; justify-content: space-between;">
+          <div style="display: flex; flex-direction: column; width: 48%;">
+            <div style="font-size: 14px; font-weight: 600; color: var(--text-secondary); margin-bottom: 4px;">Бюджет</div>
+            <div style="font-size: 16px; font-weight: bold; color: var(--text-primary);">$${Number(ad.budget).toLocaleString('en-US', {minimumFractionDigits: 0})}</div>
+          </div>
+          <div style="display: flex; flex-direction: column; width: 48%;">
+            <div style="font-size: 14px; font-weight: 600; color: var(--text-secondary); margin-bottom: 4px;">Осталось</div>
+            <div style="font-size: 16px; font-weight: bold; color: var(--accent-primary);">$${Number(ad.remaining).toLocaleString('en-US', {minimumFractionDigits: 0})}</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="claim-ad-buttons">
+        <a id="subscribe-link" href="https://t.me/${ad.channel_username}" class="btn" target="_blank">Подписаться на канал</a>
+        <div class="btn" id="check-subscribed">Я подписался</div>
+        <div class="btn disabled" id="claim-reward">Получить награду</div>
+      </div>
+    `;
+
+    // Обновляем ссылку подписки
     subscribeLink.href = 'https://t.me/' + ad.channel_username;
 
-    // Находим или создаем элемент для бюджета
-    let budgetInfo = document.getElementById('budget-info');
-    if (!budgetInfo) {
-      budgetInfo = document.createElement('div');
-      budgetInfo.id = 'budget-info';
-      budgetInfo.className = 'budget-info';
-      claimChannel.parentNode.insertBefore(budgetInfo, claimChannel.nextSibling);
-    }
-
-    // Показываем и обновляем информацию о бюджете
-    budgetInfo.style.display = 'block';
-    budgetInfo.innerHTML = `Бюджет: $${Number(ad.remaining).toLocaleString('en-US')} / $${Number(ad.budget).toLocaleString('en-US')} осталось`;
-
-    claimReward.classList.add('disabled');
-    claimReward.classList.remove('btn-green');
+    // Добавляем обработчики событий для новых кнопок
+    document.getElementById('check-subscribed').addEventListener('click', checkSubscribedHandler);
+    document.getElementById('claim-reward').addEventListener('click', claimRewardHandler);
 
   } catch (err) {
     console.error('Ошибка загрузки объявления:', err);
-
-    // Fallback на старые данные
-    claimChannel.textContent = '@' + currentChannel;
-    subscribeLink.href = 'https://t.me/' + currentChannel;
-
-    // Скрываем информацию о бюджете при ошибке
-    const budgetInfo = document.getElementById('budget-info');
-    if (budgetInfo) budgetInfo.style.display = 'none';
-
     showToast('Ошибка загрузки данных объявления');
   }
 }
