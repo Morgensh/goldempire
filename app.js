@@ -407,15 +407,15 @@ applyTheme();
 
    function renderTopList(listEl, players) {
   listEl.innerHTML = '';
-  
+
   players.forEach((player, index) => {
     const card = document.createElement('div');
     card.classList.add('top-player-card');
-    
+
     if (player.telegram_id === telegramId) {
       card.classList.add('highlighted');
     }
-    
+
     card.innerHTML = `
       <div class="top-player-header">
         <div class="top-player-rank">${index + 1}</div>
@@ -425,27 +425,19 @@ applyTheme();
         </div>
         <div class="top-player-balance">$${Number(player.balance).toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: 0})}</div>
       </div>
-      
+
       <div class="top-player-details">
         <div class="detail-item">
           <span class="detail-label">Уровень</span>
           <span class="detail-value">${player.level}</span>
         </div>
         <div class="detail-item">
-          <span class="detail-label">Слуг</span>
-          <span class="detail-value">${player.servants_count || 0}</span>
-        </div>
-        <div class="detail-item">
-          <span class="detail-label">Компаний</span>
-          <span class="detail-value">${player.companies_count || 0}</span>
-        </div>
-        <div class="detail-item">
-          <span class="detail-label">Рефералов</span>
-          <span class="detail-value">${player.referrals_count || 0}</span>
+          <span class="detail-label">Баланс</span>
+          <span class="detail-value">$${Number(player.balance).toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: 0})}</span>
         </div>
       </div>
     `;
-    
+
     listEl.appendChild(card);
   });
 }
