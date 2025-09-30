@@ -39,6 +39,31 @@
     const MAX_PRODUCTION = 50000;
     const MAX_PENDING_INCOME = 50000;
 
+// Переключатель темы
+const themeToggleBtn = document.getElementById('theme-toggle-btn');
+let isDarkMode = localStorage.getItem('darkMode') === 'true';
+
+// Применяем тему при загрузке
+function applyTheme() {
+    if (isDarkMode) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        themeToggleBtn.className = 'fas fa-sun';
+    } else {
+        document.documentElement.removeAttribute('data-theme');
+        themeToggleBtn.className = 'fas fa-moon';
+    }
+}
+
+// Переключение темы
+themeToggleBtn.addEventListener('click', () => {
+    isDarkMode = !isDarkMode;
+    localStorage.setItem('darkMode', isDarkMode);
+    applyTheme();
+});
+
+// Применяем тему при старте
+applyTheme();
+
     // Список типов персонала
     const staffTypes = [
       { type: 'director', name: 'Директор', img: 'a1.png' },
@@ -1615,4 +1640,3 @@ settingsBtn.addEventListener('click', () => switchToSection('settings'));
 
     // Инициализация
     initUser();
-
