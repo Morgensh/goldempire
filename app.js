@@ -1,4 +1,4 @@
-  // Telegram WebApp init
+// Telegram WebApp init
     const tg = window.Telegram.WebApp;
     tg.ready();
     tg.expand();
@@ -994,30 +994,38 @@ async function collectShares() {
     });
 
     // Загрузка объявлений
-    async function loadAds() {
-      try {
-        const response = await fetch(`${apiBase}/ads`);
-        const ads = await response.json();
-        adsList.innerHTML = '';
-        ads.forEach(ad => {
-          const card = document.createElement('div');
-          card.classList.add('card');
-          card.innerHTML = `
-            <div>Создатель: @${ad.creator_username}</div>
-            <div>Награда: $${Number(ad.reward).toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
-            <div>Бюджет: $${Number(ad.budget).toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
-          `;
-          card.addEventListener('click', () => {
-            currentAdId = ad.id;
-            currentChannel = ad.channel_username;
-            switchToSection('claim-ad');
-          });
-          adsList.appendChild(card);
-        });
-      } catch (err) {
-        console.error('Load ads error:', err);
-      }
-    }
+    // Загрузка объявлений
+async function loadAds() {
+  try {
+    const response = await fetch(`${apiBase}/ads`);
+    const ads = await response.json();
+    adsList.innerHTML = '';
+    ads.forEach(ad => {
+      const card = document.createElement('div');
+      card.classList.add('card', 'ad-card');
+      card.innerHTML = `
+        <div class="ad-header">
+          <div class="ad-creator">Создатель: @${ad.creator_username}</div>
+          <div class="ad-reward">$${Number(ad.reward).toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
+        </div>
+        <div class="ad-details">
+          <div class="detail-item">
+            <div class="detail-label">Бюджет</div>
+            <div class="detail-value">$${Number(ad.budget).toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
+          </div>
+        </div>
+      `;
+      card.addEventListener('click', () => {
+        currentAdId = ad.id;
+        currentChannel = ad.channel_username;
+        switchToSection('claim-ad');
+      });
+      adsList.appendChild(card);
+    });
+  } catch (err) {
+    console.error('Load ads error:', err);
+  }
+}
 
     createAdBtn.addEventListener('click', () => switchToSection('create-ad'));
 
