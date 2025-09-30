@@ -1457,17 +1457,25 @@ async function loadHoldings() {
   </div>
 
   <div style="margin-bottom: 15px;">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-      <div style="font-size: 14px; font-weight: 600; color: var(--text-secondary);">Акций</div>
-      <div style="font-size: 16px; font-weight: bold;">${shares.toLocaleString('en-US')}</div>
-      <div style="font-size: 14px; font-weight: 600; color: var(--text-secondary);">Цена покупки</div>
-      <div style="font-size: 16px; font-weight: bold;">$${avgPrice.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>
+    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+      <div style="display: flex; justify-content: space-between; width: 48%;">
+        <div style="font-size: 14px; font-weight: 600; color: var(--text-secondary);">Акций</div>
+        <div style="font-size: 16px; font-weight: bold;">${shares.toLocaleString('en-US')}</div>
+      </div>
+      <div style="display: flex; justify-content: space-between; width: 48%;">
+        <div style="font-size: 14px; font-weight: 600; color: var(--text-secondary);">Цена покупки</div>
+        <div style="font-size: 16px; font-weight: bold;">$${avgPrice.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>
+      </div>
     </div>
-    <div style="display: flex; justify-content: space-between; align-items: center;">
-      <div style="font-size: 14px; font-weight: 600; color: var(--text-secondary);">Текущая цена</div>
-      <div style="font-size: 16px; font-weight: bold;">$${currentPrice.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>
-      <div style="font-size: 14px; font-weight: 600; color: var(--text-secondary);">Доход</div>
-      <div style="font-size: 16px; font-weight: bold;">$${profit.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>
+    <div style="display: flex; justify-content: space-between;">
+      <div style="display: flex; justify-content: space-between; width: 48%;">
+        <div style="font-size: 14px; font-weight: 600; color: var(--text-secondary);">Текущая цена</div>
+        <div style="font-size: 16px; font-weight: bold;">$${currentPrice.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>
+      </div>
+      <div style="display: flex; justify-content: space-between; width: 48%;">
+        <div style="font-size: 14px; font-weight: 600; color: var(--text-secondary);">Доход</div>
+        <div style="font-size: 16px; font-weight: bold;">$${profit.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>
+      </div>
     </div>
   </div>
 
