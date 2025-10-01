@@ -930,11 +930,23 @@ async function collectShares() {
         const card = document.createElement('div');
         card.classList.add('card');
         card.innerHTML = `
-          <div>Компания: ${company.name}</div>
-          <div>Владелец: @${company.owner_username}</div>
-          <div>Клиентов: ${Number(company.clients_count).toLocaleString('en-US')}</div>
-          <div>Цена: $${Number(company.price).toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
-        `;
+  <div class="stock-card">
+    <div class="stock-header">
+      <div class="stock-name">${company.name}</div>
+      <div class="stock-price">$${Number(company.price).toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
+    </div>
+    <div class="stock-details">
+      <div class="stock-detail">
+        <span class="detail-label">Владелец</span>
+        <span class="detail-value">@${company.owner_username}</span>
+      </div>
+      <div class="stock-detail">
+        <span class="detail-label">Клиентов</span>
+        <span class="detail-value">${Number(company.clients_count).toLocaleString('en-US')}</span>
+      </div>
+    </div>
+  </div>
+`;
         card.addEventListener('click', () => {
           currentCompanyId = company.id;
           switchToSection('stock-buy');
@@ -1279,6 +1291,7 @@ async function claimRewardHandler(e) {
       }
     }
 
+    document.getElementById('buy-company-price-line').textContent = `$${Number(company.price).toLocaleString('en-US', {minimumFractionDigits: 2})}`;
     // Загрузка страницы продажи акций
 async function loadStockSell() {
   if (!currentCompanyId) return;
