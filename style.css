@@ -1203,136 +1203,167 @@ input::placeholder {
 }
 
 
-/* Компактные стили для личного кабинета */
-.company-header-compact {
+/* Профессиональные стили трейдинг терминала */
+.company-dashboard {
+  padding: 0;
+}
+
+.dashboard-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  margin-bottom: 12px;
+  align-items: flex-start;
+  padding: 16px;
+  border-bottom: 1px solid var(--border-color);
+  background: var(--bg-secondary);
 }
 
-.company-ticker-compact {
-  font-size: 22px;
-  font-weight: 800;
-  background: var(--gradient-primary);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.company-metrics-compact {
-  display: flex;
-  gap: 16px;
-}
-
-.metric-compact {
+.company-title {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 2px;
+  gap: 4px;
 }
 
-.metric-label-compact {
-  font-size: 14px;
+.ticker-symbol {
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--text-primary);
+  letter-spacing: 1px;
 }
 
-.metric-value-compact {
-  font-size: 16px;
+.company-status {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--accent-success);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.dashboard-stats {
+  display: flex;
+  gap: 24px;
+}
+
+.stat-item {
+  text-align: right;
+}
+
+.stat-label {
+  font-size: 10px;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+.stat-value {
+  font-size: 18px;
   font-weight: 700;
   color: var(--text-primary);
 }
 
-.company-info-compact {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
-  margin-bottom: 12px;
-  padding: 12px;
-  background: var(--bg-secondary);
-  border-radius: 10px;
-  border-left: 3px solid var(--accent-primary);
+.issuance-details {
+  padding: 16px;
+  border-bottom: 1px solid var(--border-color);
 }
 
-.info-row-compact {
+.detail-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 13px;
+  padding: 8px 0;
 }
 
-.info-label-compact {
+.detail-row:not(:last-child) {
+  border-bottom: 1px solid var(--border-color);
+}
+
+.detail-label {
+  font-size: 12px;
   color: var(--text-secondary);
   font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
 }
 
-.info-value-compact {
-  color: var(--text-primary);
+.detail-value {
+  font-size: 14px;
   font-weight: 700;
-  background: var(--bg-card);
-  padding: 2px 8px;
-  border-radius: 6px;
+  color: var(--text-primary);
+  background: var(--bg-secondary);
+  padding: 4px 10px;
+  border-radius: 4px;
   border: 1px solid var(--border-color);
-  font-size: 12px;
 }
 
-.issue-compact {
+.issuance-form {
+  padding: 16px;
   display: grid;
   grid-template-columns: 1fr auto;
-  gap: 8px;
+  gap: 12px;
   align-items: center;
 }
 
-.input-compact {
-  padding: 10px 12px;
-  border: 2px solid var(--border-color);
-  border-radius: 8px;
+.trading-input {
+  padding: 12px 14px;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
   background: var(--bg-card);
   color: var(--text-primary);
   font-size: 14px;
   font-weight: 600;
+  font-family: 'Courier New', monospace;
 }
 
-.input-compact:focus {
+.trading-input:focus {
   outline: none;
   border-color: var(--accent-primary);
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
 }
 
-.btn-compact {
-  padding: 10px 16px;
-  margin: 0;
-  font-size: 13px;
-  font-weight: 700;
-  background: var(--gradient-primary);
+.trading-btn {
+  padding: 12px 20px;
+  background: var(--accent-primary);
   color: white;
   border: none;
-  border-radius: 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: 'Courier New', monospace;
   white-space: nowrap;
 }
 
-.btn-compact:hover {
+.trading-btn:hover {
+  background: #1d4ed8;
   transform: translateY(-1px);
-  box-shadow: var(--shadow);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
 }
 
 /* Адаптивность */
 @media (max-width: 768px) {
-  .company-header-compact {
+  .dashboard-header {
     flex-direction: column;
-    gap: 8px;
-    text-align: center;
+    gap: 12px;
   }
-
-  .company-metrics-compact {
-    gap: 24px;
+  
+  .dashboard-stats {
+    width: 100%;
+    justify-content: space-between;
   }
-
-  .company-info-compact {
+  
+  .stat-item {
+    text-align: left;
+  }
+  
+  .issuance-form {
     grid-template-columns: 1fr;
-    gap: 6px;
   }
-
-  .issue-compact {
-    grid-template-columns: 1fr;
-    gap: 6px;
+  
+  .trading-btn {
+    width: 100%;
   }
 }
