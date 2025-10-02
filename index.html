@@ -88,14 +88,45 @@
     <div class="section" id="company-dashboard-section">
       <h2 class="section-title">Личный кабинет компании</h2>
       <div class="card">
-  <div>Название: <span id="company-name"></span></div>
-  <div>Клиентов: <span id="company-clients"></span></div>
-  <div>Выпущено акций: <span id="company-issued"></span></div>
-  <div>Доступно для выпуска: <span id="company-available-issue"></span></div>
-  <!-- ДОБАВЬ ЭТУ СТРОКУ -->
-  <div>Доступно на рынке: <span id="company-available-market">0</span></div>
-  <input type="number" id="issue-amount-input" placeholder="Количество акций для выпуска">
-  <div class="btn" id="issue-shares-btn">Выпустить акции</div>
+  <!-- Заголовок компании -->
+  <div class="company-header">
+    <div class="company-ticker" id="company-name">PROB</div>
+    <div class="company-status">🟢 Активно</div>
+  </div>
+
+  <!-- Основные метрики в стиле биржи -->
+  <div class="metrics-grid">
+    <div class="metric-card">
+      <div class="metric-icon">👥</div>
+      <div class="metric-value" id="company-clients">4</div>
+      <div class="metric-label">Клиентов</div>
+    </div>
+
+    <div class="metric-card">
+      <div class="metric-icon">📊</div>
+      <div class="metric-value" id="company-issued">131,900</div>
+      <div class="metric-label">Выпущено акций</div>
+    </div>
+  </div>
+
+  <!-- Детальная информация -->
+  <div class="info-grid">
+    <div class="info-item">
+      <span class="info-label">🎯 Доступно для выпуска</span>
+      <span class="info-value" id="company-available-issue">0</span>
+    </div>
+    <div class="info-item">
+      <span class="info-label">🏪 Доступно на рынке</span>
+      <span class="info-value" id="company-available-market">130,889</span>
+    </div>
+  </div>
+
+  <!-- Выпуск акций -->
+  <div class="issue-shares-section">
+    <div class="section-title">Выпуск акций</div>
+    <input type="number" id="issue-amount-input" placeholder="Введите количество акций" class="modern-input">
+    <div class="btn btn-primary" id="issue-shares-btn">🚀 Выпустить акции</div>
+  </div>
 </div>
 
       <!-- Раздел Персонал -->
