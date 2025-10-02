@@ -88,42 +88,42 @@
     <div class="section" id="company-dashboard-section">
       <h2 class="section-title">Личный кабинет компании</h2>
       <div class="card">
-  <!-- Основная инфа в одну строку -->
   <div class="company-dashboard">
+    <!-- Шапка с основными метриками -->
     <div class="dashboard-header">
-      <div class="company-title">
-        <div class="ticker-symbol" id="company-name">PROB</div>
-        <div class="company-status">ACTIVE</div>
+      <div class="company-info">
+        <div class="company-name" id="company-name">Prob</div>
+        <div class="company-status">Активная</div>
       </div>
 
-      <div class="dashboard-stats">
-        <div class="stat-item">
-          <div class="stat-label">CLIENTS</div>
-          <div class="stat-value" id="company-clients">4</div>
+      <div class="key-metrics">
+        <div class="metric">
+          <div class="metric-value" id="company-clients">4</div>
+          <div class="metric-label">Клиентов</div>
         </div>
-        <div class="stat-item">
-          <div class="stat-label">ISSUED</div>
-          <div class="stat-value" id="company-issued">131,900</div>
+        <div class="metric">
+          <div class="metric-value" id="company-issued">131,900</div>
+          <div class="metric-label">Акций выпущено</div>
         </div>
       </div>
     </div>
 
-    <!-- Детали выпуска -->
-    <div class="issuance-details">
-      <div class="detail-row">
-        <span class="detail-label">AVAILABLE FOR ISSUE</span>
+    <!-- Детальная информация -->
+    <div class="dashboard-details">
+      <div class="detail-item">
+        <span class="detail-label">Доступно для выпуска</span>
         <span class="detail-value" id="company-available-issue">0</span>
       </div>
-      <div class="detail-row">
-        <span class="detail-label">ON MARKET</span>
+      <div class="detail-item">
+        <span class="detail-label">На рынке</span>
         <span class="detail-value" id="company-available-market">130,889</span>
       </div>
     </div>
 
-    <!-- Форма выпуска -->
-    <div class="issuance-form">
-      <input type="number" id="issue-amount-input" placeholder="Shares amount" class="trading-input">
-      <button class="trading-btn" id="issue-shares-btn">ISSUE SHARES</button>
+    <!-- Форма выпуска акций -->
+    <div class="issue-form">
+      <input type="number" id="issue-amount-input" placeholder="Количество акций" class="modern-input">
+      <button class="primary-btn" id="issue-shares-btn">Выпустить акции</button>
     </div>
   </div>
 </div>
