@@ -1281,6 +1281,7 @@ input::placeholder {
 }
 
 /* Адаптивность для мобильных */
+/* Адаптивность для мобильных */
 @media (max-width: 480px) {
   .stats-grid {
     grid-template-columns: 1fr 1fr;
@@ -1298,11 +1299,4 @@ input::placeholder {
   .company-dashboard-card {
     padding: 16px;
   }
-  .company-name {
-    font-size: 24px;
-  }
-  .stat-value {
-    font-size: 18px;
-  }
 }
-
