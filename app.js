@@ -763,13 +763,14 @@ const staffTypes = [
     }
 
     // Загрузка кабинета компании
-    // Загрузка кабинета компании
 async function loadCompanyDashboard() {
   if (!currentCompanyId) return;
 
   try {
     const response = await fetch(`${apiBase}/company/${currentCompanyId}`);
     const company = await response.json();
+
+    // Обновляем данные компании
     companyNameEl.textContent = company.name;
     companyClientsEl.textContent = Number(company.clients_count).toLocaleString('en-US');
     setNumToEl(companyIssuedEl, company.issued_shares);
@@ -780,8 +781,7 @@ async function loadCompanyDashboard() {
     lastCollectTimestamp = new Date(company.last_collect).getTime();
     updateProducedShares();
 
-    // ВОТ ЭТОТ БЛОК НАЙДИ И ЗАМЕНИ:
-        // ОБНОВЛЕННЫЙ РЕНДЕР ПЕРСОНАЛА (2 РЯДА)
+    // --- ОБНОВЛЁННЫЙ РЕНДЕР ПЕРСОНАЛА ---
     staffGrid.innerHTML = '';
 
     const staffTypesWithIcons = [
@@ -796,6 +796,7 @@ async function loadCompanyDashboard() {
     staffTypesWithIcons.forEach(staff => {
       const staffCard = document.createElement('div');
       staffCard.classList.add('staff-card');
+
       const currentLevel = Number(company[`staff_${staff.type}_level`]) || 1;
       const cost = 500 * currentLevel;
 
@@ -804,22 +805,26 @@ async function loadCompanyDashboard() {
           <i class="fas ${staff.icon}"></i>
         </div>
         <div class="staff-name">${staff.name}</div>
-        <div class="staff-role">Производит акции</div>
         <div class="staff-level">Уровень ${currentLevel}</div>
-        <div class="staff-status">
-          <i class="fas fa-check-circle"></i> Активен
-        </div>
         <button class="btn-upgrade" onclick="upgradeStaff('${staff.type}')">
           <i class="fas fa-arrow-up"></i> Улучшить ($${cost.toLocaleString('en-US')})
         </button>
       `;
+
       staffGrid.appendChild(staffCard);
     });
-    // КОНЕЦ БЛОКА ДЛЯ ЗАМЕНЫ
+
+    // Ограничиваем сетку: максимум 2 ряда по 3 сотрудника
+    staffGrid.style.display = "grid";
+    staffGrid.style.gridTemplateColumns = "repeat(3, 1fr)";
+    staffGrid.style.gridTemplateRows = "repeat(2, auto)";
+    staffGrid.style.gap = "12px";
+
   } catch (err) {
     console.error('Load dashboard error:', err);
   }
 }
+
 
     // Обновление произведенных акций с лимитом
     function updateProducedShares() {
