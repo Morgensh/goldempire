@@ -481,7 +481,7 @@ input::placeholder {
 /* Адаптивность для персонала */
 @media (max-width: 480px) {
   .staff-grid {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr; /* оставляем 3 колонки даже на мобилках */
     gap: 10px;
   }
 
@@ -491,6 +491,7 @@ input::placeholder {
     text-align: center;
   }
 }
+
 
 .staff-section {
   background: var(--bg-card);
