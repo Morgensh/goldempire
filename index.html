@@ -175,15 +175,30 @@
     <!-- Покупка акций -->
     <div class="section" id="stock-buy-section">
       <h2 class="section-title">Покупка акций</h2>
-      <div class="card">
-        <div>Компания: <span id="buy-company-name"></span></div>
-        <div>Владелец: <span id="buy-company-owner"></span></div>
-        <div>Клиентов: <span id="buy-company-clients"></span></div>
-        <div>Цена за акцию: <span id="buy-company-price"></span></div>
-        <div>Доступно на рынке: <span id="buy-company-available"></span></div>
-        <input type="number" id="buy-amount-input" placeholder="Количество акций">
-        <div class="btn" id="buy-shares-btn">Купить</div>
-      </div>
+     <div class="card">
+  <div class="stock-buy-header">
+    <div class="company-ticker" id="buy-company-name"></div>
+    <div class="stock-price-large" id="buy-company-price"></div>
+  </div>
+
+  <div class="stock-details-grid">
+    <div class="detail-item">
+      <span class="detail-label">💼 Владелец</span>
+      <span class="detail-value" id="buy-company-owner"></span>
+    </div>
+    <div class="detail-item">
+      <span class="detail-label">👥 Клиентская база</span>
+      <span class="detail-value" id="buy-company-clients"></span>
+    </div>
+    <div class="detail-item">
+      <span class="detail-label">🔄 Доступно на рынке</span>
+      <span class="detail-value" id="buy-company-available"></span>
+    </div>
+  </div>
+
+  <input type="number" id="buy-amount-input" placeholder="Количество акций">
+  <div class="btn btn-green" id="buy-shares-btn">КУПИТЬ АКЦИИ</div>
+</div>
       <div class="btn" id="back-to-market-btn">Назад на Рынок</div>
     </div>
 
