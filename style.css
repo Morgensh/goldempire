@@ -1202,4 +1202,95 @@ input::placeholder {
   }
 }
 
+/* ===== СТИЛИ ДЛЯ ЛИЧНОГО КАБИНЕТА КОМПАНИИ (БИРЖЕВОЙ СТИЛЬ) ===== */
+.company-dashboard-card {
+  background: var(--bg-card);
+  border-radius: 20px;
+  padding: 24px;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border-color);
+  margin-bottom: 20px;
+}
+
+.company-header {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.company-name {
+  font-size: 28px;
+  font-weight: 800;
+  margin-bottom: 8px;
+  color: var(--text-primary);
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.stat-item {
+  background: rgba(30, 41, 59, 0.6);
+  border-radius: 14px;
+  padding: 16px;
+  text-align: center;
+  border: 1px solid var(--border-color);
+}
+
+.stat-label {
+  font-size: 12px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+}
+
+.stat-value {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .stat-value {
+  color: var(--text-primary);
+}
+
+.stat-value.clients { color: #3b82f6; }
+.stat-value.issued { color: #10b981; }
+.stat-value.market { color: #10b981; }
+.stat-value.available-issue { color: var(--text-secondary); }
+
+.issue-section input {
+  width: 100%;
+  padding: 14px;
+  border-radius: 12px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  font-size: 16px;
+  margin-bottom: 12px;
+}
+
+.issue-section .btn {
+  width: 100%;
+  padding: 14px;
+  border-radius: 12px;
+  font-weight: 600;
+}
+
+/* Адаптивность для мобильных */
+@media (max-width: 480px) {
+  .stats-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  .company-name {
+    font-size: 24px;
+  }
+  .stat-value {
+    font-size: 18px;
+  }
+}
 
