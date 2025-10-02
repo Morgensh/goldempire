@@ -1232,7 +1232,7 @@ input::placeholder {
 }
 
 .stat-item {
-  background: rgba(30, 41, 59, 0.6);
+  background: var(--bg-secondary);
   border-radius: 14px;
   padding: 16px;
   text-align: center;
@@ -1250,10 +1250,6 @@ input::placeholder {
 .stat-value {
   font-size: 20px;
   font-weight: 700;
-  color: var(--text-primary);
-}
-
-[data-theme="dark"] .stat-value {
   color: var(--text-primary);
 }
 
@@ -1280,7 +1276,6 @@ input::placeholder {
   font-weight: 600;
 }
 
-/* Адаптивность для мобильных */
 /* Адаптивность для мобильных */
 @media (max-width: 480px) {
   .stats-grid {
