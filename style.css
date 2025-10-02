@@ -1626,3 +1626,255 @@ input::placeholder {
     padding: 8px;
   }
 }
+
+/* ===== СТИЛИ ДЛЯ СТРАНИЦЫ ПОЛУЧЕНИЯ НАГРАДЫ ===== */
+.claim-ad-container {
+  background: var(--bg-card);
+  border-radius: 20px;
+  padding: 24px;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border-color);
+  margin-bottom: 20px;
+}
+
+.claim-ad-header {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.claim-ad-title {
+  font-size: 24px;
+  font-weight: 800;
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 8px;
+}
+
+.claim-ad-subtitle {
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+.claim-ad-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.claim-stat-card {
+  background: var(--bg-secondary);
+  border-radius: 16px;
+  padding: 20px;
+  text-align: center;
+  border: 1px solid var(--border-color);
+  transition: all 0.3s ease;
+}
+
+.claim-stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow);
+}
+
+.claim-stat-value {
+  font-size: 24px;
+  font-weight: 800;
+  margin-bottom: 6px;
+}
+
+.claim-stat-value.reward {
+  color: var(--accent-success);
+}
+
+.claim-stat-value.budget {
+  color: var(--accent-warning);
+}
+
+.claim-stat-label {
+  font-size: 12px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+}
+
+.claim-progress-section {
+  margin-bottom: 24px;
+}
+
+.claim-progress-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  font-size: 13px;
+}
+
+.claim-progress-label {
+  color: var(--text-secondary);
+}
+
+.claim-progress-percent {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.claim-progress-container {
+  width: 100%;
+  height: 8px;
+  background: var(--bg-secondary);
+  border-radius: 10px;
+  margin-bottom: 6px;
+  overflow: hidden;
+}
+
+.claim-progress-fill {
+  height: 100%;
+  background: var(--gradient-primary);
+  border-radius: 10px;
+  transition: width 0.5s ease;
+}
+
+.claim-budget-info {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.claim-actions-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.claim-action-btn {
+  padding: 14px;
+  border-radius: 12px;
+  font-weight: 600;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: none;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.claim-action-btn.primary {
+  background: var(--accent-primary);
+  color: white;
+}
+
+.claim-action-btn.secondary {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+}
+
+.claim-action-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow);
+}
+
+.claim-reward-btn {
+  width: 100%;
+  padding: 16px;
+  border-radius: 12px;
+  font-weight: 700;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: none;
+  font-size: 16px;
+  margin-bottom: 16px;
+}
+
+.claim-reward-btn:not(.disabled) {
+  background: var(--accent-success);
+  color: white;
+}
+
+.claim-reward-btn.disabled {
+  background: var(--bg-secondary);
+  color: var(--text-muted);
+  cursor: not-allowed;
+}
+
+.claim-reward-btn:not(.disabled):hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.claim-back-btn {
+  width: 100%;
+  padding: 14px;
+  border-radius: 12px;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  font-weight: 600;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.claim-back-btn:hover {
+  background: var(--border-color);
+  transform: translateY(-1px);
+}
+
+/* Адаптивность для мобильных */
+@media (max-width: 768px) {
+  .claim-ad-container {
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+  
+  .claim-ad-title {
+    font-size: 20px;
+  }
+  
+  .claim-ad-stats {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  
+  .claim-stat-card {
+    padding: 16px;
+  }
+  
+  .claim-stat-value {
+    font-size: 20px;
+  }
+  
+  .claim-actions-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .claim-ad-container {
+    padding: 16px;
+  }
+  
+  .claim-ad-title {
+    font-size: 18px;
+  }
+  
+  .claim-stat-value {
+    font-size: 18px;
+  }
+  
+  .claim-action-btn,
+  .claim-reward-btn,
+  .claim-back-btn {
+    padding: 12px;
+    font-size: 14px;
+  }
+}
+
