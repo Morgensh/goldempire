@@ -1232,7 +1232,7 @@ input::placeholder {
 }
 
 .stat-item {
-  background: var(--bg-secondary);
+  background: rgba(30, 41, 59, 0.6);
   border-radius: 14px;
   padding: 16px;
   text-align: center;
@@ -1250,6 +1250,10 @@ input::placeholder {
 .stat-value {
   font-size: 20px;
   font-weight: 700;
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .stat-value {
   color: var(--text-primary);
 }
 
@@ -1293,5 +1297,54 @@ input::placeholder {
   }
   .company-dashboard-card {
     padding: 16px;
+  }
+}
+  .company-name {
+    font-size: 24px;
+  }
+  .stat-value {
+    font-size: 18px;
+  }
+}
+
+/* ===== СТИЛИ ДЛЯ КРАСИВОГО РЕФЕРАЛЬНОГО РАЗДЕЛА ===== */
+.referral-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin: 16px 0;
+}
+
+.referral-stat-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 16px;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.referral-stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow);
+}
+
+.referral-stat-value {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.referral-stat-label {
+  font-size: 12px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Адаптивность для реферального раздела */
+@media (max-width: 768px) {
+  .referral-stats {
+    grid-template-columns: 1fr;
   }
 }
