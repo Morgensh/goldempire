@@ -814,11 +814,10 @@ async function loadCompanyDashboard() {
       staffGrid.appendChild(staffCard);
     });
 
-    // Ограничиваем сетку: максимум 2 ряда по 3 сотрудника
-    staffGrid.style.display = "grid";
-    staffGrid.style.gridTemplateColumns = "repeat(3, 1fr)";
-    staffGrid.style.gridTemplateRows = "repeat(2, auto)";
-    staffGrid.style.gap = "12px";
+    // Сетка 2 колонки
+staffGrid.style.display = "grid";
+staffGrid.style.gridTemplateColumns = "repeat(2, 1fr)";
+staffGrid.style.gap = "12px";
 
   } catch (err) {
     console.error('Load dashboard error:', err);
