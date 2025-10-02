@@ -930,11 +930,21 @@ async function collectShares() {
         const card = document.createElement('div');
         card.classList.add('card');
         card.innerHTML = `
-          <div>Компания: ${company.name}</div>
-          <div>Владелец: @${company.owner_username}</div>
-          <div>Клиентов: ${Number(company.clients_count).toLocaleString('en-US')}</div>
-          <div>Цена: $${Number(company.price).toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
-        `;
+  <div class="market-card-header">
+    <div class="company-name">${company.name}</div>
+    <div class="stock-price">$${Number(company.price).toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
+  </div>
+  <div class="market-card-details">
+    <div class="detail-item">
+      <span class="detail-label">Владелец</span>
+      <span class="detail-value">@${company.owner_username}</span>
+    </div>
+    <div class="detail-item">
+      <span class="detail-label">Клиентов</span>
+      <span class="detail-value">${Number(company.clients_count).toLocaleString('en-US')}</span>
+    </div>
+  </div>
+`;
         card.addEventListener('click', () => {
           currentCompanyId = company.id;
           switchToSection('stock-buy');
@@ -1270,10 +1280,10 @@ async function claimRewardHandler(e) {
         const response = await fetch(`${apiBase}/company/${currentCompanyId}`);
         const company = await response.json();
         buyCompanyNameEl.textContent = company.name;
-        buyCompanyOwnerEl.textContent = `@${company.owner_username}`;
-        buyCompanyClientsEl.textContent = Number(company.clients_count).toLocaleString('en-US');
-        buyCompanyPriceEl.textContent = `$${Number(company.price).toLocaleString('en-US', {minimumFractionDigits: 2})}`;
-        buyCompanyAvailableEl.textContent = Number(company.available).toLocaleString('en-US');
+buyCompanyOwnerEl.textContent = `@${company.owner_username}`;
+buyCompanyClientsEl.textContent = Number(company.clients_count).toLocaleString('en-US');
+buyCompanyPriceEl.textContent = `$${Number(company.price).toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+buyCompanyAvailableEl.textContent = Number(company.available).toLocaleString('en-US');
       } catch (err) {
         console.error('Load buy error:', err);
       }
@@ -1732,3 +1742,4 @@ settingsBtn.addEventListener('click', () => switchToSection('settings'));
 
     // Инициализация
     initUser();
+
