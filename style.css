@@ -469,21 +469,27 @@ input::placeholder {
   display: block;
 }
 
-/* ===== ПЕРСОНАЛ КОМПАНИИ ===== */
+
+/* ===== КОМПАКТНАЯ СЕТКА ПЕРСОНАЛА ===== */
 .staff-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 16px;
-  margin-top: 16px;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 12px;
 }
 
 .staff-card {
   background: var(--bg-card);
   border: 1px solid var(--border-color);
-  border-radius: 12px;
-  padding: 16px;
+  border-radius: 10px;
+  padding: 12px;
   text-align: center;
   transition: all 0.3s ease;
+  min-height: 80px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
 .staff-card:hover {
@@ -492,24 +498,91 @@ input::placeholder {
 }
 
 .staff-img {
-  width: 64px;
-  height: 64px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
-  margin-bottom: 12px;
+  margin-bottom: 8px;
   border: 2px solid var(--border-color);
 }
 
-.staff-produced {
-  font-size: 18px;
+.staff-name {
+  font-size: 12px;
   font-weight: 600;
-  margin-bottom: 16px;
-  text-align: center;
-  padding: 16px;
+  margin-bottom: 4px;
+  color: var(--text-primary);
+}
+
+.staff-level {
+  font-size: 10px;
+  color: var(--text-muted);
   background: var(--bg-secondary);
-  border-radius: 12px;
+  padding: 2px 6px;
+  border-radius: 8px;
+}
+
+.staff-produced {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  text-align: center;
+  padding: 12px;
+  background: var(--bg-secondary);
+  border-radius: 10px;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* Для очень маленьких экранов */
+@media (max-width: 360px) {
+  .staff-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  
+  .staff-card {
+    padding: 10px;
+    min-height: 70px;
+  }
+  
+  .staff-img {
+    width: 32px;
+    height: 32px;
+    margin-bottom: 6px;
+  }
+  
+  .staff-name {
+    font-size: 11px;
+  }
+  
+  .staff-level {
+    font-size: 9px;
+  }
+  
+  .staff-produced {
+    font-size: 14px;
+    padding: 10px;
+  }
+}
+
+/* Для средних экранов */
+@media (min-width: 768px) {
+  .staff-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+  }
+  
+  .staff-card {
+    padding: 16px;
+    min-height: 100px;
+  }
+  
+  .staff-img {
+    width: 50px;
+    height: 50px;
+  }
 }
 
 /* ===== РЫНОК АКЦИЙ ===== */
@@ -1432,19 +1505,19 @@ input::placeholder {
   .ads-grid {
     gap: 8px;
   }
-  
+
   .ad-card {
     padding: 10px;
   }
-  
+
   .ad-creator {
     font-size: 13px;
   }
-  
+
   .ad-reward {
     font-size: 14px;
   }
-  
+
   .ad-details {
     font-size: 11px;
   }
@@ -1511,11 +1584,11 @@ input::placeholder {
   .ad-detail-card {
     padding: 10px;
   }
-  
+
   .ad-detail-stats {
     grid-template-columns: 1fr;
   }
-  
+
   .stat-card {
     padding: 8px;
   }
