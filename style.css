@@ -470,10 +470,10 @@ input::placeholder {
 }
 
 
-/* ===== КРАСИВАЯ СЕТКА ПЕРСОНАЛА (2 КОЛОНКИ) ===== */
+/* ===== КРАСИВАЯ СЕТКА ПЕРСОНАЛА (3 КОЛОНКИ) ===== */
 .staff-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr 1fr 1fr;
   gap: 12px;
   margin-top: 12px;
 }
@@ -481,10 +481,10 @@ input::placeholder {
 /* Адаптивность для персонала */
 @media (max-width: 480px) {
   .staff-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr 1fr;
     gap: 10px;
   }
-  
+
   .staff-produced {
     flex-direction: column;
     gap: 12px;
