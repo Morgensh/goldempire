@@ -1626,3 +1626,82 @@ input::placeholder {
     padding: 8px;
   }
 }
+/* Компактные карточки сотрудников */
+.staff-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 12px;
+  text-align: center;
+  transition: all 0.3s ease;
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 140px; /* уменьшил высоту */
+}
+
+.staff-icon {
+  width: 40px; /* уменьшил иконку */
+  height: 40px;
+  background: linear-gradient(135deg, #ede9fe, #ddd6fe);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 8px; /* уменьшил отступ */
+  color: var(--accent-primary);
+  font-size: 16px; /* уменьшил размер иконки */
+}
+
+.staff-name {
+  font-weight: 700;
+  font-size: 14px; /* уменьшил шрифт */
+  margin-bottom: 4px;
+  color: var(--text-primary);
+}
+
+.staff-role {
+  font-size: 11px; /* уменьшил шрифт */
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+  line-height: 1.2;
+}
+
+.staff-level {
+  display: inline-block;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  padding: 2px 8px; /* уменьшил паддинг */
+  border-radius: 12px;
+  font-size: 10px; /* уменьшил шрифт */
+  font-weight: 600;
+  margin-bottom: 8px;
+  border: 1px solid var(--border-color);
+}
+
+.staff-status {
+  font-size: 10px; /* уменьшил шрифт */
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  color: var(--accent-success);
+}
+
+.btn-upgrade {
+  background: linear-gradient(135deg, var(--accent-primary), #7e22ce);
+  color: white;
+  font-size: 11px; /* уменьшил шрифт */
+  padding: 6px 12px; /* уменьшил паддинг */
+  border-radius: 8px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 100%;
+  max-width: 100px; /* уменьшил максимальную ширину */
+}
+
