@@ -1283,8 +1283,20 @@ input::placeholder {
 /* Адаптивность для мобильных */
 @media (max-width: 480px) {
   .stats-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr 1fr;
     gap: 12px;
+  }
+  .company-name {
+    font-size: 22px;
+  }
+  .stat-value {
+    font-size: 16px;
+  }
+  .stat-label {
+    font-size: 11px;
+  }
+  .company-dashboard-card {
+    padding: 16px;
   }
   .company-name {
     font-size: 24px;
