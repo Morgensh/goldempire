@@ -88,44 +88,37 @@
     <div class="section" id="company-dashboard-section">
       <h2 class="section-title">Личный кабинет компании</h2>
       <div class="card">
-  <!-- Заголовок компании -->
-  <div class="company-header">
-    <div class="company-ticker" id="company-name">PROB</div>
-    <div class="company-status">🟢 Активно</div>
-  </div>
-
-  <!-- Основные метрики в стиле биржи -->
-  <div class="metrics-grid">
-    <div class="metric-card">
-      <div class="metric-icon">👥</div>
-      <div class="metric-value" id="company-clients">4</div>
-      <div class="metric-label">Клиентов</div>
-    </div>
-
-    <div class="metric-card">
-      <div class="metric-icon">📊</div>
-      <div class="metric-value" id="company-issued">131,900</div>
-      <div class="metric-label">Выпущено акций</div>
+  <!-- Заголовок и метрики в одну строку -->
+  <div class="company-header-compact">
+    <div class="company-ticker-compact" id="company-name">PROB</div>
+    <div class="company-metrics-compact">
+      <div class="metric-compact">
+        <span class="metric-label-compact">👥</span>
+        <span class="metric-value-compact" id="company-clients">4</span>
+      </div>
+      <div class="metric-compact">
+        <span class="metric-label-compact">📊</span>
+        <span class="metric-value-compact" id="company-issued">131,900</span>
+      </div>
     </div>
   </div>
 
-  <!-- Детальная информация -->
-  <div class="info-grid">
-    <div class="info-item">
-      <span class="info-label">🎯 Доступно для выпуска</span>
-      <span class="info-value" id="company-available-issue">0</span>
+  <!-- Информация о выпуске акций компактно -->
+  <div class="company-info-compact">
+    <div class="info-row-compact">
+      <span class="info-label-compact">🎯 Выпуск:</span>
+      <span class="info-value-compact" id="company-available-issue">0</span>
     </div>
-    <div class="info-item">
-      <span class="info-label">🏪 Доступно на рынке</span>
-      <span class="info-value" id="company-available-market">130,889</span>
+    <div class="info-row-compact">
+      <span class="info-label-compact">🏪 Рынок:</span>
+      <span class="info-value-compact" id="company-available-market">130,889</span>
     </div>
   </div>
 
-  <!-- Выпуск акций -->
-  <div class="issue-shares-section">
-    <div class="section-title">Выпуск акций</div>
-    <input type="number" id="issue-amount-input" placeholder="Введите количество акций" class="modern-input">
-    <div class="btn btn-primary" id="issue-shares-btn">🚀 Выпустить акции</div>
+  <!-- Форма выпуска акций компактная -->
+  <div class="issue-compact">
+    <input type="number" id="issue-amount-input" placeholder="Кол-во акций" class="input-compact">
+    <div class="btn btn-compact" id="issue-shares-btn">🚀 Выпустить</div>
   </div>
 </div>
 
