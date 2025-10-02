@@ -474,7 +474,7 @@ input::placeholder {
 .staff-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 10px;
+  gap: 8px;
   margin-top: 12px;
 }
 
@@ -482,10 +482,10 @@ input::placeholder {
   background: var(--bg-card);
   border: 1px solid var(--border-color);
   border-radius: 10px;
-  padding: 12px;
+  padding: 10px 8px;
   text-align: center;
   transition: all 0.3s ease;
-  min-height: 80px;
+  min-height: 70px;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -500,24 +500,27 @@ input::placeholder {
 .staff-img {
   width: 40px;
   height: 40px;
-  border-radius: 50%;
+  border-radius: 8px;
   margin-bottom: 8px;
   border: 2px solid var(--border-color);
+  object-fit: cover;
 }
 
 .staff-name {
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 600;
-  margin-bottom: 4px;
+  margin-bottom: 2px;
   color: var(--text-primary);
+  line-height: 1.2;
 }
 
 .staff-level {
-  font-size: 10px;
+  font-size: 9px;
   color: var(--text-muted);
   background: var(--bg-secondary);
-  padding: 2px 6px;
-  border-radius: 8px;
+  padding: 1px 4px;
+  border-radius: 6px;
+  line-height: 1.2;
 }
 
 .staff-produced {
@@ -539,31 +542,29 @@ input::placeholder {
 @media (max-width: 360px) {
   .staff-grid {
     grid-template-columns: 1fr 1fr;
-    gap: 8px;
+    gap: 6px;
   }
-  
+
   .staff-card {
-    padding: 10px;
-    min-height: 70px;
+    padding: 8px 6px;
+    min-height: 65px;
   }
-  
+
   .staff-img {
-    width: 32px;
-    height: 32px;
-    margin-bottom: 6px;
+    width: 30px;
+    height: 30px;
+    margin-bottom: 4px;
+    border-radius: 6px;
   }
-  
+
   .staff-name {
-    font-size: 11px;
+    font-size: 10px;
+    margin-bottom: 1px;
   }
-  
+
   .staff-level {
-    font-size: 9px;
-  }
-  
-  .staff-produced {
-    font-size: 14px;
-    padding: 10px;
+    font-size: 8px;
+    padding: 1px 3px;
   }
 }
 
@@ -571,17 +572,26 @@ input::placeholder {
 @media (min-width: 768px) {
   .staff-grid {
     grid-template-columns: repeat(4, 1fr);
-    gap: 12px;
+    gap: 10px;
   }
   
   .staff-card {
-    padding: 16px;
-    min-height: 100px;
+    padding: 12px 10px;
+    min-height: 85px;
   }
   
   .staff-img {
-    width: 50px;
-    height: 50px;
+    width: 45px;
+    height: 45px;
+    border-radius: 8px;
+  }
+  
+  .staff-name {
+    font-size: 12px;
+  }
+  
+  .staff-level {
+    font-size: 10px;
   }
 }
 
@@ -1593,3 +1603,4 @@ input::placeholder {
     padding: 8px;
   }
 }
+
