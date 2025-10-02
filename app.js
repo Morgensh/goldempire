@@ -65,14 +65,14 @@ themeToggleBtn.addEventListener('click', () => {
 applyTheme();
 
     // Список типов персонала
-    const staffTypes = [
-      { type: 'director', name: 'Директор', img: 'a1.png' },
-      { type: 'accountant', name: 'Бухгалтер', img: 'a2.png' },
-      { type: 'marketer', name: 'Маркетолог', img: 'a3.png' },
-      { type: 'secretary', name: 'Секретарь', img: 'a4.png' },
-      { type: 'sales_manager', name: 'Менеджер по продажам', img: 'a5.png' },
-      { type: 'lawyer', name: 'Юрист', img: 'a6.png' }
-    ];
+const staffTypes = [
+  { type: 'director', name: 'Директор', icon: 'fa-crown' },
+  { type: 'accountant', name: 'Бухгалтер', icon: 'fa-file-invoice-dollar' },
+  { type: 'marketer', name: 'Маркетолог', icon: 'fa-bullhorn' },
+  { type: 'secretary', name: 'Секретарь', icon: 'fa-users' },
+  { type: 'sales_manager', name: 'Менеджер по продажам', icon: 'fa-chart-line' },
+  { type: 'lawyer', name: 'Юрист', icon: 'fa-gavel' }
+];
 
     // DOM элементы
     const companyAvailableMarketEl = document.getElementById('company-available-market');
@@ -763,43 +763,63 @@ applyTheme();
     }
 
     // Загрузка кабинета компании
-    async function loadCompanyDashboard() {
-      if (!currentCompanyId) return;
+    // Загрузка кабинета компании
+async function loadCompanyDashboard() {
+  if (!currentCompanyId) return;
 
-      try {
-        const response = await fetch(`${apiBase}/company/${currentCompanyId}`);
-        const company = await response.json();
-        companyNameEl.textContent = company.name;
-        companyClientsEl.textContent = Number(company.clients_count).toLocaleString('en-US');
-        setNumToEl(companyIssuedEl, company.issued_shares);
-        companyAvailableIssueEl.textContent = Number(company.available_to_issue).toLocaleString('en-US');
-        companyAvailableMarketEl.textContent = Number(company.available).toLocaleString('en-US');
+  try {
+    const response = await fetch(`${apiBase}/company/${currentCompanyId}`);
+    const company = await response.json();
+    companyNameEl.textContent = company.name;
+    companyClientsEl.textContent = Number(company.clients_count).toLocaleString('en-US');
+    setNumToEl(companyIssuedEl, company.issued_shares);
+    companyAvailableIssueEl.textContent = Number(company.available_to_issue).toLocaleString('en-US');
+    companyAvailableMarketEl.textContent = Number(company.available).toLocaleString('en-US');
 
-        productionRatePerSecond = Number(company.production_rate_per_second) || 0;
-        lastCollectTimestamp = new Date(company.last_collect).getTime();
-        updateProducedShares();
+    productionRatePerSecond = Number(company.production_rate_per_second) || 0;
+    lastCollectTimestamp = new Date(company.last_collect).getTime();
+    updateProducedShares();
 
-        staffGrid.innerHTML = '';
-        staffTypes.forEach(staff => {
-          const staffCard = document.createElement('div');
-          staffCard.classList.add('staff-card');
-          const currentLevel = Number(company[`staff_${staff.type}_level`]) || 1;
-          const cost = 500 * currentLevel;
+    // ВОТ ЭТОТ БЛОК НАЙДИ И ЗАМЕНИ:
+        // ОБНОВЛЕННЫЙ РЕНДЕР ПЕРСОНАЛА (2 РЯДА)
+    staffGrid.innerHTML = '';
 
-          staffCard.innerHTML = `
-            <img src="${staff.img}" alt="${staff.name}" class="staff-img">
-            <div>${staff.name}</div>
-            <div>Уровень: <span id="staff-${staff.type}-level">${currentLevel}</span></div>
-            <div class="btn" id="upgrade-${staff.type}-btn">Улучшить ($${cost.toLocaleString('en-US')})</div>
-          `;
-          staffGrid.appendChild(staffCard);
+    const staffTypesWithIcons = [
+      { type: 'director', name: 'Директор', icon: 'fa-crown' },
+      { type: 'accountant', name: 'Бухгалтер', icon: 'fa-file-invoice-dollar' },
+      { type: 'marketer', name: 'Маркетолог', icon: 'fa-bullhorn' },
+      { type: 'secretary', name: 'Секретарь', icon: 'fa-users' },
+      { type: 'sales_manager', name: 'Менеджер по продажам', icon: 'fa-chart-line' },
+      { type: 'lawyer', name: 'Юрист', icon: 'fa-gavel' }
+    ];
 
-          document.getElementById(`upgrade-${staff.type}-btn`).addEventListener('click', () => upgradeStaff(staff.type));
-        });
-      } catch (err) {
-        console.error('Load dashboard error:', err);
-      }
-    }
+    staffTypesWithIcons.forEach(staff => {
+      const staffCard = document.createElement('div');
+      staffCard.classList.add('staff-card');
+      const currentLevel = Number(company[`staff_${staff.type}_level`]) || 1;
+      const cost = 500 * currentLevel;
+
+      staffCard.innerHTML = `
+        <div class="staff-icon">
+          <i class="fas ${staff.icon}"></i>
+        </div>
+        <div class="staff-name">${staff.name}</div>
+        <div class="staff-role">Производит акции</div>
+        <div class="staff-level">Уровень ${currentLevel}</div>
+        <div class="staff-status">
+          <i class="fas fa-check-circle"></i> Активен
+        </div>
+        <button class="btn-upgrade" onclick="upgradeStaff('${staff.type}')">
+          <i class="fas fa-arrow-up"></i> Улучшить ($${cost.toLocaleString('en-US')})
+        </button>
+      `;
+      staffGrid.appendChild(staffCard);
+    });
+    // КОНЕЦ БЛОКА ДЛЯ ЗАМЕНЫ
+  } catch (err) {
+    console.error('Load dashboard error:', err);
+  }
+}
 
     // Обновление произведенных акций с лимитом
     function updateProducedShares() {
