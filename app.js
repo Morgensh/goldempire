@@ -1520,6 +1520,7 @@ async function sellShares() {
 
     // Загрузка холдингов
     // Загрузка холдингов - FIXED VERSION
+// Загрузка холдингов - ОБНОВЛЕННАЯ ВЕРСИЯ
 async function loadHoldings() {
   try {
     const response = await fetch(`${apiBase}/holdings/${telegramId}`);
@@ -1539,7 +1540,7 @@ async function loadHoldings() {
       let profit = 0;
       try {
         // Для очень больших чисел используем BigInt
-        if (shares > 1000000000) { // Если больше 1 миллиарда
+        if (shares > 1000000000) {
           const priceDiff = BigInt(Math.floor(currentPrice * 100)) - BigInt(Math.floor(avgPrice * 100));
           profit = Number((priceDiff * shares) / 100n);
         } else {
@@ -1554,28 +1555,28 @@ async function loadHoldings() {
       card.innerHTML = `
   <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
     <div style="font-size: 18px; font-weight: bold;">${holding.name}</div>
-    <div style="font-size: 24px; font-weight: bold; color: var(--accent-success);">+$${profit.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>
+    <div style="font-size: 20px; font-weight: bold; color: var(--accent-success);">+$${profit.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>
   </div>
 
   <div style="margin-bottom: 15px;">
     <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
       <div style="display: flex; justify-content: space-between; width: 48%;">
         <div style="font-size: 14px; font-weight: 600; color: var(--text-secondary);">Акций</div>
-        <div style="font-size: 16px; font-weight: bold;">${shares.toLocaleString('en-US')}</div>
+        <div style="font-size: 14px; font-weight: bold;">${shares.toLocaleString('en-US')}</div>
       </div>
       <div style="display: flex; justify-content: space-between; width: 48%;">
         <div style="font-size: 14px; font-weight: 600; color: var(--text-secondary);">Цена покупки</div>
-        <div style="font-size: 16px; font-weight: bold;">$${avgPrice.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>
+        <div style="font-size: 14px; font-weight: bold;">$${avgPrice.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>
       </div>
     </div>
     <div style="display: flex; justify-content: space-between;">
       <div style="display: flex; justify-content: space-between; width: 48%;">
         <div style="font-size: 14px; font-weight: 600; color: var(--text-secondary);">Текущая цена</div>
-        <div style="font-size: 16px; font-weight: bold;">$${currentPrice.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>
+        <div style="font-size: 14px; font-weight: bold;">$${currentPrice.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>
       </div>
       <div style="display: flex; justify-content: space-between; width: 48%;">
         <div style="font-size: 14px; font-weight: 600; color: var(--text-secondary);">Доход</div>
-        <div style="font-size: 16px; font-weight: bold;">$${profit.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>
+        <div style="font-size: 14px; font-weight: bold;">$${profit.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>
       </div>
     </div>
   </div>
