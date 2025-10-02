@@ -1063,3 +1063,142 @@ input::placeholder {
   color: white;
   font-weight: 800;
 }
+/* ===== НОВЫЕ СТИЛИ ДЛЯ БИРЖЕВЫХ КАРТОЧЕК ===== */
+
+/* Карточка акции на рынке */
+.market-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 16px;
+  margin-bottom: 12px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.market-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--accent-primary);
+}
+
+.market-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
+.company-name {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.stock-price {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--accent-success);
+}
+
+.market-card-details {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  font-size: 14px;
+}
+
+.detail-item {
+  display: flex;
+  justify-content: space-between;
+  color: var(--text-secondary);
+}
+
+.detail-label {
+  font-weight: 500;
+}
+
+.detail-value {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* Страница покупки акций */
+.stock-buy-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.company-ticker {
+  font-size: 24px;
+  font-weight: 800;
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.stock-price-large {
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--accent-success);
+}
+
+.stock-details-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.stock-details-grid .detail-item {
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.stock-details-grid .detail-item:last-child {
+  border-bottom: none;
+}
+
+.stock-details-grid .detail-label {
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.stock-details-grid .detail-value {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+/* Адаптивность для мобилок */
+@media (max-width: 768px) {
+  .market-card {
+    padding: 12px;
+  }
+
+  .company-name {
+    font-size: 16px;
+  }
+
+  .stock-price {
+    font-size: 18px;
+  }
+
+  .market-card-details {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+
+  .company-ticker {
+    font-size: 20px;
+  }
+
+  .stock-price-large {
+    font-size: 24px;
+  }
+}
+
