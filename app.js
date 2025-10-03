@@ -980,7 +980,7 @@ async function collectShares() {
       </div>
 
       <div class="market-card-footer">
-        <div class="availability">Доступно: ${Number(company.available).toLocaleString('en-US')} акций</div>
+        <div class="availability">Доступно: ${(company.available || company.available_to_issue || 0).toLocaleString('en-US')} акций</div>
         <button class="buy-btn">Купить</button>
       </div>
     `;
