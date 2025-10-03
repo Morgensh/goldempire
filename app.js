@@ -468,11 +468,17 @@ function createCoinAnimation(x, y, amount) {
   coin.style.left = (x - 15) + 'px';
   coin.style.top = (y - 15) + 'px';
 
-  // Добавляем текст с суммой
-  if (amount > 1) {
-    coin.textContent = `+${amount}`;
-    coin.style.fontSize = '14px';
+  // Всегда показываем сумму, даже дробную
+  coin.textContent = `+${amount.toFixed(2)}`;
+  coin.style.fontSize = '14px';
+  
+  // Разные цвета для разных сумм
+  if (amount < 1) {
     coin.style.background = 'linear-gradient(135deg, #C0C0C0, #A0A0A0)';
+  } else if (amount < 5) {
+    coin.style.background = 'linear-gradient(135deg, #FFD700, #FFA500)';
+  } else {
+    coin.style.background = 'linear-gradient(135deg, #FFA500, #FF8C00)';
   }
 
   document.body.appendChild(coin);
@@ -496,7 +502,7 @@ function handleClick(e) {
     if (progress >= nextThreshold) {
         level = Number(level) + 1;
         progress = Number(progress) - nextThreshold;
-        clickValue = 0.5 + (Number(level) * 0.5);
+        clickValue = Number(level) * 0.5;
     }
 
     updateUI();
@@ -620,7 +626,7 @@ clickerArea.addEventListener('click', handleClick);
           anonymous = user.anonymous;
           claimedChannelBonus = user.claimed_channel_bonus;
           lastClaimTime = new Date(user.last_claim).getTime();
-          clickValue = 0.5 + (Number(level) * 0.5);
+          clickValue = Number(level) * 0.5;
           updateUI();
           updateCreateCompanyArea();
           return true;
@@ -650,7 +656,7 @@ clickerArea.addEventListener('click', handleClick);
           anonymous = user.anonymous;
           claimedChannelBonus = user.claimed_channel_bonus;
           lastClaimTime = new Date(user.last_claim).getTime();
-          clickValue = 0.5 + (Number(level) * 0.5);
+          clickValue = Number(level) * 0.5;
 
           if (masterId) {
             response = await fetch(`${apiBase}/apply_tax/${telegramId}`, { method: 'POST' });
