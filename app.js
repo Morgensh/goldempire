@@ -7,7 +7,7 @@
     let userData = tg.initDataUnsafe.user || {};
     let telegramId = Number(userData.id) || 0;
     let balance = 0;
-    let clickValue = 0.005; // стартовое значение: 0.5 цента за клик
+    let clickValue = 0.5; // стартовое значение: 0.5 доллара за клик
     let level = 1;
     let progress = 0;
     let totalClicks = 0;
@@ -496,7 +496,7 @@ function handleClick(e) {
     if (progress >= nextThreshold) {
         level = Number(level) + 1;
         progress = Number(progress) - nextThreshold;
-        clickValue = 0.005 + (Number(level) * 0.005);
+        clickValue = 0.5 + (Number(level) * 0.5);
     }
 
     updateUI();
@@ -620,7 +620,7 @@ clickerArea.addEventListener('click', handleClick);
           anonymous = user.anonymous;
           claimedChannelBonus = user.claimed_channel_bonus;
           lastClaimTime = new Date(user.last_claim).getTime();
-          clickValue = 0.005 + (Number(level) * 0.005); // 0.5 цента + 0.5 цента за уровень
+          clickValue = 0.5 + (Number(level) * 0.5);
           updateUI();
           updateCreateCompanyArea();
           return true;
@@ -650,7 +650,7 @@ clickerArea.addEventListener('click', handleClick);
           anonymous = user.anonymous;
           claimedChannelBonus = user.claimed_channel_bonus;
           lastClaimTime = new Date(user.last_claim).getTime();
-          clickValue = 0.005 + (Number(level) * 0.005);
+          clickValue = 0.5 + (Number(level) * 0.5);
 
           if (masterId) {
             response = await fetch(`${apiBase}/apply_tax/${telegramId}`, { method: 'POST' });
