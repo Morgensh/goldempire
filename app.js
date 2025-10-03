@@ -965,7 +965,7 @@ function renderMarketList(companies) {
             <div class="company-owner">@${company.owner_username}</div>
           </div>
         </div>
-        <div class="stock-price">+$${Number(company.price).toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
+        <div class="stock-price">$${Number(company.price).toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
       </div>
 
       <div class="market-card-stats">
@@ -1799,5 +1799,6 @@ settingsBtn.addEventListener('click', () => switchToSection('settings'));
 
     // Инициализация
     initUser();
+
 
 
