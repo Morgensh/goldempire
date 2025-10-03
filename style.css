@@ -1742,10 +1742,10 @@ input::placeholder {
 .status-indicator {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 6px 12px;
+  gap: 6px;
+  padding: 4px 10px;
   border-radius: 20px;
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 600;
 }
 
@@ -1756,7 +1756,7 @@ input::placeholder {
 }
 
 .status-indicator i {
-  font-size: 16px;
+  font-size: 14px;
 }
 
 /* Стили для портфеля */
@@ -1951,3 +1951,4 @@ input::placeholder {
 body {
   -webkit-tap-highlight-color: transparent;
 }
+
