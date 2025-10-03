@@ -1791,79 +1791,76 @@ input::placeholder {
 }
 
 
-/* ===== КОМПАКТНЫЕ, НО ЧИТАБЕЛЬНЫЕ КАРТОЧКИ АКЦИЙ ===== */
+/* ===== СУПЕРКОМПАКТНЫЕ КАРТОЧКИ АКЦИЙ ===== */
 .market-card {
-    padding: 10px 14px;
-    margin-bottom: 8px;
-    border-radius: 12px;
-    gap: 8px;
-}
-
-.market-card .market-card-header {
+    padding: 8px 10px;
     margin-bottom: 6px;
+    border-radius: 10px;
+    gap: 4px; /* минимальный gap */
 }
 
+/* Заголовок */
+.market-card .market-card-header {
+    margin-bottom: 2px;
+}
+
+/* Иконка компании */
 .market-card .fixed-icon {
-    width: 32px;
-    height: 32px;
-    border-radius: 8px;
-    font-size: 14px;
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    font-size: 13px;
 }
 
-/* Название компании и владелец */
+/* Название и владелец */
 .market-card .company-name {
-    font-size: 16px;      /* оставил нормальный размер */
+    font-size: 15px;
     font-weight: 600;
+    line-height: 1.2;
+    margin: 0;
 }
 
 .market-card .company-owner {
-    font-size: 12px;
+    font-size: 11px;
+    line-height: 1.1;
+    margin: 0;
     color: var(--text-secondary);
 }
 
-/* Цена акции — делаем крупнее */
+/* Цена */
 .market-card .stock-price {
-    font-size: 18px;      /* увеличил для удобства */
+    font-size: 17px;
     font-weight: 700;
     color: var(--accent-success);
 }
 
-/* Сетка статистики */
+/* Статистика */
 .market-card .market-card-stats {
-    gap: 4px;
-    margin-top: 2px;
+    gap: 2px;
+    margin-top: 0;
 }
 
 .market-card .market-stat-label {
-    font-size: 11px;
+    font-size: 10px;
     color: var(--text-secondary);
+    line-height: 1.1;
 }
 
 .market-card .market-stat-value {
-    font-size: 15px;      /* сделал больше */
+    font-size: 14px;
     font-weight: 600;
+    line-height: 1.1;
 }
 
 /* Футер */
 .market-card .market-card-footer {
-    padding-top: 6px;
-    margin-top: 4px;
+    padding-top: 2px;
+    margin-top: 2px;
 }
 
-.market-card .status-indicator {
-    padding: 3px 6px;
-    font-size: 12px;
-    border-radius: 14px;
-}
-
-.market-card .status-indicator i {
-    font-size: 12px;
-}
-
-/* Кнопка "Купить" */
+/* Кнопка */
 .market-card .buy-btn {
-    padding: 6px 12px;
-    font-size: 13px;   /* увеличил с 12px */
-    border-radius: 6px;
+    padding: 4px 8px;
+    font-size: 12px;
+    border-radius: 4px;
 }
-
