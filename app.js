@@ -980,12 +980,18 @@ async function collectShares() {
       </div>
 
       <div class="market-card-footer">
-        <div class="availability">Доступно: ${(company.available || company.available_to_issue || 0).toLocaleString('en-US')} акций</div>
+        <!-- 🔥 НОВЫЙ СТАТУС ДОСТУПНОСТИ -->
+        <div class="availability-status">
+          <div class="status-indicator available">
+            <i class="fas fa-check-circle"></i>
+            <span>Акции доступны</span>
+          </div>
+        </div>
         <button class="buy-btn">Купить</button>
       </div>
     `;
 
-    // Обработчик клика по карточке
+    // Обработчики кликов остаются
     card.addEventListener('click', (e) => {
       if (!e.target.classList.contains('buy-btn')) {
         currentCompanyId = company.id;
@@ -993,7 +999,6 @@ async function collectShares() {
       }
     });
 
-    // Обработчик кнопки "Купить"
     card.querySelector('.buy-btn').addEventListener('click', (e) => {
       e.stopPropagation();
       currentCompanyId = company.id;
