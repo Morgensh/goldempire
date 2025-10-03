@@ -948,11 +948,11 @@ async function collectShares() {
     }
 
     // Рендер рынка акций
-    function renderMarketList(companies) {
+function renderMarketList(companies) {
   marketList.innerHTML = '';
   companies.forEach(company => {
     const card = document.createElement('div');
-    card.classList.add('market-card');
+    card.classList.add('market-card', 'compact'); // ← ДОБАВИЛ 'compact' ЗДЕСЬ
 
     card.innerHTML = `
       <div class="market-card-header">
