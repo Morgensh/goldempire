@@ -1792,62 +1792,74 @@ input::placeholder {
 
 
 /* ===== КОМПАКТНЫЕ КАРТОЧКИ АКЦИЙ ===== */
-.market-card.compact {
-    padding: 12px;
+.market-card {
+    padding: 10px 14px;
     margin-bottom: 8px;
+    border-radius: 12px;
+    gap: 8px;
 }
 
-.market-card.compact .market-card-header {
-    margin-bottom: 8px;
+.market-card .market-card-header {
+    margin-bottom: 6px;
 }
 
-.market-card.compact .fixed-icon {
-    width: 36px;
-    height: 36px;
+.market-card .fixed-icon {
+    width: 32px;
+    height: 32px;
     border-radius: 8px;
-    font-size: 16px;
-}
-
-.market-card.compact .company-name {
-    font-size: 16px;
-}
-
-.market-card.compact .company-owner {
-    font-size: 12px;
-}
-
-.market-card.compact .stock-price {
-    font-size: 16px;
-}
-
-.market-card.compact .market-card-stats {
-    gap: 6px;
-    margin-top: 4px;
-}
-
-.market-card.compact .market-stat-label {
-    font-size: 11px;
-}
-
-.market-card.compact .market-stat-value {
     font-size: 14px;
 }
 
-.market-card.compact .market-card-footer {
-    padding-top: 8px;
+.market-card .company-name {
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.market-card .company-owner {
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+.market-card .stock-price {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--accent-success);
+}
+
+.market-card .market-card-stats {
+    gap: 4px;
+    margin-top: 2px;
+}
+
+.market-card .market-stat-label {
+    font-size: 11px;
+    color: var(--text-secondary);
+}
+
+.market-card .market-stat-value {
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.market-card .market-card-footer {
+    padding-top: 6px;
     margin-top: 4px;
 }
 
-.market-card.compact .status-indicator {
-    padding: 4px 8px;
-    font-size: 12px;
+.market-card .status-indicator {
+    padding: 3px 6px;
+    font-size: 11px;
+    border-radius: 14px;
 }
 
-.market-card.compact .status-indicator i {
-    font-size: 12px;
+.market-card .status-indicator i {
+    font-size: 11px;
 }
 
-.market-card.compact .buy-btn {
-    padding: 6px 12px;
+.market-card .buy-btn {
+    padding: 6px 10px;
     font-size: 12px;
+    border-radius: 6px;
 }
+
+
