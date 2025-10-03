@@ -110,21 +110,35 @@ body {
 
 /* ===== БАНКОВСКАЯ КАРТА (ГЛАВНАЯ) ===== */
 .bank-card {
-  background: var(--gradient-gold);
+  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #d97706 100%);
   border-radius: 20px;
-  padding: 24px;
+  padding: 25px;
   margin: 24px 0;
   color: white;
   box-shadow: var(--shadow-lg);
   position: relative;
   overflow: hidden;
-  min-height: 180px;
+  min-height: 200px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  cursor: pointer;
+  transition: all 0.4s ease;
 }
 
 .bank-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100" opacity="0.1"><path d="M50 10 L60 40 L90 40 L65 60 L75 90 L50 70 L25 90 L35 60 L10 40 L40 40 Z" fill="white"/></svg>');
+  background-size: 80px;
+  opacity: 0.3;
+}
+
+.bank-card::after {
   content: '';
   position: absolute;
   top: -50%;
@@ -135,37 +149,43 @@ body {
   border-radius: 50%;
 }
 
-.bank-card::after {
-  content: '';
-  position: absolute;
-  bottom: -30%;
-  left: -30%;
-  width: 150px;
-  height: 150px;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 50%;
-}
-
-.bank-card > div:first-child {
-  font-size: 18px;
-  font-weight: 600;
+.card-logo {
+  font-size: 20px;
+  font-weight: 700;
   letter-spacing: 1px;
   z-index: 2;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
-.bank-card > div:nth-child(2) {
-  font-size: 22px;
+.card-number {
+  font-size: 18px;
   font-weight: 500;
   letter-spacing: 2px;
-  margin: 12px 0;
+  margin: 15px 0;
   z-index: 2;
 }
 
-.bank-card > div:last-child {
+.card-details {
   display: flex;
   justify-content: space-between;
   align-items: center;
   z-index: 2;
+}
+
+.card-balance {
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.card-level {
+  background: rgba(255, 255, 255, 0.2);
+  padding: 6px 12px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  backdrop-filter: blur(10px);
 }
 
 #card-balance {
