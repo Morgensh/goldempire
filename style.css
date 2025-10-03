@@ -1864,3 +1864,47 @@ input::placeholder {
     font-size: 12px;
     border-radius: 4px;
 }
+
+/* ===== АНИМАЦИЯ МОНЕТКИ ===== */
+.coin {
+  position: absolute;
+  width: 30px;
+  height: 30px;
+  background: linear-gradient(135deg, #FFD700, #FFA500);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 1000;
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.7);
+  animation: coinFloat 1s ease-out forwards;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  color: #8B4513;
+  font-size: 16px;
+}
+
+.coin::before {
+  content: '$';
+}
+
+@keyframes coinFloat {
+  0% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: translateY(-60px) scale(1.2);
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateY(-100px) scale(0.5);
+    opacity: 0;
+  }
+}
+
+/* Улучшаем анимацию кликера */
+.tap-circle:active {
+  transform: scale(0.92);
+  transition: transform 0.1s ease;
+}
