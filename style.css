@@ -1908,3 +1908,26 @@ input::placeholder {
   transform: scale(0.92);
   transition: transform 0.1s ease;
 }
+
+/* Убираем синий highlight при тапе на мобильных */
+.tap-circle {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* Также можно добавить для всех кликабельных элементов */
+.clicker-area,
+.btn,
+.nav-item,
+.market-card,
+.ad-card,
+.staff-card {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* И на всякий случай для всего body */
+body {
+  -webkit-tap-highlight-color: transparent;
+}
