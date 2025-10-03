@@ -1713,3 +1713,80 @@ input::placeholder {
     padding: 8px;
   }
 }
+
+/* Стили для статуса доступности */
+.availability-status {
+  display: flex;
+  align-items: center;
+}
+
+.status-indicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.status-indicator.available {
+  background: rgba(16, 185, 129, 0.1);
+  color: var(--accent-success);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.status-indicator i {
+  font-size: 16px;
+}
+
+/* Стили для портфеля */
+.portfolio-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  background: rgba(37, 99, 235, 0.1);
+  border-radius: 20px;
+  color: var(--accent-primary);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.portfolio-icon {
+  width: 24px;
+  height: 24px;
+  background: var(--accent-primary);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 12px;
+}
+
+/* Стили для тренда */
+.trend-status {
+  display: flex;
+  align-items: center;
+}
+
+.trend-indicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.trend-indicator.up {
+  background: rgba(16, 185, 129, 0.1);
+  color: var(--accent-success);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.trend-indicator i {
+  font-size: 16px;
+}
