@@ -622,7 +622,132 @@ input::placeholder {
   transform: scale(0.98);
 }
 
+/* ===== ОБНОВЛЕННЫЕ КАРТОЧКИ АКЦИЙ ===== */
+.market-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 20px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  position: relative;
+}
 
+.market-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--accent-primary);
+}
+
+.market-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.company-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+}
+
+.fixed-icon {
+  width: 44px;
+  height: 44px;
+  background: var(--gradient-primary);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.company-details {
+  flex: 1;
+}
+
+.company-name {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.company-owner {
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.stock-price {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--accent-success);
+  text-align: right;
+}
+
+.market-card-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.market-stat-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.market-stat-label {
+  font-size: 12px;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.market-stat-value {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.price-item .market-stat-value {
+  color: var(--accent-success);
+  font-size: 18px;
+}
+
+.market-card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 12px;
+  border-top: 1px solid var(--border-color);
+  margin-top: 8px;
+}
+
+.availability {
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.buy-btn {
+  background: var(--accent-primary);
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.buy-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow);
+}
 
 .detail-item {
   display: flex;
@@ -1130,7 +1255,50 @@ input::placeholder {
   color: white;
   font-weight: 800;
 }
+/* ===== НОВЫЕ СТИЛИ ДЛЯ БИРЖЕВЫХ КАРТОЧЕК ===== */
 
+/* Карточка акции на рынке */
+.market-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 16px;
+  margin-bottom: 12px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.market-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--accent-primary);
+}
+
+.market-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
+.company-name {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.stock-price {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--accent-success);
+}
+
+.market-card-details {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  font-size: 14px;
+}
 
 .detail-item {
   display: flex;
@@ -1620,87 +1788,4 @@ input::placeholder {
 
 .trend-indicator i {
   font-size: 16px;
-}
-
-.market-card {
-  background: var(--bg-card);
-  border: 1px solid var(--border-color);
-  border-radius: 12px; /* уменьшил скругление */
-  padding: 12px; /* уменьшил отступы */
-  transition: all 0.3s ease;
-  cursor: pointer;
-  display: flex;
-  flex-direction: column;
-  gap: 10px; /* уменьшил расстояние между элементами */
-  position: relative;
-}
-
-/* Уменьшаем размеры внутренних элементов */
-.market-card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 8px; /* уменьшил отступ */
-}
-
-.company-info {
-  display: flex;
-  align-items: center;
-  gap: 8px; /* уменьшил расстояние */
-  flex: 1;
-}
-
-.fixed-icon {
-  width: 36px; /* уменьшил иконку */
-  height: 36px;
-  border-radius: 8px; /* уменьшил скругление */
-  font-size: 16px; /* уменьшил размер иконки */
-}
-
-.company-name {
-  font-size: 16px; /* уменьшил шрифт */
-  font-weight: 700;
-  margin-bottom: 2px; /* уменьшил отступ */
-}
-
-.company-owner {
-  font-size: 12px; /* уменьшил шрифт */
-}
-
-.stock-price {
-  font-size: 18px; /* уменьшил шрифт цены */
-}
-
-.market-card-stats {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px; /* уменьшил расстояние */
-  margin-top: 4px; /* уменьшил отступ */
-}
-
-.market-stat-label {
-  font-size: 11px; /* уменьшил шрифт */
-}
-
-.market-stat-value {
-  font-size: 14px; /* уменьшил шрифт */
-}
-
-.market-card-footer {
-  padding-top: 8px; /* уменьшил отступ */
-  margin-top: 4px; /* уменьшил отступ */
-}
-
-/* Адаптивность для мобильных */
-@media (max-width: 768px) {
-  .market-card {
-    padding: 10px; /* еще меньше на мобильных */
-    gap: 8px;
-  }
-  
-  .fixed-icon {
-    width: 32px;
-    height: 32px;
-    font-size: 14px;
-  }
 }
