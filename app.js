@@ -826,7 +826,7 @@ async function loadCompanyDashboard() {
       staffCard.classList.add('staff-card');
 
       const currentLevel = Number(company[`staff_${staff.type}_level`]) || 1;
-      const cost = 500 * currentLevel;
+      const cost = 1500 * currentLevel; // ИЗМЕНЕНО С 500 НА 1500
 
       staffCard.innerHTML = `
         <div class="staff-icon">
@@ -843,9 +843,9 @@ async function loadCompanyDashboard() {
     });
 
     // Сетка 2 колонки
-staffGrid.style.display = "grid";
-staffGrid.style.gridTemplateColumns = "repeat(2, 1fr)";
-staffGrid.style.gap = "12px";
+    staffGrid.style.display = "grid";
+    staffGrid.style.gridTemplateColumns = "repeat(2, 1fr)";
+    staffGrid.style.gap = "12px";
 
   } catch (err) {
     console.error('Load dashboard error:', err);
@@ -1827,4 +1827,5 @@ settingsBtn.addEventListener('click', () => switchToSection('settings'));
 
     // Инициализация
     initUser();
+
 
