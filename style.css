@@ -1714,7 +1714,6 @@ input::placeholder {
 }
 
 /* Стили для статуса доступности */
-/* Стили для статуса доступности */
 .availability-status {
   display: flex;
   align-items: center;
@@ -1723,10 +1722,10 @@ input::placeholder {
 .status-indicator {
   display: flex;
   align-items: center;
-  gap: 4px;
-  padding: 3px 6px;
-  border-radius: 12px;
-  font-size: 10px;
+  gap: 8px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 14px;
   font-weight: 600;
 }
 
@@ -1737,7 +1736,7 @@ input::placeholder {
 }
 
 .status-indicator i {
-  font-size: 10px;
+  font-size: 16px;
 }
 
 /* Стили для портфеля */
