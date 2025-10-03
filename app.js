@@ -459,32 +459,60 @@ const staffTypes = [
       }
     });
 
+// Функция создания анимации монетки
+function createCoinAnimation(x, y, amount) {
+  const coin = document.createElement('div');
+  coin.classList.add('coin');
+
+  // Позиционируем монетку в месте клика
+  coin.style.left = (x - 15) + 'px';
+  coin.style.top = (y - 15) + 'px';
+
+  // Добавляем текст с суммой
+  if (amount > 1) {
+    coin.textContent = `+${amount}`;
+    coin.style.fontSize = '14px';
+    coin.style.background = 'linear-gradient(135deg, #C0C0C0, #A0A0A0)';
+  }
+
+  document.body.appendChild(coin);
+
+  // Удаляем монетку после анимации
+  setTimeout(() => {
+    coin.remove();
+  }, 1000);
+}
+
     // Обработка клика
-    function handleClick() {
+    // Обработка клика
+function handleClick(e) {
     if (!telegramId) return;
 
     totalClicks = Number(totalClicks) + 1;
-    balance = Number(balance) + Number(clickValue); // +1$ на первом уровне
+    balance = Number(balance) + Number(clickValue);
     progress = Number(progress) + Number(clickValue);
 
-    const nextThreshold = Number(level) * 1000; // или просто 1000
+    const nextThreshold = Number(level) * 1000;
     if (progress >= nextThreshold) {
         level = Number(level) + 1;
         progress = Number(progress) - nextThreshold;
-        clickValue = 1 + Number(level); // НОВАЯ ФОРМУЛА: 1$ + уровень
+        clickValue = 1 + Number(level);
     }
 
     updateUI();
 
-    // Анимация
+    // Создаем анимацию монетки
+    createCoinAnimation(e.clientX, e.clientY, clickValue);
+
+    // Анимация кнопки
     tapCircle.animate([
         { transform: 'scale(1)' },
-        { transform: 'scale(0.95)' },
+        { transform: 'scale(0.92)' },
         { transform: 'scale(1)' }
     ], { duration: 200 });
 }
 
-    clickerArea.addEventListener('click', handleClick);
+clickerArea.addEventListener('click', handleClick);
 
     // Обновление UI с форматированием
     function updateUI() {
@@ -1799,6 +1827,4 @@ settingsBtn.addEventListener('click', () => switchToSection('settings'));
 
     // Инициализация
     initUser();
-
-
 
