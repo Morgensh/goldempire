@@ -1791,7 +1791,7 @@ input::placeholder {
 }
 
 
-/* ===== КОМПАКТНЫЕ КАРТОЧКИ АКЦИЙ ===== */
+/* ===== КОМПАКТНЫЕ, НО ЧИТАБЕЛЬНЫЕ КАРТОЧКИ АКЦИЙ ===== */
 .market-card {
     padding: 10px 14px;
     margin-bottom: 8px;
@@ -1810,8 +1810,9 @@ input::placeholder {
     font-size: 14px;
 }
 
+/* Название компании и владелец */
 .market-card .company-name {
-    font-size: 15px;
+    font-size: 16px;      /* оставил нормальный размер */
     font-weight: 600;
 }
 
@@ -1820,12 +1821,14 @@ input::placeholder {
     color: var(--text-secondary);
 }
 
+/* Цена акции — делаем крупнее */
 .market-card .stock-price {
-    font-size: 15px;
+    font-size: 18px;      /* увеличил для удобства */
     font-weight: 700;
     color: var(--accent-success);
 }
 
+/* Сетка статистики */
 .market-card .market-card-stats {
     gap: 4px;
     margin-top: 2px;
@@ -1837,10 +1840,11 @@ input::placeholder {
 }
 
 .market-card .market-stat-value {
-    font-size: 13px;
+    font-size: 15px;      /* сделал больше */
     font-weight: 600;
 }
 
+/* Футер */
 .market-card .market-card-footer {
     padding-top: 6px;
     margin-top: 4px;
@@ -1848,18 +1852,18 @@ input::placeholder {
 
 .market-card .status-indicator {
     padding: 3px 6px;
-    font-size: 11px;
+    font-size: 12px;
     border-radius: 14px;
 }
 
 .market-card .status-indicator i {
-    font-size: 11px;
+    font-size: 12px;
 }
 
+/* Кнопка "Купить" */
 .market-card .buy-btn {
-    padding: 6px 10px;
-    font-size: 12px;
+    padding: 6px 12px;
+    font-size: 13px;   /* увеличил с 12px */
     border-radius: 6px;
 }
-
 
