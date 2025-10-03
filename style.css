@@ -1789,3 +1789,65 @@ input::placeholder {
 .trend-indicator i {
   font-size: 16px;
 }
+
+
+/* ===== КОМПАКТНЫЕ КАРТОЧКИ АКЦИЙ ===== */
+.market-card.compact {
+    padding: 12px;
+    margin-bottom: 8px;
+}
+
+.market-card.compact .market-card-header {
+    margin-bottom: 8px;
+}
+
+.market-card.compact .fixed-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    font-size: 16px;
+}
+
+.market-card.compact .company-name {
+    font-size: 16px;
+}
+
+.market-card.compact .company-owner {
+    font-size: 12px;
+}
+
+.market-card.compact .stock-price {
+    font-size: 16px;
+}
+
+.market-card.compact .market-card-stats {
+    gap: 6px;
+    margin-top: 4px;
+}
+
+.market-card.compact .market-stat-label {
+    font-size: 11px;
+}
+
+.market-card.compact .market-stat-value {
+    font-size: 14px;
+}
+
+.market-card.compact .market-card-footer {
+    padding-top: 8px;
+    margin-top: 4px;
+}
+
+.market-card.compact .status-indicator {
+    padding: 4px 8px;
+    font-size: 12px;
+}
+
+.market-card.compact .status-indicator i {
+    font-size: 12px;
+}
+
+.market-card.compact .buy-btn {
+    padding: 6px 12px;
+    font-size: 12px;
+}
