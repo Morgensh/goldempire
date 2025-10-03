@@ -185,7 +185,6 @@ body {
   border-radius: 12px;
   font-size: 14px;
   font-weight: 600;
-  backdrop-filter: blur(10px);
 }
 
 #card-balance {
@@ -1951,3 +1950,4 @@ input::placeholder {
 body {
   -webkit-tap-highlight-color: transparent;
 }
+
