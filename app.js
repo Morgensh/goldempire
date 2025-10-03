@@ -949,33 +949,60 @@ async function collectShares() {
 
     // Рендер рынка акций
     function renderMarketList(companies) {
-      marketList.innerHTML = '';
-      companies.forEach(company => {
-        const card = document.createElement('div');
-        card.classList.add('card');
-        card.innerHTML = `
-  <div class="market-card-header">
-    <div class="company-name">${company.name}</div>
-    <div class="stock-price">$${Number(company.price).toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
-  </div>
-  <div class="market-card-details">
-    <div class="detail-item">
-      <span class="detail-label">Владелец</span>
-      <span class="detail-value">@${company.owner_username}</span>
-    </div>
-    <div class="detail-item">
-      <span class="detail-label">Клиентов</span>
-      <span class="detail-value">${Number(company.clients_count).toLocaleString('en-US')}</span>
-    </div>
-  </div>
-`;
-        card.addEventListener('click', () => {
-          currentCompanyId = company.id;
-          switchToSection('stock-buy');
-        });
-        marketList.appendChild(card);
-      });
-    }
+  marketList.innerHTML = '';
+  companies.forEach(company => {
+    const card = document.createElement('div');
+    card.classList.add('market-card');
+
+    card.innerHTML = `
+      <div class="market-card-header">
+        <div class="company-info">
+          <div class="fixed-icon">
+            <i class="fas fa-chart-line"></i>
+          </div>
+          <div class="company-details">
+            <div class="company-name">${company.name}</div>
+            <div class="company-owner">@${company.owner_username}</div>
+          </div>
+        </div>
+        <div class="stock-price">$${Number(company.price).toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
+      </div>
+
+      <div class="market-card-stats">
+        <div class="market-stat-item">
+          <span class="market-stat-label">Клиентов</span>
+          <span class="market-stat-value">${Number(company.clients_count).toLocaleString('en-US')}</span>
+        </div>
+        <div class="market-stat-item price-item">
+          <span class="market-stat-label">Цена</span>
+          <span class="market-stat-value">$${Number(company.price).toLocaleString('en-US', {minimumFractionDigits: 2})}</span>
+        </div>
+      </div>
+
+      <div class="market-card-footer">
+        <div class="availability">Доступно: ${Number(company.available).toLocaleString('en-US')} акций</div>
+        <button class="buy-btn">Купить</button>
+      </div>
+    `;
+
+    // Обработчик клика по карточке
+    card.addEventListener('click', (e) => {
+      if (!e.target.classList.contains('buy-btn')) {
+        currentCompanyId = company.id;
+        switchToSection('stock-buy');
+      }
+    });
+
+    // Обработчик кнопки "Купить"
+    card.querySelector('.buy-btn').addEventListener('click', (e) => {
+      e.stopPropagation();
+      currentCompanyId = company.id;
+      switchToSection('stock-buy');
+    });
+
+    marketList.appendChild(card);
+  });
+}
 
     searchStocks.addEventListener('input', (e) => {
       const query = e.target.value.toLowerCase();
